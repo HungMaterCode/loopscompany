@@ -1,5 +1,9 @@
-import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "next/link";
+"use client";
+
+import { useState, useEffect, type FormEvent } from "react";
+import Link from "next/link";
+import Script from "next/script";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { Eye, EyeOff, LogIn, UserPlus, ArrowLeft } from "lucide-react";
 import { RED, TEXT, TEXT60, TEXT35, BORDER_M, EASE } from "@/legacy-app/tokens";
@@ -12,8 +16,59 @@ type Tab = "login" | "register";
 const SPRING = { type: "spring", stiffness: 400, damping: 34 } as const;
 
 export function UserLogin() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [tab, setTab] = useState<Tab>("login");
+
+  const handleCredentialResponse = async (response: any) => {
+    try {
+      setLoginError("");
+      const res = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ credential: response.credential }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        setLoginError(errData.error || "Đăng nhập bằng Google thất bại.");
+        return;
+      }
+
+      setLoginSuccess(true);
+      setTimeout(() => router.push("/"), 1800);
+    } catch (err) {
+      console.error(err);
+      setLoginError("Có lỗi xảy ra khi kết nối với hệ thống.");
+    }
+  };
+
+  const initGoogle = () => {
+    if (typeof window === "undefined") return;
+    const google = (window as any).google;
+    if (!google) return;
+
+    google.accounts.id.initialize({
+      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "",
+      callback: handleCredentialResponse,
+    });
+
+    const btnContainer = document.getElementById("google-signin-button");
+    if (btnContainer) {
+      google.accounts.id.renderButton(btnContainer, {
+        theme: "filled_black",
+        size: "large",
+        width: 380,
+        shape: "rectangular",
+        text: "continue_with",
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && (window as any).google) {
+      initGoogle();
+    }
+  }, []);
 
   const [loginEmail, setLoginEmail]       = useState("");
   const [loginPass, setLoginPass]         = useState("");
@@ -36,7 +91,7 @@ export function UserLogin() {
     setLoginError("");
     if (!loginEmail || !loginPass) { setLoginError("Vui lòng điền đầy đủ thông tin."); return; }
     setLoginSuccess(true);
-    setTimeout(() => navigate("/"), 1800);
+    setTimeout(() => router.push("/"), 1800);
   };
 
   const handleRegister = (e: FormEvent) => {
@@ -81,7 +136,16 @@ export function UserLogin() {
         style={{ position:"absolute", bottom:"4%", right:"6%", width:300, height:300, borderRadius:"50%", background:"radial-gradient(circle,rgba(255,110,30,0.12) 0%,transparent 70%)", filter:"blur(60px)", zIndex:3, pointerEvents:"none" }} />
 
       {/* ── Scrollable content area (inner scroll only) ── */}
-      <div style={{ position:"relative", zIndex:10, width:"100%", maxWidth:460, maxHeight:"100vh", overflowY:"auto", padding:"68px 16px 32px", boxSizing:"border-box" }}>
+      <div className="no-scrollbar" style={{ position:"relative", zIndex:10, width:"100%", maxWidth:460, maxHeight:"100vh", overflowY:"auto", padding:"68px 16px 32px", boxSizing:"border-box" }}>
+        <style>{`
+          .no-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+          .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        `}</style>
 
         {/* Back link */}
         <motion.div initial={{ opacity:0, x:-14 }} animate={{ opacity:1, x:0 }} transition={{ delay:0.12, duration:0.45, ease:EASE }}
@@ -100,9 +164,9 @@ export function UserLogin() {
           <Link href="/" style={{ display:"flex", alignItems:"center", gap:10, textDecoration:"none", marginBottom:4 }}>
             <motion.div whileHover={{ scale:1.12, rotate:-5 }} transition={SPRING}
               style={{ width:40, height:40, borderRadius:11, background:RED, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:14, fontWeight:700, boxShadow:`0 6px 26px rgba(212,59,31,0.48)` }}>
-              VW
+              LP
             </motion.div>
-            <span style={{ color:TEXT, fontWeight:700, fontSize:18, letterSpacing:"-0.03em" }}>Việt Web</span>
+            <span style={{ color:TEXT, fontWeight:700, fontSize:18, letterSpacing:"-0.03em" }}>LOOPS</span>
           </Link>
           <p style={{ color:TEXT35, fontSize:12, letterSpacing:"0.02em" }}>Nền tảng thiết kế & cho thuê website</p>
         </motion.div>
@@ -192,7 +256,7 @@ export function UserLogin() {
                     style={{ width:"100%" }}
                   >
                     <h2 style={{ color:TEXT, fontSize:20, fontWeight:700, marginBottom:3, letterSpacing:"-0.04em" }}>Tạo tài khoản</h2>
-                    <p style={{ color:TEXT60, fontSize:13, marginBottom:20 }}>Đăng ký để bắt đầu sử dụng dịch vụ Việt Web.</p>
+                    <p style={{ color:TEXT60, fontSize:13, marginBottom:20 }}>Đăng ký để bắt đầu sử dụng dịch vụ LOOP.</p>
 
                     <FL>Họ và tên</FL>
                     <AI value={regName} onChange={e=>setRegName(e.target.value)} type="text" placeholder="Nguyễn Văn A"/>
@@ -227,14 +291,15 @@ export function UserLogin() {
             <div style={{ display:"flex", alignItems:"center", gap:10, margin:"18px 0 14px", color:TEXT35, fontSize:11 }}>
               <div style={{ flex:1, height:1, background:BORDER_M }}/> HOẶC <div style={{ flex:1, height:1, background:BORDER_M }}/>
             </div>
-            <motion.button type="button"
-              whileHover={{ scale:1.015, background:"rgba(255,255,255,0.09)" }}
-              whileTap={{ scale:0.97 }}
-              transition={SPRING}
-              style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:10, padding:"11px 0", borderRadius:14, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(237,232,225,0.10)", color:TEXT60, fontSize:13, cursor:"pointer" }}
-            >
-              <GoogleIcon/> Tiếp tục với Google
-            </motion.button>
+            <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+              <div id="google-signin-button" style={{ display: "flex", justifyContent: "center", width: "100%" }} />
+            </div>
+
+            <Script
+              src="https://accounts.google.com/gsi/client"
+              onLoad={initGoogle}
+              strategy="afterInteractive"
+            />
           </div>
         </motion.div>
 
@@ -260,9 +325,13 @@ function AI({ noMargin, ...p }: React.InputHTMLAttributes<HTMLInputElement> & { 
     <input {...p} style={{
       width:"100%", boxSizing:"border-box",
       background:"rgba(255,255,255,0.055)", border:"1px solid rgba(237,232,225,0.09)",
-      borderRadius:12, padding:"10px 13px", color:TEXT, fontSize:13, outline:"none",
+      borderRadius:12,
+      paddingTop: "10px",
+      paddingBottom: "10px",
+      paddingLeft: "13px",
+      paddingRight: p.type === "password" ? "42px" : "13px",
+      color:TEXT, fontSize:13, outline:"none",
       marginBottom: noMargin ? 0 : 13, transition:"border-color 0.2s, background 0.2s",
-      ...(p.type==="password" ? { paddingRight:42 } : {}),
     }}
     onFocus={e=>{ e.currentTarget.style.borderColor="rgba(212,59,31,0.42)"; e.currentTarget.style.background="rgba(255,255,255,0.08)"; }}
     onBlur={e=>{ e.currentTarget.style.borderColor="rgba(237,232,225,0.09)"; e.currentTarget.style.background="rgba(255,255,255,0.055)"; }}

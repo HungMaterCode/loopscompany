@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Globe, Menu, X, Sun, Moon } from 'lucide-react';
+import { Globe, Menu, X, Sun, Moon, LogIn } from 'lucide-react';
 import { useTheme } from '@/legacy-app/theme-context';
 import { SITE } from '@/lib/site';
 
@@ -30,11 +30,31 @@ export function Header() {
   const [menu, setMenu]     = useState(false);
   const [isOverDark, setIsOverDark] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const lastY = useRef(0);
   const { isDark, toggleTheme } = useTheme();
 
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      setUser(null);
+      setMenu(false);
+      window.location.reload();
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+  };
+
   useEffect(() => {
     setMounted(true);
+    fetch("/api/auth/session")
+      .then(res => res.json())
+      .then(data => {
+        if (data.session) {
+          setUser(data.session);
+        }
+      })
+      .catch(err => console.error("Error fetching session:", err));
   }, []);
 
   useEffect(() => {
@@ -178,6 +198,58 @@ export function Header() {
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 16px rgba(255,107,157,0.4)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(255,107,157,0.25)'; }}
             >Xem báo giá</a>
+
+            {/* Desktop Login / User profile */}
+            {user ? (
+              <div
+                className="hidden md:flex"
+                style={{
+                  alignItems: 'center', gap: '8px', borderRadius: '9999px', padding: '8px 16px',
+                  background: btnBg, border: `1px solid ${btnBorder}`,
+                  color: textColor, fontSize: '13px', fontFamily: F, fontWeight: 600,
+                  backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <span>{user.name}</span>
+                <div style={{ width: '1px', height: '14px', background: btnBorder }} />
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    background: 'none', border: 'none', color: textMuted, cursor: 'pointer',
+                    fontSize: '12px', fontWeight: 600, padding: 0, transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = 'var(--sc-accent)'}
+                  onMouseLeave={e => e.currentTarget.style.color = textMuted}
+                >
+                  Đăng xuất
+                </button>
+              </div>
+            ) : (
+              <a href="/dang-nhap"
+                className="hidden md:flex"
+                style={{
+                  alignItems: 'center', gap: '6px', borderRadius: '9999px', padding: '8px 20px',
+                  background: btnBg, border: `1px solid ${btnBorder}`,
+                  color: textColor, fontSize: '13px', fontFamily: F, fontWeight: 600,
+                  textDecoration: 'none', transition: 'all 0.2s', letterSpacing: '0.02em', whiteSpace: 'nowrap',
+                  backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
+                  (e.currentTarget as HTMLElement).style.background = btnHoverBg;
+                  (e.currentTarget as HTMLElement).style.borderColor = btnHoverBorder;
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.transform = 'none';
+                  (e.currentTarget as HTMLElement).style.background = btnBg;
+                  (e.currentTarget as HTMLElement).style.borderColor = btnBorder;
+                }}
+              >
+                <LogIn size={13} style={{ opacity: 0.8 }} />
+                Đăng nhập
+              </a>
+            )}
 
             {/* Hamburger — visible on mobile */}
               <button
@@ -464,6 +536,64 @@ export function Header() {
                     Xem báo giá dịch vụ →
                   </a>
                 </motion.div>
+
+                {/* Mobile Login / User Profile */}
+                {user ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.45 }}
+                    style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}
+                  >
+                    <div style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                      color: 'var(--sc-text)', fontSize: '14px', fontFamily: F, fontWeight: 600,
+                    }}>
+                      Xin chào, {user.name}
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                        borderRadius: '9999px', padding: '14px 28px',
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                        color: '#ef4444', fontSize: '14px', fontFamily: F, fontWeight: 700,
+                        width: '100%', boxSizing: 'border-box', cursor: 'pointer',
+                        transition: 'all 0.3s',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.18)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; }}
+                    >
+                      Đăng xuất
+                    </button>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.45 }}
+                    style={{ width: '100%' }}
+                  >
+                    <a href="/dang-nhap"
+                      onClick={() => setMenu(false)}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                        borderRadius: '9999px', padding: '14px 28px',
+                        background: 'rgba(255, 255, 255, 0.08)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        color: 'var(--sc-text)', fontSize: '14px', fontFamily: F, fontWeight: 700,
+                        textDecoration: 'none', width: '100%', boxSizing: 'border-box',
+                        transition: 'all 0.3s',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'; }}
+                    >
+                      <LogIn size={15} style={{ opacity: 0.8 }} />
+                      Đăng nhập tài khoản
+                    </a>
+                  </motion.div>
+                )}
                 
               </div>
             </div>
