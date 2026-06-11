@@ -1,0 +1,323 @@
+/* ─── Theme tokens — dark (default) & light ─────────────────────────────── */
+:root {
+  /* backgrounds */
+  --vw-bg:             #020202;
+  --vw-bg-nav:         rgba(2,2,2,0.88);
+  --vw-bg-input:       rgba(0,0,0,0.42);
+
+  /* ghost / subtle fills */
+  --vw-ghost:          rgba(237,232,225,0.04);
+  --vw-ghost-md:       rgba(237,232,225,0.08);
+  --vw-ghost-10:       rgba(237,232,225,0.10);
+  --vw-ghost-20:       rgba(237,232,225,0.20);
+  --vw-ghost-22:       rgba(237,232,225,0.22);
+  --vw-gridline-color: rgba(237,232,225,0.025);
+
+  /* text */
+  --vw-text:           #EDE8E1;
+  --vw-text-60:        rgba(237,232,225,0.60);
+  --vw-text-35:        rgba(237,232,225,0.35);
+
+  /* borders */
+  --vw-border:         rgba(237,232,225,0.07);
+  --vw-border-m:       rgba(237,232,225,0.13);
+
+  /* glass cards — dark mode */
+  --vw-glass-bg:       rgba(255,255,255,0.05);
+  --vw-glass-light-bg: rgba(255,255,255,0.03);
+  --vw-glass-border:   rgba(255,255,255,0.12);
+  --vw-glass-shadow:   0 8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08);
+
+  /* pricing highlight card (inverted in dark = cream card) */
+  --vw-hl-bg:          rgba(237,232,225,0.95);
+  --vw-hl-text:        #020202;
+  --vw-hl-sub:         rgba(0,0,0,0.45);
+  --vw-hl-div:         rgba(0,0,0,0.08);
+  --vw-hl-feat:        rgba(0,0,0,0.75);
+
+  /* accent — vàng kim trong dark mode (thay cho đỏ cũ) */
+  --vw-accent:         #C8A261;
+  --vw-accent-rgb:     200,162,97;
+  --vw-accent-hover:   #D4AF37;
+
+  /* ── Section_change theme tokens (dark) ──────────────────────────────── */
+  --sc-bg-1:           #020510;
+  --sc-bg-2:           #06030f;
+  --sc-bg-3:           #000000;
+  --sc-bg-4:           #050400;
+  --sc-text:           #ffffff;
+  --sc-text-60:        rgba(255,255,255,0.60);
+  --sc-text-45:        rgba(255,255,255,0.45);
+  --sc-text-35:        rgba(255,255,255,0.35);
+  --sc-text-25:        rgba(255,255,255,0.25);
+  --sc-text-20:        rgba(255,255,255,0.20);
+  --sc-text-18:        rgba(255,255,255,0.18);
+  --sc-border:         rgba(255,255,255,0.06);
+  --sc-border-m:       rgba(255,255,255,0.08);
+  --sc-border-h:       rgba(255,255,255,0.12);
+  --sc-card-bg:        rgba(255,255,255,0.04);
+  --sc-card-border:    rgba(255,255,255,0.09);
+  --sc-input-bg:       rgba(255,255,255,0.05);
+  --sc-input-border:   rgba(255,255,255,0.10);
+  --sc-item-bg:        #0a0a0a;
+  --sc-item-border:    rgba(255,255,255,0.07);
+  --sc-modal-bg:       #0d0d0d;
+  --sc-grid-line:      rgba(255,255,255,0.025);
+  --sc-accent:         #C8A261;
+  --sc-accent-dim:     rgba(200,162,97,0.15);
+  --sc-accent-text:    #E8D4A8;
+  --sc-accent-border:  rgba(200,162,97,0.35);
+  --sc-plan-feat-bg:   rgba(10,8,4,0.9);
+  --sc-plan-feat-border: rgba(200,162,97,0.2);
+  --sc-plan-feat-shadow: 0 20px 60px rgba(200,162,97,0.12),inset 0 1px 0 rgba(200,162,97,0.1);
+
+  /* premium liquid glass - dark theme */
+  --sc-glass-bg:              rgba(255, 255, 255, 0.03);
+  --sc-glass-border:          rgba(255, 255, 255, 0.06);
+  --sc-glass-shadow:          0 12px 40px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --sc-glass-featured-bg:     rgba(200, 162, 97, 0.05);
+  --sc-glass-featured-border: rgba(200, 162, 97, 0.15);
+  --sc-glass-featured-shadow: 0 16px 48px rgba(200, 162, 97, 0.15), 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(200, 162, 97, 0.1);
+
+  /* orb backgrounds - dark theme (Midnight Gold) */
+  --sc-orb-1-bg:              rgba(200,162,97,0.15); /* Gold */
+  --sc-orb-2-bg:              rgba(218,165,32,0.10); /* Goldenrod */
+  --sc-orb-3-bg:              rgba(184,134,11,0.08); /* DarkGoldenrod */
+}
+
+.light-theme {
+  /* ── Bảng màu: Trắng · Hồng · Đen ────────────────────────────────────── */
+
+  /* backgrounds */
+  --vw-bg:             #ffffff;
+  --vw-bg-nav:         rgba(255,255,255,0.94);
+  --vw-bg-input:       #ffffff;
+
+  /* ghost / subtle fills */
+  --vw-ghost:          rgba(255,107,157,0.05);
+  --vw-ghost-md:       rgba(255,107,157,0.09);
+  --vw-ghost-10:       rgba(0,0,0,0.05);
+  --vw-ghost-20:       rgba(0,0,0,0.10);
+  --vw-ghost-22:       rgba(0,0,0,0.13);
+  --vw-gridline-color: transparent;
+
+  /* text — đen tuyền */
+  --vw-text:           #0d0d0d;
+  --vw-text-60:        rgba(13,13,13,0.62);
+  --vw-text-35:        rgba(13,13,13,0.48);
+
+  /* borders */
+  --vw-border:         rgba(0,0,0,0.09);
+  --vw-border-m:       rgba(0,0,0,0.16);
+
+  /* glass cards: Apple liquid glass */
+  --vw-glass-bg:       linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.18) 100%);
+  --vw-glass-light-bg: linear-gradient(135deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.25) 100%);
+  --vw-glass-border:   rgba(255,255,255,0.85);
+  --vw-glass-shadow:   0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.95);
+
+  /* pricing highlight card — đen hồng */
+  --vw-hl-bg:          #1a0d12;
+  --vw-hl-text:        #fff0f6;
+  --vw-hl-sub:         rgba(255,240,246,0.58);
+  --vw-hl-div:         rgba(255,240,246,0.14);
+  --vw-hl-feat:        rgba(255,240,246,0.84);
+
+  /* accent — hồng rose tươi sáng dễ thương */
+  --vw-accent:         #FF6B9D;
+  --vw-accent-rgb:     255,107,157;
+  --vw-accent-hover:   #e8538a;
+
+  /* ── Section_change theme tokens (light) ─────────────────────────────── */
+  --sc-bg-1:           #f8f5ff;
+  --sc-bg-2:           #f9f6ff;
+  --sc-bg-3:           #f5f5f7;
+  --sc-bg-4:           #fffaf5;
+  --sc-text:           #0d0d0d;
+  --sc-text-60:        rgba(13,13,13,0.65);
+  --sc-text-45:        rgba(13,13,13,0.50);
+  --sc-text-35:        rgba(13,13,13,0.42);
+  --sc-text-25:        rgba(13,13,13,0.30);
+  --sc-text-20:        rgba(13,13,13,0.26);
+  --sc-text-18:        rgba(13,13,13,0.22);
+  --sc-border:         rgba(0,0,0,0.07);
+  --sc-border-m:       rgba(0,0,0,0.10);
+  --sc-border-h:       rgba(0,0,0,0.15);
+  --sc-card-bg:        rgba(255,255,255,0.85);
+  --sc-card-border:    rgba(0,0,0,0.08);
+  --sc-input-bg:       rgba(0,0,0,0.04);
+  --sc-input-border:   rgba(0,0,0,0.12);
+  --sc-item-bg:        #ffffff;
+  --sc-item-border:    rgba(0,0,0,0.08);
+  --sc-card-glass-bg:     linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.05) 100%);
+  --sc-card-glass-border: rgba(255,255,255,0.6);
+  --sc-orb-opacity:       0.45;
+  --sc-modal-bg:       #ffffff;
+  --sc-grid-line:      transparent;
+  /* Accent — hồng rose (thay vàng gold sang hồng ở light mode) */
+  --sc-accent:         #FF6B9D;
+  --sc-accent-dim:     rgba(255,107,157,0.12);
+  --sc-accent-text:    #c0356e;
+  --sc-accent-border:  rgba(255,107,157,0.40);
+  --sc-plan-feat-bg:   rgba(255,255,255,0.95);
+  --sc-plan-feat-border: rgba(255,107,157,0.25);
+  --sc-plan-feat-shadow: 0 20px 60px rgba(255,107,157,0.10),0 4px 20px rgba(0,0,0,0.06);
+
+  /* premium liquid glass - light theme */
+  --sc-glass-bg:              linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.358) 100%);
+  --sc-glass-border:          rgba(255, 255, 255, 0.65);
+  --sc-glass-shadow:          0 12px 40px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --sc-glass-featured-bg:     linear-gradient(135deg, rgba(255, 240, 245, 0.45) 0%, rgba(255, 218, 230, 0.18) 100%);
+  --sc-glass-featured-border: rgba(255, 107, 157, 0.45);
+  --sc-glass-featured-shadow: 0 16px 48px rgba(255, 107, 157, 0.14), 0 12px 40px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+  /* orb backgrounds - light theme */
+  --sc-orb-1-bg:              rgba(255,107,157,0.35);
+  --sc-orb-2-bg:              rgba(139,92,246,0.25);
+  --sc-orb-3-bg:              rgba(251,146,60,0.22);
+}
+
+/* ─── Light theme: SectionBg overlay → trắng để text đọc được ───────────── */
+.light-theme .section-overlay {
+  background-color: rgba(255, 248, 252, 0.92) !important;
+}
+
+/* ─── Light theme: section backgrounds (tinted pink) ─────────────────────── */
+.light-theme #dich-vu,
+.light-theme #about,
+.light-theme #bang-gia,
+.light-theme #lien-he {
+  background-color: #fff5f9;
+}
+
+/* Smooth theme transition on key surfaces */
+html { transition: background-color 0.38s ease; }
+body { transition: background-color 0.38s ease; }
+
+/* ─── Custom Scrollbar — toàn site ──────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--vw-accent-rgb), 0.38);
+  border-radius: 100px;
+  transition: background 0.2s;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--vw-accent-rgb), 0.72);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--vw-accent-rgb), 0.38) transparent;
+}
+
+/* ─── Smooth scroll ──────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ─── Remove default focus outline artefacts on auth inputs ─────────────── */
+input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(var(--vw-accent-rgb), 0.32);
+}
+
+/* Premium Liquid Glass Cards */
+.premium-glass {
+  background: var(--sc-glass-bg) !important;
+  backdrop-filter: blur(40px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(220%) !important;
+  border: 1px solid var(--sc-glass-border) !important;
+  box-shadow: var(--sc-glass-shadow) !important;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.38s ease;
+}
+
+/* Glass specular highlight overlay */
+.premium-glass::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.0) 50%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+.light-theme .premium-glass::after {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0) 100%);
+}
+
+.premium-glass-featured {
+  background: var(--sc-glass-featured-bg) !important;
+  backdrop-filter: blur(40px) saturate(240%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(240%) !important;
+  border: 1px solid var(--sc-glass-featured-border) !important;
+  box-shadow: var(--sc-glass-featured-shadow) !important;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.38s ease;
+}
+
+.premium-glass-featured::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+  background: linear-gradient(to bottom, rgba(200, 162, 97, 0.08) 0%, rgba(200, 162, 97, 0.0) 50%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+.light-theme .premium-glass-featured::after {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0) 100%);
+}
+
+/* Force dark-theme variables for any elements marked data-theme="dark" (like Hero Carousel) */
+[data-theme="dark"] {
+  --vw-bg:             #020202;
+  --vw-bg-nav:         rgba(2,2,2,0.88);
+  --vw-bg-input:       rgba(0,0,0,0.42);
+
+  --vw-ghost:          rgba(237,232,225,0.04);
+  --vw-ghost-md:       rgba(237,232,225,0.08);
+  --vw-ghost-10:       rgba(237,232,225,0.10);
+  --vw-ghost-20:       rgba(237,232,225,0.20);
+  --vw-ghost-22:       rgba(237,232,225,0.22);
+  --vw-gridline-color: rgba(237,232,225,0.025);
+
+  --vw-text:           #EDE8E1;
+  --vw-text-60:        rgba(237,232,225,0.60);
+  --vw-text-35:        rgba(237,232,225,0.35);
+
+  --vw-border:         rgba(237,232,225,0.07);
+  --vw-border-m:       rgba(237,232,225,0.13);
+
+  --vw-glass-bg:       rgba(255,255,255,0.05);
+  --vw-glass-light-bg: rgba(255,255,255,0.03);
+  --vw-glass-border:   rgba(255,255,255,0.12);
+  --vw-glass-shadow:   0 8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08);
+
+  --vw-hl-bg:          rgba(237,232,225,0.95);
+  --vw-hl-text:        #020202;
+  --vw-hl-sub:         rgba(0,0,0,0.45);
+  --vw-hl-div:         rgba(0,0,0,0.08);
+  --vw-hl-feat:        rgba(0,0,0,0.75);
+
+  --vw-accent:         #C8A261;
+  --vw-accent-rgb:     200,162,97;
+  --vw-accent-hover:   #D4AF37;
+}
+
