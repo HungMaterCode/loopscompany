@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Globe, Menu, X, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/legacy-app/theme-context';
 import { SITE } from '@/lib/site';
+import Link from 'next/link';
 
 const F = "inherit";
 
@@ -34,7 +35,8 @@ export function Header() {
   const { isDark, toggleTheme } = useTheme();
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -106,20 +108,20 @@ export function Header() {
           boxShadow: 'var(--sc-header-shadow, 0 8px 32px rgba(0, 0, 0, 0.05))',
         }}>
           {/* Logo */}
-          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', flexShrink: 0 }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', flexShrink: 0 }}>
             <Globe size={18} color={textColor} style={{ transition: 'color 0.3s' }} />
             <span style={{ color: textColor, fontWeight: 800, fontSize: '15px', fontFamily: F, letterSpacing: '0.06em', transition: 'color 0.3s' }}>LOOPS</span>
-          </a>
+          </Link>
 
           {/* Desktop links — hidden on mobile via display none at <768px */}
           <div style={{ gap: 'clamp(16px,2.5vw,28px)', alignItems: 'center' }} className="hidden md:flex">
             {NAV.map(l => (
-              <a key={l.label} href={l.href}
+              <Link key={l.label} href={l.href}
                 onClick={e => goTo(l.href, e)}
                 style={{ color: textMuted, fontSize: '13px', fontFamily: F, fontWeight: 600, textDecoration: 'none', transition: 'color 0.2s', whiteSpace: 'nowrap' }}
                 onMouseEnter={e => e.currentTarget.style.color = textColor}
                 onMouseLeave={e => e.currentTarget.style.color = textMuted}
-              >{l.label}</a>
+              >{l.label}</Link>
             ))}
           </div>
 
@@ -166,7 +168,7 @@ export function Header() {
             </button>
 
             {/* Desktop CTA */}
-            <a href="/#pricing" onClick={e => goTo('/#pricing', e)}
+            <Link href="/#pricing" onClick={e => goTo('/#pricing', e)}
               className="hidden md:flex"
               style={{
                 alignItems: 'center', gap: '6px', borderRadius: '9999px', padding: '8px 20px',
@@ -177,7 +179,7 @@ export function Header() {
               }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 16px rgba(255,107,157,0.4)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(255,107,157,0.25)'; }}
-            >Xem báo giá</a>
+            >Xem báo giá</Link>
 
             {/* Hamburger — visible on mobile */}
               <button
@@ -303,7 +305,7 @@ export function Header() {
                     transition={{ delay: 0.05 + i * 0.05, duration: 0.4 }}
                     style={{ width: '100%' }}
                   >
-                    <a
+                    <Link
                       href={l.href}
                       onClick={e => { goTo(l.href, e); setMenu(false); }}
                       style={{
@@ -331,7 +333,7 @@ export function Header() {
                         0{i + 1}.
                       </span>
                       {l.label}
-                    </a>
+                    </Link>
                   </motion.div>
                 ))}
               </div>
@@ -447,7 +449,7 @@ export function Header() {
                   transition={{ delay: 0.4 }}
                   style={{ width: '100%' }}
                 >
-                  <a href="/#pricing"
+                  <Link href="/#pricing"
                     onClick={e => { goTo('/#pricing', e); setMenu(false); }}
                     style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
@@ -462,7 +464,7 @@ export function Header() {
                     onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(255,107,157,0.3)'; }}
                   >
                     Xem báo giá dịch vụ →
-                  </a>
+                  </Link>
                 </motion.div>
                 
               </div>
