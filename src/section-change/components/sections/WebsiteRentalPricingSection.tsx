@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { motion, useInView, AnimatePresence } from 'motion/react';
+import { useRouter } from 'next/navigation';
 import { Check, X, ArrowRight } from 'lucide-react';
 import { useBreakpoint } from '../ui/useBreakpoint';
 import { SectionHeader } from '../shared/SectionHeader';
@@ -119,6 +120,7 @@ function InquiryModal({ planId, onClose }: { planId: string; onClose: () => void
 }
 
 export function WebsiteRentalPricingSection() {
+  const router = useRouter();
   const ref    = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const { isMobile, isTablet } = useBreakpoint();
@@ -248,7 +250,7 @@ export function WebsiteRentalPricingSection() {
                       ))}
                     </div>
 
-                    <button onClick={() => setActivePlan(plan.id)}
+                    <button onClick={() => router.push('/bao-gia')}
                       style={{ width: '100%', borderRadius: '9999px', padding: '11px 8px', background: isFeat ? 'var(--sc-accent)' : 'var(--sc-card-bg)', border: isFeat ? 'none' : '1px solid var(--sc-border-h)', color: isFeat ? '#fff' : 'var(--sc-text)', fontFamily: F, fontSize: '12px', fontWeight: 700, cursor: 'pointer', letterSpacing: '0.03em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', transition: 'all 0.2s' }}
                       onMouseEnter={e => { if (!isFeat) (e.currentTarget as HTMLElement).style.background = 'var(--sc-border-m)'; }}
                       onMouseLeave={e => { if (!isFeat) (e.currentTarget as HTMLElement).style.background = 'var(--sc-card-bg)'; }}
