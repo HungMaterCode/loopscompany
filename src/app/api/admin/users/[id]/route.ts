@@ -1,13 +1,27 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function PATCH(request: Request, context: any) {
+import bcrypt from "bcryptjs";
+
+export async function PATCH(request: Request, props: { params: Promise<{ id: string }> }) {
   try {
-    const { params } = context;
-    const { role } = await request.json();
+    const params = await props.params;
+    const { role, password } = await request.json();
+    
+    const existing = await prisma.user.findUnique({ where: { id: params.id } });
+    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    const updateData: Record<string, string> = { role };
+    
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    } else if (role === "admin" && existing.role !== "admin" && !existing.password) {
+      updateData.password = await bcrypt.hash("admin123", 10);
+    }
+    
     const user = await prisma.user.update({
       where: { id: params.id },
-      data: { role },
+      data: updateData,
     });
     return NextResponse.json(user);
   } catch (error) {
@@ -15,9 +29,9 @@ export async function PATCH(request: Request, context: any) {
   }
 }
 
-export async function DELETE(request: Request, context: any) {
+export async function DELETE(request: Request, props: { params: Promise<{ id: string }> }) {
   try {
-    const { params } = context;
+    const params = await props.params;
     await prisma.user.delete({
       where: { id: params.id },
     });

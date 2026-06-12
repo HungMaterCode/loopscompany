@@ -12,6 +12,7 @@ export type SessionPayload = {
   email: string;
   name: string;
   role?: string;
+  authMethod?: "google" | "password";
 };
 
 export async function createSession(payload: SessionPayload) {

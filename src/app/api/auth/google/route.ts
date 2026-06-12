@@ -60,6 +60,7 @@ export async function POST(request: Request) {
       email: user.email,
       name: user.name,
       role: user.role,
+      authMethod: "google",
     });
 
     return NextResponse.json({ ok: true, name: user.name });

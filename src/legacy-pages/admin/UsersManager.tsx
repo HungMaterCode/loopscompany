@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Trash2, X, Check, Mail, UserCircle2 } from "lucide-react";
+import { Trash2, X, Check, Mail, UserCircle2, Pencil } from "lucide-react";
 import type { TC } from "./types";
 
 interface UserItem {
@@ -20,10 +20,11 @@ export function UsersManager({ t, isDark }: Props) {
   const [users, setUsers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [editIdx, setEditIdx] = useState<number | null>(null);
-  const [form, setForm] = useState<Partial<UserItem>>({});
+  const [form, setForm] = useState<Partial<UserItem> & { password?: string }>({});
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
   const [filter, setFilter] = useState<"all" | "admin" | "user">("all");
   const [search, setSearch] = useState("");
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -54,7 +55,8 @@ export function UsersManager({ t, isDark }: Props) {
   const openEdit = (idx: number) => {
     const realIdx = users.indexOf(filtered[idx]);
     setEditIdx(realIdx);
-    setForm({ ...users[realIdx] });
+    setForm({ ...users[realIdx], password: "" });
+    setIsEditingPassword(false);
   };
 
   const closeModal = () => { setEditIdx(null); };
@@ -65,7 +67,7 @@ export function UsersManager({ t, isDark }: Props) {
         await fetch(`/api/admin/users/${form.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ role: form.role })
+          body: JSON.stringify({ role: form.role, password: form.password })
         });
         setUsers((prev) => prev.map((u, i) => i === editIdx ? { ...u, role: form.role as "user"|"admin" } : u));
       } catch (e) {
@@ -240,6 +242,28 @@ export function UsersManager({ t, isDark }: Props) {
                     <option value="admin">Quản trị viên (Admin)</option>
                   </select>
                 </div>
+                {form.role === "admin" && (
+                  <div className="col-span-2">
+                    <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Mật khẩu mới</label>
+                    {!isEditingPassword ? (
+                      <div className={`flex items-center justify-between w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input} opacity-80`}>
+                        <span className="text-gray-500 font-medium">admin123</span>
+                        <button onClick={() => setIsEditingPassword(true)} className="text-blue-500 hover:text-blue-600 transition p-1" title="Đổi mật khẩu">
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <input 
+                        type="text"
+                        value={form.password || ""} 
+                        onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                        className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
+                        placeholder="Nhập mật khẩu mới..."
+                        autoFocus
+                      />
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-3">
