@@ -22,6 +22,7 @@ export async function POST(request: Request) {
       userId: user.id,
       email: user.email,
       name: user.name,
+      role: user.role,
     });
 
     return NextResponse.json({ ok: true, name: user.name });
@@ -34,6 +35,7 @@ export async function POST(request: Request) {
         userId: "dev-admin",
         email: "admin@loops.vn",
         name: "Quản trị viên LOOP",
+        role: "admin",
       });
       return NextResponse.json({ ok: true, name: "Quản trị viên LOOP" });
     }
