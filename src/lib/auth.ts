@@ -11,6 +11,8 @@ export type SessionPayload = {
   userId: string;
   email: string;
   name: string;
+  role?: string;
+  authMethod?: "google" | "password";
 };
 
 export async function createSession(payload: SessionPayload) {

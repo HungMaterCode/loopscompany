@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Globe, Menu, X, Sun, Moon } from 'lucide-react';
+import { Globe, Menu, X, Sun, Moon, User, LogOut } from 'lucide-react';
 import { useTheme } from '@/legacy-app/theme-context';
 import { SITE } from '@/lib/site';
 import Link from 'next/link';
@@ -29,10 +29,48 @@ function goTo(href: string, e: React.MouseEvent) {
 export function Header() {
   const [hidden, setHidden] = useState(false);
   const [menu, setMenu]     = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [user, setUser] = useState<{ name: string; email: string; avatar: string | null } | null>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   const [isOverDark, setIsOverDark] = useState(false);
   const [mounted, setMounted] = useState(false);
   const lastY = useRef(0);
   const { isDark, toggleTheme } = useTheme();
+
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data.user) {
+          setUser(data.user);
+        }
+      })
+      .catch(err => console.error(err));
+  }, []);
+
+  // Close user menu on wheel or touchmove even if scroll position doesn't change
+  useEffect(() => {
+    const handleInteraction = () => {
+      setUserMenuOpen(false);
+    };
+    window.addEventListener('wheel', handleInteraction, { passive: true });
+    window.addEventListener('touchmove', handleInteraction, { passive: true });
+    return () => {
+      window.removeEventListener('wheel', handleInteraction);
+      window.removeEventListener('touchmove', handleInteraction);
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 0);
@@ -44,6 +82,7 @@ export function Header() {
       const y = window.scrollY;
       setHidden(y > lastY.current && y > 80);
       lastY.current = y;
+      setUserMenuOpen(false); // Close dropdown on scroll
 
       const headerEl = document.getElementById('main-nav-bar');
       if (headerEl) {
@@ -106,6 +145,7 @@ export function Header() {
           backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
           border: 'var(--sc-header-border, 1px solid rgba(128, 128, 128, 0.2))',
           boxShadow: 'var(--sc-header-shadow, 0 8px 32px rgba(0, 0, 0, 0.05))',
+          overflow: 'visible',
         }}>
           {/* Logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', flexShrink: 0 }}>
@@ -166,6 +206,166 @@ export function Header() {
                 <Moon size={17} />
               )}
             </button>
+
+            {/* User Info / Login Button */}
+            {user ? (
+              <div style={{ position: 'relative' }} ref={userMenuRef}>
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  style={{
+                    background: btnBg,
+                    border: `1px solid ${btnBorder}`,
+                    borderRadius: '9999px',
+                    height: '36px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '4px 12px 4px 4px',
+                    color: textColor,
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = btnHoverBg; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = btnBg; }}
+                >
+                  {user.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user.name}
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '50%',
+                        background: 'var(--sc-accent)',
+                        color: '#fff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '14px',
+                        fontWeight: 700,
+                        fontFamily: F,
+                      }}
+                    >
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <span style={{ fontSize: '13px', fontWeight: 600, fontFamily: F, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>
+                    {user.name}
+                  </span>
+                </button>
+
+                {/* Dropdown Menu */}
+                <AnimatePresence>
+                  {userMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 8px)',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: '240px',
+                        background: 'rgba(20, 20, 20, 0.95)',
+                        backdropFilter: 'blur(16px)',
+                        WebkitBackdropFilter: 'blur(16px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        borderRadius: '16px',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+                        overflow: 'hidden',
+                        zIndex: 1000,
+                      }}
+                    >
+                      <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                        <p style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#ffffff', fontFamily: F, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {user.name}
+                        </p>
+                        <p style={{ margin: '4px 0 0', fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)', fontFamily: F, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {user.email}
+                        </p>
+                      </div>
+                      <div style={{ padding: '8px' }}>
+                        <button
+                          onClick={async () => {
+                            await fetch('/api/auth/logout', { method: 'POST' });
+                            window.location.reload();
+                          }}
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '10px 12px',
+                            background: 'transparent',
+                            border: 'none',
+                            borderRadius: '8px',
+                            color: '#ef4444',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            fontFamily: F,
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            transition: 'background 0.2s',
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                        >
+                          <LogOut size={16} />
+                          Đăng xuất
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <Link
+                href="/dang-nhap"
+                aria-label="Login"
+                style={{
+                  background: btnBg,
+                  border: `1px solid ${btnBorder}`,
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: textColor,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                  padding: 0,
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  textDecoration: 'none',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'scale(1.08)';
+                  e.currentTarget.style.background = btnHoverBg;
+                  e.currentTarget.style.borderColor = btnHoverBorder;
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.background = btnBg;
+                  e.currentTarget.style.borderColor = btnBorder;
+                }}
+              >
+                <User size={17} />
+              </Link>
+            )}
 
             {/* Desktop CTA */}
             <Link href="/#pricing" onClick={e => goTo('/#pricing', e)}

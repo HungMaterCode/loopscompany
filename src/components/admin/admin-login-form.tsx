@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { RED, TEXT, TEXT60, BG, GLASS, BORDER } from "@/legacy-app/tokens";
 
-export function AdminLoginForm() {
+export function AdminLoginForm({ defaultEmail = "admin@loops.vn" }: { defaultEmail?: string }) {
   const router = useRouter();
-  const [email, setEmail] = useState("admin@loops.vn");
+  const [email, setEmail] = useState(defaultEmail);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
