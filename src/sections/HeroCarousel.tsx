@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { BrowserMockup } from "@/components/ui/BrowserMockup";
 import { IMG } from "@/legacy-app/images";
 import { useSiteData } from "@/legacy-app/SiteDataContext";
@@ -14,6 +15,14 @@ export function HeroCarousel() {
   const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
   const { config } = useSiteData();
+  const router = useRouter();
+
+  const handleScrollToServices = () => {
+    const el = document.getElementById("services");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   useEffect(() => {
     setProgress(0);
@@ -78,12 +87,16 @@ export function HeroCarousel() {
                 <p style={{ color: TEXT60, fontSize: "clamp(13px,1.4vw,16px)", lineHeight: 1.75, margin: "0 0 32px", maxWidth: 440 }}>{slide.sub}</p>
 
                 <div className="hero-ctas" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                  <button style={{ display: "flex", alignItems: "center", gap: 8, backgroundColor: RED, color: "#fff", border: "none", borderRadius: 40, padding: "12px 22px", fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "background-color 0.2s" }}
+                  <button 
+                    onClick={() => router.push('/bao-gia')}
+                    style={{ display: "flex", alignItems: "center", gap: 8, backgroundColor: RED, color: "#fff", border: "none", borderRadius: 40, padding: "12px 22px", fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "background-color 0.2s" }}
                     onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.backgroundColor = "#bb3218")}
                     onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.backgroundColor = RED)}>
                     {slide.cta} <ArrowRight size={14} />
                   </button>
-                  <button style={{ display: "flex", alignItems: "center", gap: 8, backgroundColor: "transparent", color: TEXT, border: `1px solid ${BORDER_M}`, borderRadius: 40, padding: "12px 20px", fontSize: 14, fontWeight: 500, cursor: "pointer" }}>
+                  <button 
+                    onClick={handleScrollToServices}
+                    style={{ display: "flex", alignItems: "center", gap: 8, backgroundColor: "transparent", color: TEXT, border: `1px solid ${BORDER_M}`, borderRadius: 40, padding: "12px 20px", fontSize: 14, fontWeight: 500, cursor: "pointer" }}>
                     Xem danh mục
                   </button>
                 </div>

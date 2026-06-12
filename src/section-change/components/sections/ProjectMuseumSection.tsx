@@ -5,7 +5,18 @@ import { useSiteData } from '@/legacy-app/SiteDataContext';
 
 const F = "'Be Vietnam Pro', sans-serif";
 
-const projects = [
+interface ProjectItem {
+  num: string;
+  title: string;
+  cat: string;
+  year: string;
+  result: string;
+  img: string;
+  accent: string;
+  url?: string;
+}
+
+const DEFAULT_PROJECTS: ProjectItem[] = [
   { num: '01', title: 'VinFast Toàn Cầu',     cat: 'WEB · STRATEGY',  year: '2024', result: '+340% traffic', img: 'https://images.unsplash.com/photo-1615829386703-e2bb66a7cb7d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600', accent: '#C8A261' },
   { num: '02', title: 'Vista Residence',       cat: 'BRAND · UX',      year: '2024', result: 'Top 1 Google',   img: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600', accent: '#7B61FF' },
   { num: '03', title: 'Pho Ha Noi Kitchen',    cat: 'SOCIAL · CONTENT', year: '2025', result: '2M+ impressions',img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600', accent: '#00D9A3' },
@@ -16,9 +27,7 @@ const projects = [
   { num: '08', title: 'FoodieApp Vietnam',     cat: 'APP · CONTENT',    year: '2026', result: '50K downloads',  img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600', accent: '#C8A261' },
 ];
 
-const doubled = [...projects, ...projects];
-
-function MarqueeCard({ p }: { p: typeof projects[0] }) {
+function MarqueeCard({ p }: { p: ProjectItem }) {
   return (
     <div style={{
       flexShrink: 0, width: '280px', borderRadius: '16px', overflow: 'hidden',
@@ -62,6 +71,12 @@ export function ProjectMuseumSection() {
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const { config } = useSiteData();
 
+  const list = config.portfolio.projects && config.portfolio.projects.length > 0
+    ? config.portfolio.projects
+    : DEFAULT_PROJECTS;
+
+  const doubled = [...list, ...list];
+
   return (
     <section id="portfolio" ref={ref} style={{
       backgroundColor: 'var(--sc-bg-3)',
@@ -81,10 +96,15 @@ export function ProjectMuseumSection() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
               <div style={{ width: '20px', height: '1px', background: 'var(--sc-accent)' }} />
-              <span style={{ fontFamily: F, fontSize: '10px', letterSpacing: '0.22em', color: 'var(--sc-accent)', fontWeight: 700 }}>DỰ ÁN ĐÃ THỰC HIỆN</span>
+              <span style={{ fontFamily: F, fontSize: '10px', letterSpacing: '0.22em', color: 'var(--sc-accent)', fontWeight: 700 }}>
+                {config.portfolio.subtitle || "DỰ ÁN ĐÃ THỰC HIỆN"}
+              </span>
             </div>
             <h2 style={{ fontFamily: F, fontSize: 'clamp(30px,5vw,64px)', fontWeight: 800, color: 'var(--sc-text)', letterSpacing: '-0.04em', margin: 0, lineHeight: 1.1 }}>
-              Bảo tàng <em style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--sc-text-45)' }}>Dự án</em>
+              {config.portfolio.titleRegular || "Bảo tàng"}{' '}
+              <em style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--sc-text-45)' }}>
+                {config.portfolio.titleItalic || "Dự án"}
+              </em>
             </h2>
           </div>
           <a href="#" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontFamily: F, fontSize: '12px', color: 'var(--sc-text-35)', textDecoration: 'none', border: '1px solid var(--sc-border-h)', borderRadius: '9999px', padding: '8px 16px', transition: 'all 0.2s' }}
@@ -113,7 +133,7 @@ export function ProjectMuseumSection() {
       {/* Footer note */}
       <motion.p initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.8, delay: 0.5 }}
         style={{ fontFamily: F, fontSize: '10px', color: 'var(--sc-text-20)', textAlign: 'center', marginTop: '36px', letterSpacing: '0.12em' }}>
-        ↔ HOVER ĐỂ TẠM DỪNG · {projects.length}+ DỰ ÁN ĐÃ HOÀN THÀNH
+        ↔ HOVER ĐỂ TẠM DỪNG · {list.length}+ DỰ ÁN ĐÃ HOÀN THÀNH
       </motion.p>
     </section>
   );

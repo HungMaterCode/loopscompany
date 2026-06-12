@@ -88,14 +88,14 @@ model TeamMember {
 }
 
 model Project {
-  id        String   @id
-  num       String
-  title     String
-  category  String
-  year      String
-  result    String
-  img       String
-  accent    String
-  url       String?
+  id        String   @id @default(cuid())
+  num       String   // Ví dụ "01"
+  title     String   // Ví dụ "VinFast Toàn Cầu"
+  category  String   // Ví dụ "WEB · STRATEGY"
+  year      String   // Ví dụ "2024"
+  result    String   // Ví dụ "+340% traffic"
+  img       String   // URL hình ảnh
+  accent    String   // Màu nhấn HEX "#C8A261"
+  url       String?  // URL liên kết (tuỳ chọn)
   createdAt DateTime @default(now())
 }

@@ -57,7 +57,6 @@ export function SectionHeader({
 
       {/* Heading */}
       <h2 style={{
-        fontFamily: F,
         fontSize: 'clamp(28px, 4.5vw, 64px)',
         fontWeight: 800, color: 'var(--sc-text)',
         letterSpacing: '-0.04em',
@@ -68,7 +67,7 @@ export function SectionHeader({
         {headingEm && (
           <>
             {' '}
-            <em style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--sc-text-45)' }}>
+            <em style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--sc-text-45)' }}>
               {headingEm}
             </em>
           </>
