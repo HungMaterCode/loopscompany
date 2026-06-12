@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart3, Eye, Layers3, LogOut, MonitorSmartphone, Palette,
   Search, Settings2, ShieldCheck, Sparkles, Globe, Menu, X,
@@ -28,7 +28,7 @@ const NAV_ITEMS: { id: AdminTab; label: string; icon: typeof Layers3; group?: st
   { id: "blog",        label: "Bài viết",     icon: BookOpen,          group: "content" },
   { id: "users",       label: "Người dùng",   icon: Users,             group: "content" },
   { id: "team",        label: "Đội ngũ",      icon: UserSquare2,       group: "content" },
-  { id: "siteConfig",  label: "Cấu hình Mới", icon: Settings2,         group: "tools" },
+  { id: "siteConfig",  label: "Cấu hình Web", icon: Settings2,         group: "tools" },
   { id: "seo",         label: "SEO",          icon: Globe,             group: "tools" },
   { id: "appearance",  label: "Giao diện",    icon: Palette,           group: "tools" },
 ];
@@ -51,8 +51,18 @@ export function Admin({
   onLogout?: () => void | Promise<void>;
 }) {
   const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
-  const [theme, setThemeState] = useState<AdminTheme>(getStoredTheme);
+  const [theme, setThemeState] = useState<AdminTheme>("dark");
+  const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    setThemeState(getStoredTheme());
+  }, []);
+
+  if (!mounted) {
+    return <div className="flex h-screen overflow-hidden bg-[#020510]" />;
+  }
 
   const isDark = theme === "dark";
   const t = tc(isDark);

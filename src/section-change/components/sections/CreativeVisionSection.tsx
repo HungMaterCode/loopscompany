@@ -4,16 +4,20 @@ import { useSiteData } from '@/legacy-app/SiteDataContext';
 
 const F = "'Be Vietnam Pro', sans-serif";
 
-const pillars = [
-  { num: '01', title: 'Không gian sáng tạo', body: 'Mỗi đột phá đều bắt đầu tại giao điểm của chiến lược kỷ luật và tầm nhìn sáng tạo vượt trội. Chúng tôi biến tư duy táo bạo thành kết quả hữu hình.' },
-  { num: '02', title: 'Định hình tương lai',  body: 'Công việc tốt nhất xuất hiện khi sự tò mò gặp sự kiên định. Quy trình của chúng tôi chuyển hóa cơ hội ẩn thành trải nghiệm còn vang vọng mãi.' },
-  { num: '03', title: 'Dữ liệu & Cảm xúc',   body: 'Chúng tôi kết hợp phân tích dữ liệu chính xác với cảm xúc thương hiệu sâu sắc để tạo ra những chiến lược vừa đo được vừa cảm được.' },
-];
-
 export function CreativeVisionSection() {
   const ref    = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const { config } = useSiteData();
+
+  const titleRegular = config.creativeVision.titleRegular || "Sáng tạo";
+  const titleItalic = config.creativeVision.titleItalic || "Tầm nhìn";
+  const displayPillars = config.creativeVision.pillars && config.creativeVision.pillars.length > 0
+    ? config.creativeVision.pillars
+    : [
+        { num: '01', title: 'Không gian sáng tạo', body: 'Mỗi đột phá đều bắt đầu tại giao điểm của chiến lược kỷ luật và tầm nhìn sáng tạo vượt trội. Chúng tôi biến tư duy táo bạo thành kết quả hữu hình.' },
+        { num: '02', title: 'Định hình tương lai',  body: 'Công việc tốt nhất xuất hiện khi sự tò mò gặp sự kiên định. Quy trình của chúng tôi chuyển hóa cơ hội ẩn thành trải nghiệm còn vang vọng mãi.' },
+        { num: '03', title: 'Dữ liệu & Cảm xúc',   body: 'Chúng tôi kết hợp phân tích dữ liệu chính xác với cảm xúc thương hiệu sâu sắc để tạo ra những chiến lược vừa đo được vừa cảm được.' },
+      ];
 
   return (
     <section ref={ref} style={{
@@ -48,10 +52,10 @@ export function CreativeVisionSection() {
             <div style={{ width: '20px', height: '1px', background: 'var(--sc-accent)' }} />
           </div>
           <h2 style={{
-            fontFamily: F, fontSize: 'clamp(36px,6vw,80px)', fontWeight: 800,
+            fontSize: 'clamp(36px,6vw,80px)', fontWeight: 800,
             color: 'var(--sc-text)', letterSpacing: '-0.04em', lineHeight: 1.05, margin: 0,
           }}>
-            Sáng tạo <em style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--sc-text-45)' }}>× Tầm nhìn</em>
+            {titleRegular} <em style={{ fontStyle: 'italic', fontWeight: 400, color: 'var(--sc-text-45)' }}>× {titleItalic}</em>
           </h2>
         </motion.div>
 
@@ -74,7 +78,7 @@ export function CreativeVisionSection() {
 
           {/* Pillar cards */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {pillars.map((p, i) => (
+            {displayPillars.map((p, i) => (
               <motion.div key={p.num}
                 initial={{ opacity: 0, x: 50, y: 20 }} animate={inView ? { opacity: 1, x: 0, y: 0 } : {}}
                 transition={{ duration: 0.7, delay: 0.2 + i * 0.12 }}
