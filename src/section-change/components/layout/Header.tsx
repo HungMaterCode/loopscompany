@@ -2,11 +2,39 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Globe, Menu, X, Sun, Moon, LogIn } from 'lucide-react';
+import { Globe, Menu, X, Sun, Moon, LogIn, User, ChevronDown, LogOut } from 'lucide-react';
+import Link from 'next/link';
 import { useTheme } from '@/legacy-app/theme-context';
 import { SITE } from '@/lib/site';
+import { UserLogin } from '@/legacy-pages/UserLogin';
 
 const F = "inherit";
+
+function getGoogleAvatar(name: string, email: string) {
+  const identifier = name || email || 'U';
+  const char = identifier.charAt(0);
+  
+  // Hash function to choose a stable color based on the identifier string
+  let hash = 0;
+  const hashStr = email || name || 'U';
+  for (let i = 0; i < hashStr.length; i++) {
+    hash = hashStr.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  
+  const GOOGLE_COLORS = [
+    '#1a73e8', // Blue
+    '#2e7d32', // Green
+    '#795548', // Brown
+    '#673ab7', // Purple
+    '#d93025', // Red
+    '#e37400', // Orange
+    '#00796b', // Teal
+    '#c2185b', // Pink
+  ];
+  
+  const color = GOOGLE_COLORS[Math.abs(hash) % GOOGLE_COLORS.length];
+  return { char, color };
+}
 
 const NAV = [
   { label: 'Dịch vụ', href: '/#services'  },
@@ -30,8 +58,11 @@ export function Header() {
   const [menu, setMenu]     = useState(false);
   const [isOverDark, setIsOverDark] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; email: string; avatar?: string | null } | null>(null);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const lastY = useRef(0);
+  const profileRef = useRef<HTMLDivElement>(null);
   const { isDark, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
@@ -89,6 +120,25 @@ export function Header() {
     return () => { document.body.style.overflow = ''; };
   }, [menu]);
 
+  // Close profile dropdown when clicking outside or scrolling
+  useEffect(() => {
+    if (!profileOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+    const handleScroll = () => {
+      setProfileOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [profileOpen]);
+
   const textColor = isOverDark ? '#ffffff' : 'var(--sc-text)';
   const textMuted = isOverDark ? 'rgba(255, 255, 255, 0.75)' : 'var(--sc-text-60)';
 
@@ -124,12 +174,13 @@ export function Header() {
           backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
           border: 'var(--sc-header-border, 1px solid rgba(128, 128, 128, 0.2))',
           boxShadow: 'var(--sc-header-shadow, 0 8px 32px rgba(0, 0, 0, 0.05))',
+          overflow: 'visible',
         }}>
           {/* Logo */}
-          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', flexShrink: 0 }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', flexShrink: 0 }}>
             <Globe size={18} color={textColor} style={{ transition: 'color 0.3s' }} />
             <span style={{ color: textColor, fontWeight: 800, fontSize: '15px', fontFamily: F, letterSpacing: '0.06em', transition: 'color 0.3s' }}>LOOPS</span>
-          </a>
+          </Link>
 
           {/* Desktop links — hidden on mobile via display none at <768px */}
           <div style={{ gap: 'clamp(16px,2.5vw,28px)', alignItems: 'center' }} className="hidden md:flex">
@@ -185,8 +236,181 @@ export function Header() {
               )}
             </button>
 
+            {/* Desktop Login / User profile */}
+            {user ? (
+              <div
+                ref={profileRef}
+                className="hidden md:flex"
+                style={{ position: 'relative', alignItems: 'center' }}
+              >
+                <button
+                  onClick={() => setProfileOpen(v => !v)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '8px', borderRadius: '9999px',
+                    padding: '5px 12px 5px 6px',
+                    background: btnBg, border: `1px solid ${btnBorder}`,
+                    color: textColor, fontSize: '13px', fontFamily: F, fontWeight: 600,
+                    backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+                    whiteSpace: 'nowrap', cursor: 'pointer',
+                    transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = btnHoverBg;
+                    e.currentTarget.style.borderColor = btnHoverBorder;
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = btnBg;
+                    e.currentTarget.style.borderColor = btnBorder;
+                  }}
+                >
+                  {user.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user.name}
+                      style={{
+                        width: '26px', height: '26px', borderRadius: '50%',
+                        objectFit: 'cover', border: `1px solid ${btnBorder}`,
+                      }}
+                    />
+                  ) : (() => {
+                    const { char, color } = getGoogleAvatar(user.name, user.email);
+                    return (
+                      <div style={{
+                        width: '26px', height: '26px', borderRadius: '50%',
+                        background: color, color: '#fff', display: 'flex',
+                        alignItems: 'center', justifyContent: 'center',
+                        fontSize: '12px', fontWeight: 500,
+                        fontFamily: 'Inter, system-ui, sans-serif', lineHeight: 1,
+                      }}>{char}</div>
+                    );
+                  })()}
+                  <span style={{ maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {user.name || user.email.split('@')[0]}
+                  </span>
+                  <ChevronDown size={14} style={{
+                    opacity: 0.6,
+                    transition: 'transform 0.2s',
+                    transform: profileOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  }} />
+                </button>
+
+                {/* Profile Dropdown */}
+                <AnimatePresence>
+                  {profileOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.96, x: '-50%' }}
+                      animate={{ opacity: 1, y: 0, scale: 1, x: '-50%' }}
+                      exit={{ opacity: 0, y: -8, scale: 0.96, x: '-50%' }}
+                      transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      style={{
+                        position: 'absolute', top: 'calc(100% + 10px)', left: '50%',
+                        minWidth: '200px', borderRadius: '14px',
+                        background: isDark ? 'rgba(30, 30, 30, 0.85)' : 'rgba(255, 255, 255, 0.9)',
+                        backdropFilter: 'blur(24px) saturate(180%)',
+                        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                        border: `1px solid ${btnBorder}`,
+                        boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06)',
+                        overflow: 'hidden', zIndex: 400,
+                      }}
+                    >
+                      {/* User info section */}
+                      <div style={{ padding: '12px 14px', display: 'flex', alignItems: 'center', gap: '10px',
+                        borderBottom: `1px solid ${btnBorder}`,
+                      }}>
+                        {user.avatar ? (
+                          <img src={user.avatar} alt={user.name} style={{
+                            width: '36px', height: '36px', borderRadius: '50%',
+                            objectFit: 'cover', border: `1px solid ${btnBorder}`,
+                          }} />
+                        ) : (() => {
+                          const { char, color } = getGoogleAvatar(user.name, user.email);
+                          return (
+                            <div style={{
+                              width: '36px', height: '36px', borderRadius: '50%',
+                              background: color, color: '#fff', display: 'flex',
+                              alignItems: 'center', justifyContent: 'center',
+                              fontSize: '16px', fontWeight: 500,
+                              fontFamily: 'Inter, system-ui, sans-serif', lineHeight: 1, flexShrink: 0,
+                            }}>{char}</div>
+                          );
+                        })()}
+                        <div style={{ overflow: 'hidden' }}>
+                          <div style={{
+                            color: isDark ? '#ffffff' : '#000000', fontSize: '13px', fontWeight: 700,
+                            fontFamily: F, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                          }}>{user.name || 'Người dùng'}</div>
+                          <div style={{
+                            color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)', fontSize: '11px', fontWeight: 500,
+                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                          }}>{user.email}</div>
+                        </div>
+                      </div>
+                      {/* Logout button */}
+                      <button
+                        onClick={() => { setProfileOpen(false); handleLogout(); }}
+                        style={{
+                          width: '100%', display: 'flex', alignItems: 'center', gap: '10px',
+                          padding: '10px 14px', background: 'none', border: 'none',
+                          color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)', fontSize: '13px', fontWeight: 600,
+                          fontFamily: F, cursor: 'pointer', transition: 'all 0.2s',
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)';
+                          e.currentTarget.style.color = '#ef4444';
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.background = 'none';
+                          e.currentTarget.style.color = isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)';
+                        }}
+                      >
+                        <div style={{ width: '36px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                          <LogOut size={14} />
+                        </div>
+                        Đăng xuất
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <Link href="/dang-nhap"
+                onClick={e => { e.preventDefault(); setLoginOpen(true); }}
+                className="hidden md:flex"
+                aria-label="Đăng nhập"
+                style={{
+                  background: btnBg,
+                  border: `1px solid ${btnBorder}`,
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: textColor,
+                  cursor: 'pointer',
+                  transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                  padding: 0,
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  textDecoration: 'none',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'scale(1.08)';
+                  e.currentTarget.style.background = btnHoverBg;
+                  e.currentTarget.style.borderColor = btnHoverBorder;
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.background = btnBg;
+                  e.currentTarget.style.borderColor = btnBorder;
+                }}
+              >
+                <User size={17} />
+              </Link>
+            )}
+
             {/* Desktop CTA */}
-            <a href="/#pricing" onClick={e => goTo('/#pricing', e)}
+            <Link href="/#pricing" onClick={e => goTo('/#pricing', e)}
               className="hidden md:flex"
               style={{
                 alignItems: 'center', gap: '6px', borderRadius: '9999px', padding: '8px 20px',
@@ -197,59 +421,7 @@ export function Header() {
               }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 16px rgba(255,107,157,0.4)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(255,107,157,0.25)'; }}
-            >Xem báo giá</a>
-
-            {/* Desktop Login / User profile */}
-            {user ? (
-              <div
-                className="hidden md:flex"
-                style={{
-                  alignItems: 'center', gap: '8px', borderRadius: '9999px', padding: '8px 16px',
-                  background: btnBg, border: `1px solid ${btnBorder}`,
-                  color: textColor, fontSize: '13px', fontFamily: F, fontWeight: 600,
-                  backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <span>{user.name}</span>
-                <div style={{ width: '1px', height: '14px', background: btnBorder }} />
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    background: 'none', border: 'none', color: textMuted, cursor: 'pointer',
-                    fontSize: '12px', fontWeight: 600, padding: 0, transition: 'color 0.2s',
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.color = 'var(--sc-accent)'}
-                  onMouseLeave={e => e.currentTarget.style.color = textMuted}
-                >
-                  Đăng xuất
-                </button>
-              </div>
-            ) : (
-              <a href="/dang-nhap"
-                className="hidden md:flex"
-                style={{
-                  alignItems: 'center', gap: '6px', borderRadius: '9999px', padding: '8px 20px',
-                  background: btnBg, border: `1px solid ${btnBorder}`,
-                  color: textColor, fontSize: '13px', fontFamily: F, fontWeight: 600,
-                  textDecoration: 'none', transition: 'all 0.2s', letterSpacing: '0.02em', whiteSpace: 'nowrap',
-                  backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
-                  (e.currentTarget as HTMLElement).style.background = btnHoverBg;
-                  (e.currentTarget as HTMLElement).style.borderColor = btnHoverBorder;
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.transform = 'none';
-                  (e.currentTarget as HTMLElement).style.background = btnBg;
-                  (e.currentTarget as HTMLElement).style.borderColor = btnBorder;
-                }}
-              >
-                <LogIn size={13} style={{ opacity: 0.8 }} />
-                Đăng nhập
-              </a>
-            )}
+            >Xem báo giá</Link>
 
             {/* Hamburger — visible on mobile */}
               <button
@@ -519,7 +691,7 @@ export function Header() {
                   transition={{ delay: 0.4 }}
                   style={{ width: '100%' }}
                 >
-                  <a href="/#pricing"
+                  <Link href="/#pricing"
                     onClick={e => { goTo('/#pricing', e); setMenu(false); }}
                     style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
@@ -534,7 +706,7 @@ export function Header() {
                     onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(255,107,157,0.3)'; }}
                   >
                     Xem báo giá dịch vụ →
-                  </a>
+                  </Link>
                 </motion.div>
 
                 {/* Mobile Login / User Profile */}
@@ -545,14 +717,43 @@ export function Header() {
                     transition={{ delay: 0.45 }}
                     style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}
                   >
+                    {/* User info card */}
                     <div style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                      color: 'var(--sc-text)', fontSize: '14px', fontFamily: F, fontWeight: 600,
+                      display: 'flex', alignItems: 'center', gap: '12px', padding: '16px',
+                      borderRadius: '16px',
+                      background: 'var(--sc-card-bg, rgba(255, 255, 255, 0.06))',
+                      border: '1px solid var(--sc-border, rgba(128, 128, 128, 0.15))',
                     }}>
-                      Xin chào, {user.name}
+                      {user.avatar ? (
+                        <img src={user.avatar} alt={user.name} style={{
+                          width: '40px', height: '40px', borderRadius: '50%',
+                          objectFit: 'cover', border: '1px solid var(--sc-border)', flexShrink: 0,
+                        }} />
+                      ) : (() => {
+                        const { char, color } = getGoogleAvatar(user.name, user.email);
+                        return (
+                          <div style={{
+                            width: '40px', height: '40px', borderRadius: '50%',
+                            background: color, color: '#fff', display: 'flex',
+                            alignItems: 'center', justifyContent: 'center',
+                            fontSize: '18px', fontWeight: 500,
+                            fontFamily: 'Inter, system-ui, sans-serif', lineHeight: 1, flexShrink: 0,
+                          }}>{char}</div>
+                        );
+                      })()}
+                      <div style={{ overflow: 'hidden' }}>
+                        <div style={{
+                          color: 'var(--sc-text)', fontSize: '15px', fontWeight: 700,
+                          fontFamily: F, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>{user.name || 'Người dùng'}</div>
+                        <div style={{
+                          color: 'var(--sc-text-60)', fontSize: '12px', fontWeight: 500,
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>{user.email}</div>
+                      </div>
                     </div>
                     <button
-                      onClick={handleLogout}
+                      onClick={() => { setMenu(false); handleLogout(); }}
                       style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                         borderRadius: '9999px', padding: '14px 28px',
@@ -565,6 +766,7 @@ export function Header() {
                       onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.18)'; }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; }}
                     >
+                      <LogOut size={15} />
                       Đăng xuất
                     </button>
                   </motion.div>
@@ -575,8 +777,8 @@ export function Header() {
                     transition={{ delay: 0.45 }}
                     style={{ width: '100%' }}
                   >
-                    <a href="/dang-nhap"
-                      onClick={() => setMenu(false)}
+                    <Link href="/dang-nhap"
+                      onClick={e => { e.preventDefault(); setMenu(false); setLoginOpen(true); }}
                       style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                         borderRadius: '9999px', padding: '14px 28px',
@@ -591,13 +793,19 @@ export function Header() {
                     >
                       <LogIn size={15} style={{ opacity: 0.8 }} />
                       Đăng nhập tài khoản
-                    </a>
+                    </Link>
                   </motion.div>
                 )}
                 
               </div>
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {loginOpen && (
+          <UserLogin onClose={() => setLoginOpen(false)} />
         )}
       </AnimatePresence>
     </>

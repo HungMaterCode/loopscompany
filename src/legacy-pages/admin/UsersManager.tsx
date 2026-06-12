@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, X, Check, ShieldCheck, ShieldOff, Mail, Phone, UserCircle2 } from "lucide-react";
 import type { TC } from "./types";
 
@@ -18,27 +18,45 @@ interface Props {
   isDark: boolean;
 }
 
-const MOCK_USERS: UserItem[] = [
-  { id: "u1", name: "Nguyễn Hồng Nhung",  email: "nhung@spacha.vn",       phone: "0901 234 567", plan: "W-03 — 889K/tháng",   joinDate: "12/01/2025", status: "active",   role: "user" },
-  { id: "u2", name: "Trần Minh Đức",       email: "duc@phosaigon.vn",      phone: "0912 345 678", plan: "W-04 — 1.189K/tháng",joinDate: "03/02/2025", status: "active",   role: "user" },
-  { id: "u3", name: "Lê Thị Bích Ngọc",   email: "ngoc@ngocbeauty.vn",   phone: "0923 456 789", plan: "W-02 — 589K/tháng",  joinDate: "20/02/2025", status: "active",   role: "user" },
-  { id: "u4", name: "Phạm Văn Tùng",       email: "tung@tungspa.vn",      phone: "0934 567 890", plan: "W-01 — 189K/tháng",  joinDate: "07/03/2025", status: "inactive", role: "user" },
-  { id: "u5", name: "Hoàng Thị Lan",       email: "lan@hoanglan.vn",      phone: "0945 678 901", plan: "W-03 — 889K/tháng",  joinDate: "15/03/2025", status: "active",   role: "user" },
-  { id: "u6", name: "Võ Minh Khải",        email: "khai@vominhdeco.vn",   phone: "0956 789 012", plan: "W-02 — 589K/tháng",  joinDate: "01/04/2025", status: "active",   role: "user" },
-  { id: "u7", name: "Admin",               email: "admin@vietweb.vn",     phone: "0800 000 001", plan: "—",                  joinDate: "01/01/2024", status: "active",   role: "admin" },
-];
-
 const EMPTY: UserItem = { id: "", name: "", email: "", phone: "", plan: "W-01 — 189K/tháng", joinDate: "", status: "active", role: "user" };
 const PLANS = ["W-01 — 189K/tháng", "W-02 — 589K/tháng", "W-03 — 889K/tháng", "W-04 — 1.189K/tháng"];
 
 export function UsersManager({ t, isDark }: Props) {
-  const [users, setUsers]         = useState<UserItem[]>(MOCK_USERS);
+  const [users, setUsers]         = useState<UserItem[]>([]);
+  const [loading, setLoading]     = useState(true);
   const [editIdx, setEditIdx]     = useState<number | null>(null);
   const [isAdding, setIsAdding]   = useState(false);
   const [form, setForm]           = useState<UserItem>(EMPTY);
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
   const [filter, setFilter]       = useState<"all" | "active" | "inactive">("all");
   const [search, setSearch]       = useState("");
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/users");
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setUsers(data.map((u: any) => ({
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          phone: u.phone || "",
+          plan: u.plan || "—",
+          joinDate: new Date(u.createdAt).toLocaleDateString("vi-VN"),
+          status: u.status || "active",
+          role: u.role || "user"
+        })));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setLoading(false);
+  };
 
   const filtered = users.filter((u) => {
     const matchStatus = filter === "all" || u.status === filter;
@@ -65,29 +83,56 @@ export function UsersManager({ t, isDark }: Props) {
 
   const closeModal = () => { setEditIdx(null); setIsAdding(false); };
 
-  const save = () => {
+  const save = async () => {
     if (!form.name.trim() || !form.email.trim()) return;
-    if (isAdding) {
-      setUsers((prev) => [{ ...form }, ...prev]);
-    } else if (editIdx !== null) {
-      setUsers((prev) => prev.map((u, i) => i === editIdx ? { ...form } : u));
+    try {
+      if (isAdding) {
+        const res = await fetch("/api/admin/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form)
+        });
+        if (res.ok) await fetchUsers();
+      } else if (editIdx !== null) {
+        const res = await fetch(`/api/admin/users/${form.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form)
+        });
+        if (res.ok) await fetchUsers();
+      }
+    } catch (e) {
+      console.error(e);
     }
     closeModal();
   };
 
-  const doDelete = () => {
+  const doDelete = async () => {
     if (deleteIdx !== null) {
-      const realIdx = users.indexOf(filtered[deleteIdx]);
-      setUsers((prev) => prev.filter((_, i) => i !== realIdx));
+      const userToDel = filtered[deleteIdx];
+      try {
+        const res = await fetch(`/api/admin/users/${userToDel.id}`, { method: "DELETE" });
+        if (res.ok) await fetchUsers();
+      } catch (e) {
+        console.error(e);
+      }
     }
     setDeleteIdx(null);
   };
 
-  const toggleStatus = (idx: number) => {
-    const realIdx = users.indexOf(filtered[idx]);
-    setUsers((prev) => prev.map((u, i) =>
-      i === realIdx ? { ...u, status: u.status === "active" ? "inactive" : "active" } : u
-    ));
+  const toggleStatus = async (idx: number) => {
+    const userToToggle = filtered[idx];
+    const newStatus = userToToggle.status === "active" ? "inactive" : "active";
+    try {
+      const res = await fetch(`/api/admin/users/${userToToggle.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...userToToggle, status: newStatus })
+      });
+      if (res.ok) await fetchUsers();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const showModal = isAdding || editIdx !== null;
@@ -100,9 +145,6 @@ export function UsersManager({ t, isDark }: Props) {
           <h2 className={`text-2xl font-bold tracking-tight ${t.text}`}>Người dùng</h2>
           <p className={`mt-1 text-sm ${t.textMuted}`}>{activeCount} đang hoạt động · {inactiveCount} tạm khóa</p>
         </div>
-        <button onClick={openAdd} className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${t.btn}`}>
-          <Plus className="h-4 w-4" /> Thêm người dùng
-        </button>
       </div>
 
       {/* Stats */}
@@ -182,10 +224,7 @@ export function UsersManager({ t, isDark }: Props) {
                       className={`rounded-lg p-1.5 transition ${isDark ? "hover:bg-white/10 text-white/30 hover:text-amber-300" : "hover:bg-gray-100 text-gray-300 hover:text-amber-500"}`}>
                       {user.status === "active" ? <ShieldOff className="h-3.5 w-3.5" /> : <ShieldCheck className="h-3.5 w-3.5" />}
                     </button>
-                    <button onClick={() => openEdit(idx)}
-                      className={`rounded-lg p-1.5 transition ${isDark ? "hover:bg-white/10 text-white/30 hover:text-white" : "hover:bg-gray-100 text-gray-300 hover:text-gray-700"}`}>
-                      <Pencil className="h-3.5 w-3.5" />
-                    </button>
+
                     {deleteIdx === idx ? (
                       <div className="flex gap-1">
                         <button onClick={doDelete} className="rounded-lg p-1.5 bg-red-500/20 text-red-400 hover:bg-red-500/30 transition"><Check className="h-3.5 w-3.5" /></button>

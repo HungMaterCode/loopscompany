@@ -11,6 +11,7 @@ export type SessionPayload = {
   userId: string;
   email: string;
   name: string;
+  avatar?: string | null;
 };
 
 export async function createSession(payload: SessionPayload) {

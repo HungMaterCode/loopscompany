@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     }
 
     const payload = await verifyRes.json();
-    const { email, name, sub, email_verified } = payload;
+    const { email, name, sub, email_verified, picture } = payload;
 
     if (!email_verified || !email) {
       return NextResponse.json({ error: "Google account not verified or email missing" }, { status: 400 });
@@ -34,20 +34,25 @@ export async function POST(request: Request) {
       });
 
       if (user) {
-        // If user exists but has no googleId, link it
-        if (!user.googleId) {
+        // Update user if they don't have googleId or avatar
+        const updateData: { googleId?: string; avatar?: string } = {};
+        if (!user.googleId) updateData.googleId = sub;
+        if (!user.avatar && picture) updateData.avatar = picture;
+        
+        if (Object.keys(updateData).length > 0) {
           user = await prisma.user.update({
             where: { id: user.id },
-            data: { googleId: sub },
+            data: updateData,
           });
         }
       } else {
-        // Create new user with googleId
+        // Create new user with googleId and avatar
         user = await prisma.user.create({
           data: {
             email: email.trim().toLowerCase(),
             name: name || "Google User",
             googleId: sub,
+            avatar: picture || null,
             role: "user",
           },
         });
@@ -60,6 +65,7 @@ export async function POST(request: Request) {
           userId: `google-${sub}`,
           email: email.trim().toLowerCase(),
           name: name || "Google User",
+          avatar: picture || null,
         });
         return NextResponse.json({ ok: true, name: name || "Google User", devFallback: true });
       }
@@ -71,6 +77,7 @@ export async function POST(request: Request) {
       userId: user.id,
       email: user.email,
       name: user.name,
+      avatar: user.avatar,
     });
 
     return NextResponse.json({ ok: true, name: user.name });
