@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi" suppressHydrationWarning>
-      <body style={{ margin: 0 }}>{children}</body>
+      <body style={{ margin: 0 }} suppressHydrationWarning>{children}</body>
     </html>
   );
 }
