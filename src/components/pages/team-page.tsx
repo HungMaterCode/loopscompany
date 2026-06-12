@@ -1,3 +1,3 @@
 "use client";
 
-export { Team as TeamPage } from "@/legacy-pages/Team";
+export { default as TeamPage } from "@/section-change/pages/TeamPage";
