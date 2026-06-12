@@ -11,7 +11,8 @@ export type AdminTab =
   | "team"
   | "siteConfig"
   | "seo"
-  | "appearance";
+  | "appearance"
+  | "contacts";
 
 export interface TC {
   page: string;

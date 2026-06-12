@@ -11,6 +11,11 @@ export function ContactSection() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
   const { config } = useSiteData();
 
   return (
@@ -67,35 +72,54 @@ export function ContactSection() {
                 <p style={{ color: TEXT60, fontSize: 13, margin: 0 }}>Chúng tôi sẽ liên hệ bạn trong 30 phút.</p>
               </div>
             ) : (
-              <form onSubmit={e => { e.preventDefault(); setSubmitted(true); }} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <form onSubmit={async e => {
+                e.preventDefault();
+                setIsSubmitting(true);
+                try {
+                  const res = await fetch("/api/contact", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, phone, email, message, source: "consultation_form" }),
+                  });
+                  if (res.ok) setSubmitted(true);
+                  else alert("Có lỗi xảy ra, vui lòng thử lại!");
+                } catch (err) {
+                  alert("Có lỗi xảy ra, vui lòng thử lại!");
+                } finally {
+                  setIsSubmitting(false);
+                }
+              }} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 <p style={{ color: TEXT, fontSize: 16, fontWeight: 600, margin: "0 0 4px", letterSpacing: "-0.02em" }}>Đăng ký tư vấn miễn phí</p>
-                {[{ label: "Họ và tên", placeholder: "Nguyễn Văn A", type: "text" },
-                  { label: "Số điện thoại / Zalo", placeholder: "0901 234 567", type: "tel" },
-                  { label: "Email", placeholder: "email@congty.vn", type: "email" }]
-                  .map(({ label, placeholder, type }) => (
-                    <div key={label}>
-                      <label style={{ display: "block", color: TEXT35, fontSize: 12, marginBottom: 7, fontWeight: 500 }}>{label}</label>
-                      <input type={type} placeholder={placeholder} required
-                        style={{ width: "100%", backgroundColor: "var(--vw-bg-input)", backdropFilter: "blur(8px)", border: `1px solid ${BORDER_M}`, borderRadius: 10, padding: "10px 14px", fontSize: 14, color: TEXT, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
-                        onFocus={e => (e.currentTarget.style.borderColor = RED)}
-                        onBlur={e => (e.currentTarget.style.borderColor = BORDER_M)} />
-                    </div>
-                  ))}
                 <div>
-                  <label style={{ display: "block", color: TEXT35, fontSize: 12, marginBottom: 7, fontWeight: 500 }}>Gói quan tâm</label>
-                  <select defaultValue="W-03"
-                    style={{ width: "100%", backgroundColor: "var(--vw-bg-input)", backdropFilter: "blur(8px)", border: `1px solid ${BORDER_M}`, borderRadius: 10, padding: "10px 14px", fontSize: 14, color: TEXT, outline: "none" }}>
-                    <option value="W-01">W-01 — Gói Thuê 1 (189.000₫/tháng)</option>
-                    <option value="W-02">W-02 — Gói Thuê 2 (589.000₫/tháng)</option>
-                    <option value="W-03">W-03 — Gói Thuê 3 (889.000₫/tháng)</option>
-                    <option value="W-04">W-04 — Gói Thuê 4 (1.189.000₫/tháng)</option>
-                  </select>
+                  <label style={{ display: "block", color: TEXT35, fontSize: 12, marginBottom: 7, fontWeight: 500 }}>Họ và tên</label>
+                  <input type="text" placeholder="Nguyễn Văn A" required value={name} onChange={e => setName(e.target.value)}
+                    style={{ width: "100%", backgroundColor: "var(--vw-bg-input)", backdropFilter: "blur(8px)", border: `1px solid ${BORDER_M}`, borderRadius: 10, padding: "10px 14px", fontSize: 14, color: TEXT, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
+                    onFocus={e => (e.currentTarget.style.borderColor = RED)} onBlur={e => (e.currentTarget.style.borderColor = BORDER_M)} />
                 </div>
-                <button type="submit"
-                  style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, backgroundColor: RED, color: "#fff", border: "none", borderRadius: 40, padding: "13px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer", marginTop: 6, letterSpacing: "-0.01em", transition: "background-color 0.2s" }}
-                  onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.backgroundColor = "#bb3218")}
-                  onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.backgroundColor = RED)}>
-                  Gửi yêu cầu tư vấn <ArrowRight size={15} />
+                <div>
+                  <label style={{ display: "block", color: TEXT35, fontSize: 12, marginBottom: 7, fontWeight: 500 }}>Số điện thoại / Zalo</label>
+                  <input type="tel" placeholder="0901 234 567" required value={phone} onChange={e => setPhone(e.target.value)}
+                    style={{ width: "100%", backgroundColor: "var(--vw-bg-input)", backdropFilter: "blur(8px)", border: `1px solid ${BORDER_M}`, borderRadius: 10, padding: "10px 14px", fontSize: 14, color: TEXT, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
+                    onFocus={e => (e.currentTarget.style.borderColor = RED)} onBlur={e => (e.currentTarget.style.borderColor = BORDER_M)} />
+                </div>
+                <div>
+                  <label style={{ display: "block", color: TEXT35, fontSize: 12, marginBottom: 7, fontWeight: 500 }}>Email</label>
+                  <input type="email" placeholder="email@congty.vn" required value={email} onChange={e => setEmail(e.target.value)}
+                    style={{ width: "100%", backgroundColor: "var(--vw-bg-input)", backdropFilter: "blur(8px)", border: `1px solid ${BORDER_M}`, borderRadius: 10, padding: "10px 14px", fontSize: 14, color: TEXT, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
+                    onFocus={e => (e.currentTarget.style.borderColor = RED)} onBlur={e => (e.currentTarget.style.borderColor = BORDER_M)} />
+                </div>
+                <div>
+                  <label style={{ display: "block", color: TEXT35, fontSize: 12, marginBottom: 7, fontWeight: 500 }}>Yêu cầu cần tư vấn / Lời nhắn</label>
+                  <textarea rows={3} placeholder="Ví dụ: Tôi muốn tư vấn thiết kế website..." required value={message} onChange={e => setMessage(e.target.value)}
+                    style={{ width: "100%", backgroundColor: "var(--vw-bg-input)", backdropFilter: "blur(8px)", border: `1px solid ${BORDER_M}`, borderRadius: 10, padding: "10px 14px", fontSize: 14, color: TEXT, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s", resize: "none" }}
+                    onFocus={e => (e.currentTarget.style.borderColor = RED)}
+                    onBlur={e => (e.currentTarget.style.borderColor = BORDER_M)} />
+                </div>
+                <button type="submit" disabled={isSubmitting}
+                  style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, backgroundColor: isSubmitting ? RED_MED : RED, color: "#fff", border: "none", borderRadius: 40, padding: "13px 24px", fontSize: 14, fontWeight: 600, cursor: isSubmitting ? "not-allowed" : "pointer", marginTop: 6, letterSpacing: "-0.01em", transition: "background-color 0.2s", opacity: isSubmitting ? 0.7 : 1 }}
+                  onMouseEnter={e => { if (!isSubmitting) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#bb3218" }}
+                  onMouseLeave={e => { if (!isSubmitting) (e.currentTarget as HTMLButtonElement).style.backgroundColor = RED }}>
+                  {isSubmitting ? "Đang gửi..." : "Gửi yêu cầu tư vấn"} <ArrowRight size={15} />
                 </button>
               </form>
             )}
