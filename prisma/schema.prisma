@@ -30,10 +30,10 @@ model SeoPage {
   pageId        String   @unique
   label         String
   title         String
-  description   String
+  description   String   @db.Text
   keywords      String?
   ogTitle       String?
-  ogDescription String?
+  ogDescription String?  @db.Text
   canonical     String
   ogImage       String?
   robots        String   @default("index, follow")
@@ -46,8 +46,8 @@ model Article {
   category      String
   categoryColor String   @default("#16a34a")
   title         String
-  excerpt       String
-  content       String
+  excerpt       String   @db.Text
+  content       String   @db.Text
   cover         String
   coverPublicId String?
   author        String
@@ -65,7 +65,7 @@ model ContactLead {
   name      String
   email     String
   phone     String?
-  message   String
+  message   String   @db.Text
   source    String   @default("website")
   createdAt DateTime @default(now())
 }
@@ -77,7 +77,7 @@ model TeamMember {
   avatar      String
   years       Int
   badge       String
-  bio         String
+  bio         String   @db.Text
   skills      String[]
   isSpotlight Boolean  @default(false)
   specialty   String?
@@ -89,13 +89,13 @@ model TeamMember {
 
 model Project {
   id        String   @id @default(cuid())
-  num       String   // Ví dụ "01"
-  title     String   // Ví dụ "VinFast Toàn Cầu"
-  category  String   // Ví dụ "WEB · STRATEGY"
-  year      String   // Ví dụ "2024"
-  result    String   // Ví dụ "+340% traffic"
-  img       String   // URL hình ảnh
-  accent    String   // Màu nhấn HEX "#C8A261"
-  url       String?  // URL liên kết (tuỳ chọn)
+  num       String // Ví dụ "01"
+  title     String // Ví dụ "VinFast Toàn Cầu"
+  category  String // Ví dụ "WEB · STRATEGY"
+  year      String // Ví dụ "2024"
+  result    String // Ví dụ "+340% traffic"
+  img       String // URL hình ảnh
+  accent    String // Màu nhấn HEX "#C8A261"
+  url       String? // URL liên kết (tuỳ chọn)
   createdAt DateTime @default(now())
 }
