@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Settings } from "lucide-react";
-import { RED, TEXT, TEXT60, TEXT35, BORDER, GLASS } from "@/legacy-app/tokens";
+import { RED, TEXT, TEXT60, TEXT35, BORDER, GLASS } from "@/features/legacy-core/tokens";
 
 const COLS = [
   { title: "Dịch vụ", links: ["Landing Page","Cửa hàng online","Website doanh nghiệp","SEO & Google","Thiết kế thương hiệu"] },

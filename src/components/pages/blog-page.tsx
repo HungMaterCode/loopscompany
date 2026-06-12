@@ -1,3 +1,3 @@
 "use client";
 
-export { Blog as BlogPage } from "@/legacy-pages/Blog";
+export { Blog as BlogPage } from "@/features/blog/Blog";

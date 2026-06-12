@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Admin } from "@/legacy-pages/Admin";
+import { Admin } from "@/features/admin/Admin";
 
 export function AdminShell({ adminName }: { adminName: string }) {
   const router = useRouter();

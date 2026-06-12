@@ -1,3 +1,3 @@
 "use client";
 
-export { default as TeamPage } from "@/section-change/pages/TeamPage";
+export { default as TeamPage } from "@/features/pages/TeamPage";

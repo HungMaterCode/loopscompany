@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { BlogPostPage } from "@/components/pages/blog-post-page";
 import { getArticleBySlug, getArticleSlugs } from "@/lib/site-config-server";
-import { ARTICLES } from "@/legacy-app/articles";
+import { ARTICLES } from "@/features/legacy-core/articles";
 import { articleJsonLd, buildMetadata } from "@/lib/seo";
 
 export const revalidate = 3600;

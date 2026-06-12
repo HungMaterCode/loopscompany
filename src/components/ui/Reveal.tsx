@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { motion, useInView } from "motion/react";
-import { EASE } from "@/legacy-app/tokens";
+import { EASE } from "@/features/legacy-core/tokens";
 
 interface RevealProps {
   children: React.ReactNode;

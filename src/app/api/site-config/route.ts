@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSiteConfig, saveSiteConfigToDb } from "@/lib/site-config-server";
-import type { SiteConfig } from "@/legacy-app/site-config-api";
+import type { SiteConfig } from "@/features/legacy-core/site-config-api";
 import { getSession } from "@/lib/auth";
 
 export async function GET() {

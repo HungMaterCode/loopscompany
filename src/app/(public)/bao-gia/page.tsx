@@ -1,4 +1,4 @@
-import BaogiaWeb from "@/baogiaWebsite/BaogiaWeb";
+import BaogiaWeb from "@/features/baogia/BaogiaWeb";
 
 export default function BaoGiaPage() {
   return (

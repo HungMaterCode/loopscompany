@@ -5,8 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, User } from "lucide-react";
-import { NAV_LINKS } from "@/legacy-app/data";
-import { RED, TEXT, TEXT60, BORDER, GLASS_LIGHT, EASE } from "@/legacy-app/tokens";
+import { NAV_LINKS } from "@/features/legacy-core/data";
+import { RED, TEXT, TEXT60, BORDER, GLASS_LIGHT, EASE } from "@/features/legacy-core/tokens";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);

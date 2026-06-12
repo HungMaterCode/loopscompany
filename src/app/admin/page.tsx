@@ -1,7 +1,7 @@
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { SiteDataProvider } from "@/legacy-app/SiteDataContext";
+import { SiteDataProvider } from "@/features/legacy-core/SiteDataContext";
 import { getSiteConfig } from "@/lib/site-config-server";
 
 export const dynamic = "force-dynamic";
