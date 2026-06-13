@@ -151,7 +151,7 @@ function FeaturedArticle({ article }: { article: typeof ARTICLES[0] }) {
 
 // ─── Blog Page ────────────────────────────────────────────────────────────────
 
-export function Blog() {
+export function Blog({ bgUrl }: { bgUrl?: string }) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -167,8 +167,13 @@ export function Blog() {
   const rest = filtered.filter(a => a.slug !== featured.slug || activeCategory !== "all" || searchQuery);
 
   return (
-    <div style={{ backgroundColor: "var(--sc-bg-1)", minHeight: "100vh" }}>
+    <div style={{ backgroundColor: "var(--sc-bg-1)", minHeight: "100vh", position: "relative" }}>
       <style>{GLOBAL_CSS}</style>
+      
+      {bgUrl && (
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${bgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.15, pointerEvents: 'none', zIndex: 0 }} />
+      )}
+      
       <Header />
 
       {/* ── Hero header ── */}

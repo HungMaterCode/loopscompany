@@ -176,7 +176,7 @@ function RelatedCard({ article, index }: { article: typeof ARTICLES[0]; index: n
 
 // ─── Blog Post Page ────────────────────────────────────────────────────────────
 
-export function BlogPost({ slug }: { slug: string }) {
+export function BlogPost({ slug, bgUrl }: { slug: string; bgUrl?: string }) {
   const router = useRouter();
   const article = ARTICLES.find(a => a.slug === slug);
 
@@ -204,8 +204,12 @@ export function BlogPost({ slug }: { slug: string }) {
   };
 
   return (
-    <div style={{ backgroundColor: "var(--sc-bg-1)", minHeight: "100vh" }}>
+    <div style={{ backgroundColor: "var(--sc-bg-1)", minHeight: "100vh", position: "relative" }}>
       <style>{GLOBAL_CSS}</style>
+
+      {bgUrl && (
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${bgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.15, pointerEvents: 'none', zIndex: 0 }} />
+      )}
 
       {/* Reading progress bar */}
       <motion.div style={{

@@ -2,6 +2,6 @@
 
 import { BlogPost } from "@/features/blog/BlogPost";
 
-export function BlogPostPage({ slug }: { slug: string }) {
-  return <BlogPost slug={slug} />;
+export function BlogPostPage({ slug, bgUrl }: { slug: string; bgUrl?: string }) {
+  return <BlogPost slug={slug} bgUrl={bgUrl} />;
 }

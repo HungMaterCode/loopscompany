@@ -98,7 +98,7 @@ export async function getSiteConfig(): Promise<SiteConfig> {
       };
     }
   } catch (err) {
-    console.error("Error in getSiteConfig:", err);
+    // console.error("Error in getSiteConfig:", err);
   }
   return DEFAULT_SITE_CONFIG;
 }

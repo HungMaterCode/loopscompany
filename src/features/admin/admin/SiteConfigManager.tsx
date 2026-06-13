@@ -220,12 +220,14 @@ export function SiteConfigManager({ t, isDark }: Props) {
       )}
 
       {/* Tabs */}
-      <div className={`flex border-b ${t.divider}`}>
+      <div className={`flex flex-wrap border-b ${t.divider}`}>
         {[
           { id: 'banners', label: 'Banners Chính (Hero)' },
           { id: 'philosophy', label: 'Triết lý của chúng tôi' },
           { id: 'whyChooseUs', label: 'Tại sao chọn chúng tôi' },
           { id: 'process', label: 'Quy trình làm việc' },
+          { id: 'blog', label: 'Bài viết (Blog)' },
+          { id: 'portfolio', label: 'Dự án (Portfolio)' },
         ].map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
             className={`px-6 py-3 text-sm font-semibold transition-all border-b-2 ${activeTab === tab.id ? 'border-red-500 text-red-500' : `border-transparent ${t.textMuted} hover:${t.text}`}`}>
@@ -236,6 +238,24 @@ export function SiteConfigManager({ t, isDark }: Props) {
 
       {/* Tab Content */}
       <div className="pt-2">
+        {activeTab === ('portfolio' as any) && (
+          <div className={`rounded-2xl p-6 ${t.card}`}>
+            <h3 className={`mb-4 text-lg font-bold ${t.text}`}>Cấu hình trang Dự án (Portfolio)</h3>
+            <div className="grid grid-cols-1 gap-4">
+              <InputRow label="Hình nền chìm (Background URL)" value={form.portfolio?.bgUrl || ''} type="url"
+                onChange={(v: string) => setForm({ ...form, portfolio: { ...form.portfolio, bgUrl: v } })} />
+            </div>
+          </div>
+        )}
+        {activeTab === ('blog' as any) && (
+          <div className={`rounded-2xl p-6 ${t.card}`}>
+            <h3 className={`mb-4 text-lg font-bold ${t.text}`}>Cấu hình trang Bài viết (Blog)</h3>
+            <div className="grid grid-cols-1 gap-4">
+              <InputRow label="Hình nền chìm (Background URL)" value={form.blog?.bgUrl || ''} type="url"
+                onChange={(v: string) => setForm({ ...form, blog: { ...form.blog, bgUrl: v } })} />
+            </div>
+          </div>
+        )}
         {activeTab === 'banners' && (
           <div className="grid gap-6">
             {form.hero.slides.map((slide, idx) => (

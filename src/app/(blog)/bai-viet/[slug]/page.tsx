@@ -47,6 +47,10 @@ export default async function BlogPostRoute({ params }: Props) {
       })
     : null;
 
+  const { getSiteConfig } = await import("@/lib/site-config-server");
+  const config = await getSiteConfig();
+  const bgUrl = config.blog?.bgUrl || "";
+
   return (
     <>
       {jsonLd && (
@@ -55,7 +59,7 @@ export default async function BlogPostRoute({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <BlogPostPage slug={slug} />
+      <BlogPostPage slug={slug} bgUrl={bgUrl} />
     </>
   );
 }

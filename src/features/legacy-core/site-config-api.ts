@@ -95,6 +95,9 @@ export interface SiteConfig {
       desc: string;
     }[];
   };
+  blog: {
+    bgUrl: string;
+  };
 }
 
 export const DEFAULT_SITE_CONFIG: SiteConfig = {
@@ -163,7 +166,7 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
   portfolio: {
     bgLight: "#f5f5f7",
     bgDark: "#080b16",
-    bgUrl: "",
+    bgUrl: IMG.whyBg,
     titleRegular: "Bảo tàng",
     titleItalic: "Dự án",
     subtitle: "DỰ ÁN ĐÃ THỰC HIỆN",
@@ -205,6 +208,9 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
       { num: "03", iconName: "Rocket", title: "Ra mắt website", desc: "Website go-live trong 5 ngày làm việc. Đầy đủ domain, hosting, SSL và email." },
       { num: "04", iconName: "Headphones", title: "Hỗ trợ liên tục", desc: "Báo cáo traffic hàng tháng, cập nhật nội dung và hỗ trợ kỹ thuật 24/7 qua Zalo." },
     ],
+  },
+  blog: {
+    bgUrl: "",
   },
 };
 

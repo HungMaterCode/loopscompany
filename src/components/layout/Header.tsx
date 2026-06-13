@@ -11,8 +11,8 @@ const F = "inherit";
 
 const NAV = [
   { label: 'Dịch vụ', href: '/#services'  },
-  { label: 'Dự án',   href: '/#portfolio' },
-  { label: 'Báo giá', href: '/#pricing'   },
+  { label: 'Dự án',   href: '/du-an' },
+  { label: 'Báo giá', href: '/bao-gia'   },
   { label: 'Đội ngũ', href: '/doi-ngu'    },
   { label: 'Bài viết', href: '/bai-viet'  },
   { label: 'Liên hệ', href: '/#lien-he'   },

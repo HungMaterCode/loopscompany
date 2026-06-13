@@ -27,42 +27,49 @@ const DEFAULT_PROJECTS: ProjectItem[] = [
   { num: '08', title: 'FoodieApp Vietnam',     cat: 'APP · CONTENT',    year: '2026', result: '50K downloads',  img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600', accent: '#C8A261' },
 ];
 
+import Link from 'next/link';
+import { generateSlug } from '@/lib/slug';
+
 function MarqueeCard({ p }: { p: ProjectItem }) {
+  const href = p.url || `/du-an/${generateSlug(p.title)}`;
+
   return (
-    <div style={{
-      flexShrink: 0, width: '280px', borderRadius: '16px', overflow: 'hidden',
-      background: 'var(--sc-item-bg)',
-      border: '1px solid var(--sc-item-border)',
-      cursor: 'pointer', marginRight: '20px',
-      transition: 'border-color 0.2s, transform 0.3s, background 0.38s ease',
-      boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-    }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = p.accent + '50'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--sc-item-border)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
-    >
-      {/* Image */}
-      <div style={{ height: '180px', overflow: 'hidden', position: 'relative' }}>
-        <img src={p.img} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.5s' }}
-          onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.06)'}
-          onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-        />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.65) 100%)' }} />
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: p.accent }} />
-        <div style={{ position: 'absolute', top: '12px', left: '12px', fontFamily: F, fontSize: '9px', letterSpacing: '0.14em', color: p.accent, fontWeight: 700 }}>{p.num}</div>
-        <div style={{ position: 'absolute', top: '10px', right: '10px', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <ArrowUpRight size={13} color="white" />
+    <Link href={href} style={{ textDecoration: 'none' }}>
+      <div style={{
+        flexShrink: 0, width: '280px', borderRadius: '16px', overflow: 'hidden',
+        background: 'var(--sc-item-bg)',
+        border: '1px solid var(--sc-item-border)',
+        cursor: 'pointer', marginRight: '20px',
+        transition: 'border-color 0.2s, transform 0.3s, background 0.38s ease',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+      }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = p.accent + '50'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'; }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--sc-item-border)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
+      >
+        {/* Image */}
+        <div style={{ height: '180px', overflow: 'hidden', position: 'relative' }}>
+          <img src={p.img} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.5s' }}
+            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.06)'}
+            onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+          />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.65) 100%)' }} />
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: p.accent }} />
+          <div style={{ position: 'absolute', top: '12px', left: '12px', fontFamily: F, fontSize: '9px', letterSpacing: '0.14em', color: p.accent, fontWeight: 700 }}>{p.num}</div>
+          <div style={{ position: 'absolute', top: '10px', right: '10px', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ArrowUpRight size={13} color="white" />
+          </div>
+          <div style={{ position: 'absolute', bottom: '10px', left: '12px' }}>
+            <div style={{ fontFamily: F, fontSize: '8px', letterSpacing: '0.16em', color: 'rgba(255,255,255,0.75)', marginBottom: '3px' }}>{p.cat}</div>
+            <div style={{ fontFamily: F, fontSize: '16px', color: 'white', fontWeight: 700 }}>{p.title}</div>
+          </div>
         </div>
-        <div style={{ position: 'absolute', bottom: '10px', left: '12px' }}>
-          <div style={{ fontFamily: F, fontSize: '8px', letterSpacing: '0.16em', color: 'rgba(255,255,255,0.75)', marginBottom: '3px' }}>{p.cat}</div>
-          <div style={{ fontFamily: F, fontSize: '16px', color: 'white', fontWeight: 700 }}>{p.title}</div>
+        {/* Footer */}
+        <div style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontFamily: F, fontSize: '10px', color: 'var(--sc-text-35)', letterSpacing: '0.08em' }}>{p.year}</span>
+          <span style={{ fontFamily: F, fontSize: '10px', color: p.accent, fontWeight: 600, background: p.accent + '18', borderRadius: '9999px', padding: '3px 10px' }}>{p.result}</span>
         </div>
       </div>
-      {/* Footer */}
-      <div style={{ padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontFamily: F, fontSize: '10px', color: 'var(--sc-text-35)', letterSpacing: '0.08em' }}>{p.year}</span>
-        <span style={{ fontFamily: F, fontSize: '10px', color: p.accent, fontWeight: 600, background: p.accent + '18', borderRadius: '9999px', padding: '3px 10px' }}>{p.result}</span>
-      </div>
-    </div>
+    </Link>
   );
 }
 
@@ -107,10 +114,10 @@ export function ProjectMuseumSection() {
               </em>
             </h2>
           </div>
-          <a href="#" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontFamily: F, fontSize: '12px', color: 'var(--sc-text-35)', textDecoration: 'none', border: '1px solid var(--sc-border-h)', borderRadius: '9999px', padding: '8px 16px', transition: 'all 0.2s' }}
+          <Link href="/du-an" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontFamily: F, fontSize: '12px', color: 'var(--sc-text-35)', textDecoration: 'none', border: '1px solid var(--sc-border-h)', borderRadius: '9999px', padding: '8px 16px', transition: 'all 0.2s' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--sc-text)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--sc-border-m)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--sc-text-35)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--sc-border-h)'; }}
-          ><ExternalLink size={12} /> Xem tất cả</a>
+          ><ExternalLink size={12} /> Xem tất cả</Link>
         </motion.div>
       </div>
 
