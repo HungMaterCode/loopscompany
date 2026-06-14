@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { DEFAULT_SITE_CONFIG } from "../src/legacy-app/site-config-api";
-import { ARTICLES } from "../src/legacy-app/articles";
+import { DEFAULT_SITE_CONFIG } from "../src/features/legacy-core/site-config-api";
+import { ARTICLES } from "../src/features/legacy-core/articles";
 
 const prisma = new PrismaClient();
 

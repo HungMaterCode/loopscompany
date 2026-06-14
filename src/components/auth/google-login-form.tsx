@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-import { RED, TEXT, TEXT60, BG, GLASS, BORDER } from "@/legacy-app/tokens";
+import { RED, TEXT, TEXT60, BG, GLASS, BORDER } from "@/features/legacy-core/tokens";
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 

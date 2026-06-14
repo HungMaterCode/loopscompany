@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { Settings } from "lucide-react";
-import { RED, TEXT, TEXT60, TEXT35, BORDER, GLASS } from "@/legacy-app/tokens";
+import { RED, TEXT, TEXT60, TEXT35, BORDER, GLASS } from "@/features/legacy-core/tokens";
 
 const COLS = [
-  { title: "Dịch vụ", links: ["Landing Page","Cửa hàng online","Website doanh nghiệp","SEO & Google","Thiết kế thương hiệu"] },
-  { title: "Bảng giá", links: ["W-01 — 189K/tháng","W-02 — 589K/tháng","W-03 — 889K/tháng","W-04 — 1.189K/tháng"] },
-  { title: "Công ty",  links: ["Về chúng tôi","Quy trình làm việc","Danh mục dự án","Blog & Kiến thức","Tuyển dụng"] },
+  { title: "Dịch vụ", links: [{ label: "Landing Page", href: "/#services" }, { label: "Website doanh nghiệp", href: "/#services" }] },
+  { title: "Bảng giá", links: [{ label: "W-01 — 189K/tháng", href: "/bao-gia" }, { label: "Tất cả bảng giá", href: "/bao-gia" }] },
+  { title: "Công ty",  links: [{ label: "Đội ngũ", href: "/doi-ngu" }, { label: "Danh mục dự án", href: "/du-an" }, { label: "Blog & Kiến thức", href: "/bai-viet" }] },
 ];
 
 export function Footer() {
@@ -38,10 +38,10 @@ export function Footer() {
               <p style={{ color: TEXT, fontSize: 12, fontWeight: 600, margin: "0 0 12px", letterSpacing: "0.02em" }}>{col.title}</p>
               <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8 }}>
                 {col.links.map(link => (
-                  <li key={link}>
-                    <a href="#" style={{ color: TEXT35, fontSize: 12, textDecoration: "none", transition: "color 0.2s" }}
+                  <li key={link.label}>
+                    <Link href={link.href} style={{ color: TEXT35, fontSize: 12, textDecoration: "none", transition: "color 0.2s" }}
                       onMouseEnter={e => (e.currentTarget.style.color = TEXT)}
-                      onMouseLeave={e => (e.currentTarget.style.color = TEXT35)}>{link}</a>
+                      onMouseLeave={e => (e.currentTarget.style.color = TEXT35)}>{link.label}</Link>
                   </li>
                 ))}
               </ul>

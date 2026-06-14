@@ -2,7 +2,7 @@ import { prisma } from "./prisma";
 import {
   DEFAULT_SITE_CONFIG,
   type SiteConfig,
-} from "@/legacy-app/site-config-api";
+} from "@/features/legacy-core/site-config-api";
 
 export async function getSiteConfig(): Promise<SiteConfig> {
   try {
@@ -98,7 +98,7 @@ export async function getSiteConfig(): Promise<SiteConfig> {
       };
     }
   } catch (err) {
-    console.error("Error in getSiteConfig:", err);
+    // console.error("Error in getSiteConfig:", err);
   }
   return DEFAULT_SITE_CONFIG;
 }
@@ -210,7 +210,7 @@ export async function getArticleSlugs() {
     });
     return rows.map((r) => r.slug);
   } catch {
-    const { ARTICLES } = await import("@/legacy-app/articles");
+    const { ARTICLES } = await import("@/features/legacy-core/articles");
     return ARTICLES.map((a) => a.slug);
   }
 }

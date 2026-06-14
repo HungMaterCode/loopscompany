@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,7 +23,24 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@/features/*": [
+        "./src/features/*"
+      ],
+      "@/components/*": [
+        "./src/components/*"
+      ],
+      "@/sections/*": [
+        "./src/components/sections/*"
+      ],
+      "@/hooks/*": [
+        "./src/hooks/*"
+      ],
+      "@/seo/*": [
+        "./src/seo/*"
+      ]
     }
   },
   "include": [
@@ -30,5 +51,12 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "src/legacy-app/**", "src/legacy-pages/Login.tsx", "src/legacy-pages/UserLogin.tsx", "src/legacy-pages/NotFound.tsx", "src/legacy-pages/AdminProtected.tsx"]
+  "exclude": [
+    "node_modules",
+    "src/legacy-app/**",
+    "src/legacy-pages/Login.tsx",
+    "src/legacy-pages/UserLogin.tsx",
+    "src/legacy-pages/NotFound.tsx",
+    "src/legacy-pages/AdminProtected.tsx"
+  ]
 }
