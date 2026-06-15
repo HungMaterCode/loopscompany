@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { RED, TEXT, TEXT60, BG, GLASS, BORDER } from "@/legacy-app/tokens";
+import { RED, TEXT, TEXT60, BG, GLASS, BORDER } from "@/features/legacy-core/tokens";
 
 export function AdminLoginForm({ defaultEmail = "admin@loops.vn" }: { defaultEmail?: string }) {
   const router = useRouter();

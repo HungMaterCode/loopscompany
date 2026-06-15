@@ -1,7 +1,7 @@
-import { SiteDataProvider } from "@/legacy-app/SiteDataContext";
+import { SiteDataProvider } from "@/features/legacy-core/SiteDataContext";
 import { getSiteConfig } from "@/lib/site-config-server";
-import { BG, GLOBAL_CSS } from "@/legacy-app/tokens";
-import { ThemeProvider } from "@/legacy-app/theme-context";
+import { BG, GLOBAL_CSS } from "@/features/legacy-core/tokens";
+import { ThemeProvider } from "@/features/legacy-core/theme-context";
 
 export default async function BlogLayout({
   children,

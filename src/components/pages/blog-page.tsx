@@ -1,3 +1,7 @@
 "use client";
 
-export { Blog as BlogPage } from "@/legacy-pages/Blog";
+import { Blog } from "@/features/blog/Blog";
+
+export function BlogPage({ bgUrl }: { bgUrl?: string }) {
+  return <Blog bgUrl={bgUrl} />;
+}

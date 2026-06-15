@@ -6,12 +6,10 @@ import { WhySection } from "@/sections/WhySection";
 import { ProcessSection } from "@/sections/ProcessSection";
 import { BlogPreviewSection } from "@/sections/BlogPreviewSection";
 import { ContactSection } from "@/sections/ContactSection";
-import {
-  CreativeVisionSection,
-  ServiceEcosystemSection,
-  ProjectMuseumSection,
-  WebsiteRentalPricingSection,
-} from "@/section-change";
+import { CreativeVisionSection } from "@/sections/CreativeVisionSection";
+import { ServiceEcosystemSection } from "@/sections/ServiceEcosystemSection";
+import { ProjectMuseumSection } from "@/sections/ProjectMuseumSection";
+import { WebsiteRentalPricingSection } from "@/sections/WebsiteRentalPricingSection";
 
 export function HomePage() {
   return (

@@ -10,6 +10,10 @@ export const metadata = buildMetadata({
   path: "/bai-viet",
 });
 
-export default function BlogRoute() {
-  return <BlogPage />;
+import { fetchSiteConfig } from "@/features/legacy-core/site-config-api";
+
+export default async function BlogRoute() {
+  const config = await fetchSiteConfig();
+  const bgUrl = config.blog?.bgUrl || "";
+  return <BlogPage bgUrl={bgUrl} />;
 }
