@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Linkedin, Twitter, Instagram, Mail, ArrowUpRight } from 'lucide-react';
+import { MessageCircle, Facebook, Phone, Mail, ArrowUpRight } from 'lucide-react';
 import { useTilt3D } from '@/hooks/useTilt3D';
+import { useTheme } from '@/features/legacy-core/theme-context';
 
 const F = "'Plus Jakarta Sans', sans-serif";
 const SERIF = "'Instrument Serif', serif";
@@ -14,7 +16,7 @@ const team = [
     gradient: 'linear-gradient(145deg, #C8A261 0%, #E8D4A8 40%, #B89240 100%)',
     marginTop: '0px',
     skills: ['Brand Identity', 'UI/UX Design', 'Creative Strategy', 'Art Direction'],
-    socials: { linkedin: '#', twitter: '#', instagram: '#', email: 'an@loops.vn' },
+    socials: { zalo: 'https://zalo.me/0901234567', facebook: 'https://facebook.com', phone: '0901234567', email: 'an@loops.vn' },
     projects: 120,
     years: 10,
   },
@@ -26,7 +28,7 @@ const team = [
     gradient: 'linear-gradient(145deg, #2A2520 0%, #1A1A1A 50%, #3A3530 100%)',
     marginTop: '48px',
     skills: ['UX Research', 'Interaction Design', 'Prototyping', 'Motion Design'],
-    socials: { linkedin: '#', twitter: '#', instagram: '#', email: 'duc@loops.vn' },
+    socials: { zalo: 'https://zalo.me/0901234567', facebook: 'https://facebook.com', phone: '0901234567', email: 'duc@loops.vn' },
     projects: 85,
     years: 7,
   },
@@ -38,7 +40,7 @@ const team = [
     gradient: 'linear-gradient(145deg, #8C8276 0%, #B0A898 50%, #7A7068 100%)',
     marginTop: '24px',
     skills: ['Full-Stack Dev', 'System Architecture', 'AI Integration', 'DevOps'],
-    socials: { linkedin: '#', twitter: '#', instagram: '#', email: 'minh@loops.vn' },
+    socials: { zalo: 'https://zalo.me/0901234567', facebook: 'https://facebook.com', phone: '0901234567', email: 'minh@loops.vn' },
     projects: 95,
     years: 8,
   },
@@ -50,7 +52,7 @@ const team = [
     gradient: 'linear-gradient(145deg, #4A3560 0%, #6B5080 50%, #3A2550 100%)',
     marginTop: '0px',
     skills: ['Digital Marketing', 'Content Strategy', 'Performance Ads', 'Analytics'],
-    socials: { linkedin: '#', twitter: '#', instagram: '#', email: 'linh@loops.vn' },
+    socials: { zalo: 'https://zalo.me/0901234567', facebook: 'https://facebook.com', phone: '0901234567', email: 'linh@loops.vn' },
     projects: 110,
     years: 6,
   },
@@ -62,7 +64,7 @@ const team = [
     gradient: 'linear-gradient(145deg, #1E3A3A 0%, #2A5050 50%, #163030 100%)',
     marginTop: '60px',
     skills: ['Video Production', 'Storytelling', 'Photography', 'Post-Production'],
-    socials: { linkedin: '#', twitter: '#', instagram: '#', email: 'nam@loops.vn' },
+    socials: { zalo: 'https://zalo.me/0901234567', facebook: 'https://facebook.com', phone: '0901234567', email: 'nam@loops.vn' },
     projects: 75,
     years: 5,
   },
@@ -74,18 +76,44 @@ const team = [
     gradient: 'linear-gradient(145deg, #3A2020 0%, #5A3030 50%, #2A1818 100%)',
     marginTop: '30px',
     skills: ['Copywriting', 'SEO Content', 'Editorial', 'Brand Voice'],
-    socials: { linkedin: '#', twitter: '#', instagram: '#', email: 'mai@loops.vn' },
+    socials: { zalo: 'https://zalo.me/0901234567', facebook: 'https://facebook.com', phone: '0901234567', email: 'mai@loops.vn' },
     projects: 200,
     years: 6,
   },
 ];
 
+interface TeamMember {
+  id?: string;
+  name: string;
+  role: string;
+  roleEn?: string;
+  en?: string;
+  avatar?: string;
+  photo?: string;
+  years: number;
+  projects: number;
+  bio: string;
+  skills: string[];
+  gradient: string;
+  email?: string;
+  zalo?: string | null;
+  facebook?: string | null;
+  phone?: string | null;
+  socials?: {
+    zalo?: string;
+    facebook?: string;
+    phone?: string;
+    email?: string;
+  };
+  active?: boolean;
+}
+
 const FRAME_DEPTH = 14;
 
-function TeamCard({ member, index }: { member: typeof team[0]; index: number }) {
+function TeamCard({ member, index }: { member: TeamMember; index: number }) {
   const tilt = useTilt3D(6, 900);
   const isLight = index === 0;
-  const edgeDark  = isLight ? '#C8C3B5' : '#111';
+  const edgeDark = isLight ? '#C8C3B5' : '#111';
   const edgeDark2 = isLight ? '#B0ABA0' : '#0a0a0a';
   const frameShadow = isLight
     ? `${FRAME_DEPTH}px ${FRAME_DEPTH}px 0 #C8C3B5, ${FRAME_DEPTH * 2}px ${FRAME_DEPTH * 2}px 0 #B0ABA0, ${FRAME_DEPTH * 2}px ${FRAME_DEPTH * 2}px 36px rgba(26,20,10,0.12)`
@@ -115,16 +143,31 @@ function TeamCard({ member, index }: { member: typeof team[0]; index: number }) 
             position: 'relative',
             overflow: 'hidden',
           }}>
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(145deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)' }} />
-            <div style={{ position: 'absolute', bottom: '-30px', left: '50%', transform: 'translateX(-50%)', width: '140px', height: '180px', borderRadius: '70px 70px 0 0', background: 'rgba(251,249,246,0.1)', backdropFilter: 'blur(2px)' }} />
-            <div style={{ position: 'absolute', top: '50px', left: '50%', transform: 'translateX(-50%)', width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(251,249,246,0.18)', border: '1.5px solid rgba(251,249,246,0.3)', boxShadow: '2px 2px 0 rgba(0,0,0,0.1)' }} />
+            {(member.avatar || member.photo) ? (
+              <img src={member.avatar || member.photo} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
+            ) : (
+              <>
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(145deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)' }} />
+                <div style={{ position: 'absolute', bottom: '-30px', left: '50%', transform: 'translateX(-50%)', width: '140px', height: '180px', borderRadius: '70px 70px 0 0', background: 'rgba(251,249,246,0.1)', backdropFilter: 'blur(2px)' }} />
+                <div style={{ position: 'absolute', top: '50px', left: '50%', transform: 'translateX(-50%)', width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(251,249,246,0.18)', border: '1.5px solid rgba(251,249,246,0.3)', boxShadow: '2px 2px 0 rgba(0,0,0,0.1)' }} />
+              </>
+            )}
 
             <div style={{ position: 'absolute', top: '14px', left: '14px', right: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontFamily: F, fontSize: '8px', letterSpacing: '0.15em', color: 'rgba(200,162,97,0.85)', fontWeight: 700 }}>
-                LOOPS / {String(index + 1).padStart(2, '0')}
+              <div style={{
+                padding: '5px 10px',
+                borderRadius: '8px',
+                background: 'rgba(0,0,0,0.4)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255,255,255,0.1)',
+              }}>
+                <span style={{ fontFamily: F, fontSize: '8px', letterSpacing: '0.15em', color: 'var(--sc-accent)', fontWeight: 700 }}>
+                  LOOPS / {String(index + 1).padStart(2, '0')}
+                </span>
               </div>
               <div style={{ display: 'flex', gap: '5px' }}>
-                {[Linkedin, Twitter].map((Icon, j) => (
+                {[MessageCircle, Facebook].map((Icon, j) => (
                   <div key={j} style={{ width: '24px', height: '24px', borderRadius: '50%', border: '1px solid rgba(251,249,246,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
                     <Icon size={8} color="rgba(251,249,246,0.6)" />
                   </div>
@@ -132,10 +175,18 @@ function TeamCard({ member, index }: { member: typeof team[0]; index: number }) 
               </div>
             </div>
 
-            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '18px 18px 16px', background: 'linear-gradient(transparent, rgba(26,20,10,0.5))' }}>
-              <div style={{ fontFamily: F, fontSize: '8px', letterSpacing: '0.16em', color: 'rgba(200,162,97,0.9)', fontWeight: 700 }}>
-                {member.en.toUpperCase()}
-              </div>
+            <div style={{
+              position: 'absolute', bottom: '14px', left: '14px', zIndex: 2,
+              padding: '5px 10px',
+              borderRadius: '8px',
+              background: 'rgba(0,0,0,0.4)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.1)',
+            }}>
+              <span style={{ fontFamily: F, fontSize: '8px', letterSpacing: '0.14em', color: 'var(--sc-accent)', fontWeight: 700 }}>
+                {(member.roleEn || member.en || '').toUpperCase()}
+              </span>
             </div>
           </div>
 
@@ -144,18 +195,19 @@ function TeamCard({ member, index }: { member: typeof team[0]; index: number }) 
         </div>
 
         {/* Info */}
-        <div style={{ marginTop: '24px', paddingLeft: '4px' }}>
-          <div style={{ fontFamily: F, fontSize: '17px', fontWeight: 600, color: '#1A1A1A', letterSpacing: '-0.01em', marginBottom: '3px' }}>{member.name}</div>
-          <div style={{ fontFamily: F, fontSize: '10px', color: '#C8A261', letterSpacing: '0.08em', marginBottom: '10px', fontWeight: 600 }}>{member.role}</div>
-          <p style={{ fontFamily: F, fontSize: '12px', color: '#8C8276', lineHeight: 1.7, margin: '0 0 14px', fontStyle: 'italic' }}>{member.bio}</p>
+        <div style={{ marginTop: '36px', paddingLeft: '4px' }}>
+          <div style={{ fontFamily: F, fontSize: '17px', fontWeight: 600, color: 'var(--sc-text)', letterSpacing: '-0.01em', marginBottom: '3px' }}>{member.name}</div>
+          <div style={{ fontFamily: F, fontSize: '10px', color: 'var(--sc-accent)', letterSpacing: '0.08em', marginBottom: '10px', fontWeight: 600 }}>{member.role}</div>
+          <p style={{ fontFamily: F, fontSize: '12px', color: 'var(--sc-text-60)', lineHeight: 1.7, margin: '0 0 14px', fontStyle: 'italic', textAlign: 'justify' }}>{member.bio}</p>
 
           {/* Skills */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
             {member.skills.map(skill => (
               <span key={skill} style={{
-                fontFamily: F, fontSize: '10px', color: '#8C8276',
-                border: '1px solid #DDD8CC', borderRadius: '9999px',
+                fontFamily: F, fontSize: '10px', color: 'var(--sc-text-60)',
+                border: '1px solid var(--sc-border)', borderRadius: '9999px',
                 padding: '3px 10px', letterSpacing: '0.02em',
+                backgroundColor: 'var(--vw-ghost)',
               }}>
                 {skill}
               </span>
@@ -165,43 +217,69 @@ function TeamCard({ member, index }: { member: typeof team[0]; index: number }) 
           {/* Stats */}
           <div style={{ display: 'flex', gap: '20px', marginBottom: '14px' }}>
             <div>
-              <div style={{ fontFamily: SERIF, fontSize: '22px', color: '#1A1A1A', fontWeight: 300, lineHeight: 1 }}>{member.projects}+</div>
-              <div style={{ fontFamily: F, fontSize: '10px', color: '#8C8276', marginTop: '3px' }}>Dự án</div>
+              <div style={{ fontFamily: SERIF, fontSize: '22px', color: 'var(--sc-text)', fontWeight: 300, lineHeight: 1 }}>{member.projects}+</div>
+              <div style={{ fontFamily: F, fontSize: '10px', color: 'var(--sc-text-60)', marginTop: '3px' }}>Dự án</div>
             </div>
             <div>
-              <div style={{ fontFamily: SERIF, fontSize: '22px', color: '#1A1A1A', fontWeight: 300, lineHeight: 1 }}>{member.years}</div>
-              <div style={{ fontFamily: F, fontSize: '10px', color: '#8C8276', marginTop: '3px' }}>Năm kinh nghiệm</div>
+              <div style={{ fontFamily: SERIF, fontSize: '22px', color: 'var(--sc-text)', fontWeight: 300, lineHeight: 1 }}>{member.years}</div>
+              <div style={{ fontFamily: F, fontSize: '10px', color: 'var(--sc-text-60)', marginTop: '3px' }}>Năm kinh nghiệm</div>
             </div>
           </div>
 
           {/* Social links */}
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             {[
-              { icon: Linkedin, href: member.socials.linkedin },
-              { icon: Twitter, href: member.socials.twitter },
-              { icon: Instagram, href: member.socials.instagram },
-            ].map(({ icon: Icon, href }, j) => (
-              <a key={j} href={href} style={{
-                width: '32px', height: '32px', borderRadius: '50%',
-                border: '1px solid #DDD8CC', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                textDecoration: 'none', transition: 'all 0.2s', color: '#8C8276',
-              }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#C8A261'; (e.currentTarget as HTMLElement).style.color = '#C8A261'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#DDD8CC'; (e.currentTarget as HTMLElement).style.color = '#8C8276'; }}
-              >
-                <Icon size={13} />
-              </a>
-            ))}
-            <a href={`mailto:${member.socials.email}`} style={{
+              { name: 'Zalo', icon: MessageCircle, value: member.zalo || member.socials?.zalo },
+              { name: 'Facebook', icon: Facebook, value: member.facebook || member.socials?.facebook },
+              { name: 'Số điện thoại', icon: Phone, value: member.phone || member.socials?.phone },
+            ].map(({ name, icon: Icon, value }, j) => {
+              const hasValue = !!value && value !== '#';
+              const href = name === 'Số điện thoại' && hasValue ? `tel:${value}` : (hasValue ? value : '#');
+
+              return (
+                <a
+                  key={j}
+                  href={href}
+                  onClick={e => {
+                    if (!hasValue) {
+                      e.preventDefault();
+                      alert(`${member.name} chưa cung cấp ${name}.`);
+                    }
+                  }}
+                  title={hasValue ? `Liên hệ qua ${name}` : `${member.name} chưa cung cấp ${name}`}
+                  style={{
+                    width: '32px', height: '32px', borderRadius: '50%',
+                    border: '1px solid var(--sc-border)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    textDecoration: 'none', transition: 'all 0.25s',
+                    color: hasValue ? 'var(--sc-text-60)' : 'var(--sc-text-25)',
+                    cursor: 'pointer',
+                    opacity: hasValue ? 1 : 0.6,
+                  }}
+                  onMouseEnter={e => {
+                    if (hasValue) {
+                      (e.currentTarget as HTMLElement).style.borderColor = 'var(--sc-accent)';
+                      (e.currentTarget as HTMLElement).style.color = 'var(--sc-accent)';
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.borderColor = 'var(--sc-border)';
+                    (e.currentTarget as HTMLElement).style.color = hasValue ? 'var(--sc-text-60)' : 'var(--sc-text-25)';
+                  }}
+                >
+                  <Icon size={13} />
+                </a>
+              );
+            })}
+            <a href={`mailto:${member.email || member.socials?.email}`} style={{
               display: 'flex', alignItems: 'center', gap: '6px',
-              fontFamily: F, fontSize: '11px', color: '#8C8276', textDecoration: 'none',
+              fontFamily: F, fontSize: '11px', color: 'var(--sc-text-60)', textDecoration: 'none',
               transition: 'color 0.2s', marginLeft: '4px',
             }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#C8A261'}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#8C8276'}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--sc-accent)'}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'var(--sc-text-60)'}
             >
               <Mail size={12} />
-              {member.socials.email}
+              {member.email || member.socials?.email}
             </a>
           </div>
         </div>
@@ -211,49 +289,52 @@ function TeamCard({ member, index }: { member: typeof team[0]; index: number }) 
 }
 
 export default function TeamPage() {
+  const { isDark } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [members, setMembers] = useState<any[]>([]);
+
+  useEffect(() => {
+    setMounted(true);
+    fetch("/api/team")
+      .then((res) => {
+        if (!res.ok) throw new Error("API failed");
+        return res.json();
+      })
+      .then((data) => {
+        if (data && data.length > 0) {
+          // Display active team members
+          setMembers(data.filter((m: any) => m.active !== false));
+        } else {
+          setMembers(team);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch team members:", err);
+        setMembers(team);
+      });
+  }, []);
+
+  const activeDark = !mounted || isDark;
+
   return (
-    <div style={{ backgroundColor: '#F5F2EB', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: activeDark ? '#121212' : '#F5F2EB', minHeight: '100vh', transition: 'background-color 0.3s ease' }}>
 
       {/* Hero */}
       <section style={{ backgroundColor: '#1A1A1A', padding: 'clamp(100px, 12vw, 160px) clamp(24px, 5vw, 100px) clamp(80px, 10vw, 120px)', overflow: 'hidden', position: 'relative' }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 120%, rgba(200,162,97,0.08) 0%, transparent 60%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 120%, var(--sc-accent-dim) 0%, transparent 60%)', pointerEvents: 'none' }} />
         <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative' }}>
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9 }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-              <div style={{ width: '24px', height: '1.5px', background: '#C8A261' }} />
-              <span style={{ fontSize: '9px', letterSpacing: '0.28em', color: '#C8A261', fontFamily: F, fontWeight: 700 }}>ĐỘI NGŨ LOOPS</span>
-            </div>
             <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(40px, 6vw, 88px)', fontWeight: 400, color: '#FBF9F6', lineHeight: 1.05, letterSpacing: '-0.02em', margin: '0 0 24px', maxWidth: '700px' }}>
               Những bộ óc đứng sau{' '}
-              <em style={{ fontStyle: 'italic', color: '#C8A261' }}>các siêu phẩm</em>
+              <em style={{ fontStyle: 'italic', color: 'var(--sc-accent)' }}>các siêu phẩm</em>
             </h1>
             <p style={{ fontFamily: F, fontSize: 'clamp(14px, 1.5vw, 16px)', color: 'rgba(251,249,246,0.5)', lineHeight: 1.75, maxWidth: '480px', margin: 0 }}>
               Mỗi thành viên là một chuyên gia trong lĩnh vực của mình — cùng nhau, chúng tôi tạo ra những trải nghiệm kỹ thuật số không thể nào quên.
             </p>
-          </motion.div>
-
-          {/* Stats row */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            style={{ display: 'flex', gap: 'clamp(32px, 5vw, 64px)', marginTop: 'clamp(40px, 5vw, 64px)', flexWrap: 'wrap' }}
-          >
-            {[
-              { n: '6+', label: 'Chuyên gia core team' },
-              { n: '50+', label: 'Cộng tác viên toàn cầu' },
-              { n: '680+', label: 'Dự án hoàn thành' },
-              { n: '15', label: 'Quốc gia phục vụ' },
-            ].map(s => (
-              <div key={s.label}>
-                <div style={{ fontFamily: SERIF, fontSize: 'clamp(28px, 3.5vw, 44px)', color: '#C8A261', fontWeight: 400, lineHeight: 1 }}>{s.n}</div>
-                <div style={{ fontFamily: F, fontSize: '11px', color: 'rgba(251,249,246,0.35)', marginTop: '6px', letterSpacing: '0.04em' }}>{s.label}</div>
-              </div>
-            ))}
           </motion.div>
         </div>
       </section>
@@ -269,17 +350,17 @@ export default function TeamPage() {
             viewport={{ once: true }}
             style={{ marginBottom: '64px' }}
           >
-            <h2 style={{ fontFamily: F, fontSize: 'clamp(18px, 2vw, 24px)', fontWeight: 300, color: '#1A1A1A', letterSpacing: '-0.01em', margin: '0 0 8px' }}>
+            <h2 style={{ fontFamily: F, fontSize: 'clamp(18px, 2vw, 24px)', fontWeight: 300, color: activeDark ? '#FBF9F6' : '#1A1A1A', letterSpacing: '-0.01em', margin: '0 0 8px' }}>
               Core Team
             </h2>
-            <p style={{ fontFamily: F, fontSize: '13px', color: '#8C8276', margin: 0 }}>
+            <p style={{ fontFamily: F, fontSize: '13px', color: activeDark ? 'rgba(251,249,246,0.5)' : '#8C8276', margin: 0 }}>
               Đội ngũ sáng lập và lãnh đạo chính
             </p>
           </motion.div>
 
           <div style={{ display: 'flex', gap: '60px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-            {team.map((member, i) => (
-              <TeamCard key={member.name} member={member} index={i} />
+            {members.map((member, i) => (
+              <TeamCard key={member.id || member.name} member={member} index={i} />
             ))}
           </div>
         </div>
@@ -296,8 +377,8 @@ export default function TeamPage() {
             style={{ marginBottom: '56px' }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <div style={{ width: '24px', height: '1.5px', background: '#C8A261' }} />
-              <span style={{ fontSize: '9px', letterSpacing: '0.28em', color: '#C8A261', fontFamily: F, fontWeight: 700 }}>VĂN HÓA LOOPS</span>
+              <div style={{ width: '24px', height: '1.5px', background: 'var(--sc-accent)' }} />
+              <span style={{ fontSize: '9px', letterSpacing: '0.28em', color: 'var(--sc-accent)', fontFamily: F, fontWeight: 700 }}>VĂN HÓA LOOPS</span>
             </div>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px, 4vw, 56px)', fontWeight: 400, color: '#FBF9F6', lineHeight: 1.1, letterSpacing: '-0.02em', margin: 0 }}>
               Chúng tôi tin vào{' '}
@@ -326,10 +407,10 @@ export default function TeamPage() {
                   cursor: 'default',
                   transition: 'background 0.2s, border-color 0.2s',
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(200,162,97,0.04)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(200,162,97,0.15)'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--sc-accent-dim)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--sc-accent-border)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.02)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.06)'; }}
               >
-                <div style={{ fontFamily: F, fontSize: '9px', letterSpacing: '0.2em', color: '#C8A261', fontWeight: 700, marginBottom: '16px' }}>{v.num}</div>
+                <div style={{ fontFamily: F, fontSize: '9px', letterSpacing: '0.2em', color: 'var(--sc-accent)', fontWeight: 700, marginBottom: '16px' }}>{v.num}</div>
                 <h3 style={{ fontFamily: F, fontSize: 'clamp(14px, 1.5vw, 17px)', fontWeight: 600, color: '#FBF9F6', margin: '0 0 12px', lineHeight: 1.3, letterSpacing: '-0.01em' }}>{v.title}</h3>
                 <p style={{ fontFamily: F, fontSize: '13px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.7, margin: 0 }}>{v.desc}</p>
               </motion.div>
@@ -339,7 +420,7 @@ export default function TeamPage() {
       </section>
 
       {/* Join us CTA */}
-      <section style={{ backgroundColor: '#F5F2EB', padding: 'clamp(80px, 10vw, 120px) clamp(24px, 5vw, 100px)', textAlign: 'center' }}>
+      <section style={{ backgroundColor: activeDark ? '#121212' : '#F5F2EB', transition: 'background-color 0.3s ease', padding: 'clamp(80px, 10vw, 120px) clamp(24px, 5vw, 100px)', textAlign: 'center' }}>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -348,27 +429,29 @@ export default function TeamPage() {
           style={{ maxWidth: '560px', margin: '0 auto' }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '24px' }}>
-            <div style={{ width: '24px', height: '1.5px', background: '#C8A261' }} />
-            <span style={{ fontSize: '9px', letterSpacing: '0.28em', color: '#C8A261', fontFamily: F, fontWeight: 700 }}>GIA NHẬP ĐỘI NGŨ</span>
-            <div style={{ width: '24px', height: '1.5px', background: '#C8A261' }} />
+            <div style={{ width: '24px', height: '1.5px', background: 'var(--sc-accent)' }} />
+            <span style={{ fontSize: '9px', letterSpacing: '0.28em', color: 'var(--sc-accent)', fontFamily: F, fontWeight: 700 }}>GIA NHẬP ĐỘI NGŨ</span>
+            <div style={{ width: '24px', height: '1.5px', background: 'var(--sc-accent)' }} />
           </div>
-          <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px, 4vw, 52px)', fontWeight: 400, color: '#1A1A1A', lineHeight: 1.1, letterSpacing: '-0.02em', margin: '0 0 20px' }}>
+          <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px, 4vw, 52px)', fontWeight: 400, color: activeDark ? '#FBF9F6' : '#1A1A1A', lineHeight: 1.1, letterSpacing: '-0.02em', margin: '0 0 20px' }}>
             Bạn có muốn tạo ra điều{' '}
-            <em style={{ fontStyle: 'italic', color: '#C8A261' }}>phi thường?</em>
+            <em style={{ fontStyle: 'italic', color: 'var(--sc-accent)' }}>phi thường?</em>
           </h2>
-          <p style={{ fontFamily: F, fontSize: '14px', color: '#8C8276', lineHeight: 1.75, margin: '0 0 36px' }}>
+          <p style={{ fontFamily: F, fontSize: '14px', color: activeDark ? 'rgba(251,249,246,0.5)' : '#8C8276', lineHeight: 1.75, margin: '0 0 36px' }}>
             Chúng tôi luôn tìm kiếm những tài năng đam mê và muốn để lại dấu ấn trong thế giới kỹ thuật số.
           </p>
           <a
             href="mailto:hello@loops.vn"
             style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
-              fontFamily: F, fontSize: '14px', fontWeight: 600, color: '#fff',
-              background: '#1A1A1A', borderRadius: '9999px', padding: '14px 32px',
+              fontFamily: F, fontSize: '14px', fontWeight: 600,
+              color: activeDark ? '#1A1A1A' : '#fff',
+              background: activeDark ? '#C8A261' : '#1A1A1A',
+              borderRadius: '9999px', padding: '14px 32px',
               textDecoration: 'none', transition: 'all 0.25s', letterSpacing: '0.01em',
             }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#C8A261'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#1A1A1A'; }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = activeDark ? '#fff' : '#C8A261'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = activeDark ? '#C8A261' : '#1A1A1A'; }}
           >
             Gửi hồ sơ ứng tuyển
             <ArrowUpRight size={15} />

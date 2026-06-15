@@ -149,8 +149,7 @@ export function Header() {
         }}>
           {/* Logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', flexShrink: 0 }}>
-            <Globe size={18} color={textColor} style={{ transition: 'color 0.3s' }} />
-            <span style={{ color: textColor, fontWeight: 800, fontSize: '15px', fontFamily: F, letterSpacing: '0.06em', transition: 'color 0.3s' }}>LOOPS</span>
+            <img src="/LOOP_LOGO_removeBG.png" alt="LOOP Logo" style={{ height: '42px', objectFit: 'contain' }} />
           </Link>
 
           {/* Desktop links — hidden on mobile via display none at <768px */}
@@ -368,7 +367,7 @@ export function Header() {
             )}
 
             {/* Desktop CTA */}
-            <Link href="/#pricing" onClick={e => goTo('/#pricing', e)}
+            <Link href="/bao-gia"
               className="hidden md:flex"
               style={{
                 alignItems: 'center', gap: '6px', borderRadius: '9999px', padding: '8px 20px',
@@ -459,8 +458,7 @@ export function Header() {
               transition={{ delay: 0.1 }}
               style={{ position: 'absolute', top: '24px', left: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}
             >
-              <Globe size={18} color="var(--sc-text)" />
-              <span style={{ color: 'var(--sc-text)', fontWeight: 800, fontSize: '15px', fontFamily: F, letterSpacing: '0.06em' }}>LOOPS</span>
+              <img src="/LOOP_LOGO_removeBG.png" alt="LOOP Logo" style={{ height: '38px', objectFit: 'contain' }} />
             </motion.div>
 
             {/* Close button */}
@@ -555,8 +553,7 @@ export function Header() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Globe size={18} color="var(--sc-accent)" />
-                    <span style={{ color: 'var(--sc-text)', fontWeight: 800, fontSize: '15px', fontFamily: F, letterSpacing: '0.06em' }}>LOOPS</span>
+                    <img src="/LOOP_LOGO_removeBG.png" alt="LOOP Logo" style={{ height: '36px', objectFit: 'contain' }} />
                     <span style={{
                       backgroundColor: 'rgba(255,107,157,0.12)', color: 'var(--sc-accent)',
                       fontSize: '9px', fontWeight: 700, padding: '3px 8px', borderRadius: '999px',
@@ -649,8 +646,8 @@ export function Header() {
                   transition={{ delay: 0.4 }}
                   style={{ width: '100%' }}
                 >
-                  <Link href="/#pricing"
-                    onClick={e => { goTo('/#pricing', e); setMenu(false); }}
+                  <Link href="/bao-gia"
+                    onClick={() => setMenu(false)}
                     style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                       borderRadius: '9999px', padding: '14px 28px',

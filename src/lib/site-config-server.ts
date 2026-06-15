@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { generateSlug } from "./slug";
 import {
   DEFAULT_SITE_CONFIG,
   type SiteConfig,
@@ -29,6 +30,14 @@ export async function getSiteConfig(): Promise<SiteConfig> {
             img: p.img,
             accent: p.accent,
             url: p.url || null,
+            slug: p.slug || generateSlug(p.title),
+            overview: p.overview || null,
+            challenge: p.challenge || null,
+            solution: p.solution || null,
+            roles: p.roles || [],
+            mockupImg: p.mockupImg || null,
+            solutionImg1: p.solutionImg1 || null,
+            solutionImg2: p.solutionImg2 || null,
           }))
         });
         dbProjects = await prisma.project.findMany({
@@ -47,6 +56,14 @@ export async function getSiteConfig(): Promise<SiteConfig> {
       img: p.img,
       accent: p.accent,
       url: p.url || undefined,
+      slug: p.slug || undefined,
+      overview: p.overview || undefined,
+      challenge: p.challenge || undefined,
+      solution: p.solution || undefined,
+      roles: p.roles,
+      mockupImg: p.mockupImg || undefined,
+      solutionImg1: p.solutionImg1 || undefined,
+      solutionImg2: p.solutionImg2 || undefined,
     }));
 
     if (row?.config) {
@@ -146,6 +163,14 @@ export async function saveSiteConfigToDb(config: SiteConfig) {
           img: p.img,
           accent: p.accent,
           url: p.url || null,
+          slug: p.slug || generateSlug(p.title),
+          overview: p.overview || null,
+          challenge: p.challenge || null,
+          solution: p.solution || null,
+          roles: p.roles || [],
+          mockupImg: p.mockupImg || null,
+          solutionImg1: p.solutionImg1 || null,
+          solutionImg2: p.solutionImg2 || null,
         };
 
         if (id) {

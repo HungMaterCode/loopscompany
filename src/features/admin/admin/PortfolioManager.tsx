@@ -35,9 +35,18 @@ export function PortfolioManager({ t, isDark }: Props) {
     result: "",
     img: "",
     accent: PRESET_COLORS[0],
-    url: ""
+    url: "",
+    slug: "",
+    overview: "",
+    challenge: "",
+    solution: "",
+    roles: [],
+    mockupImg: "",
+    solutionImg1: "",
+    solutionImg2: ""
   });
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<"basic" | "detail">("basic");
 
   // Sync state when config loads
   useEffect(() => {
@@ -102,15 +111,36 @@ export function PortfolioManager({ t, isDark }: Props) {
       result: "",
       img: "",
       accent: PRESET_COLORS[Math.min(projects.length, PRESET_COLORS.length - 1)],
-      url: ""
+      url: "",
+      slug: "",
+      overview: "",
+      challenge: "",
+      solution: "",
+      roles: [],
+      mockupImg: "",
+      solutionImg1: "",
+      solutionImg2: ""
     });
+    setActiveTab("basic");
     setIsAdding(true);
     setEditIdx(null);
   };
 
   const openEdit = (idx: number) => {
     setEditIdx(idx);
-    setForm({ ...projects[idx] });
+    const p = projects[idx];
+    setForm({
+      ...p,
+      slug: p.slug || "",
+      overview: p.overview || "",
+      challenge: p.challenge || "",
+      solution: p.solution || "",
+      roles: p.roles || [],
+      mockupImg: p.mockupImg || "",
+      solutionImg1: p.solutionImg1 || "",
+      solutionImg2: p.solutionImg2 || ""
+    });
+    setActiveTab("basic");
     setIsAdding(false);
   };
 
@@ -380,7 +410,7 @@ export function PortfolioManager({ t, isDark }: Props) {
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className={`w-full max-w-lg rounded-2xl p-6 ${t.modal} max-h-[90vh] overflow-y-auto`}>
+          <div className={`w-full max-w-2xl rounded-2xl p-6 ${t.modal} max-h-[90vh] overflow-y-auto`}>
             <style>{`
               .theme-light-picker {
                 color: #1f2937 !important;
@@ -389,115 +419,246 @@ export function PortfolioManager({ t, isDark }: Props) {
                 color: #ffffff !important;
               }
             `}</style>
+            
+            {/* Header */}
             <div className="mb-5 flex items-center justify-between">
               <h3 className={`text-lg font-bold ${t.text}`}>{isAdding ? "Thêm dự án mới" : "Chỉnh sửa dự án"}</h3>
               <button onClick={closeModal} className={`rounded-lg p-1.5 transition ${isDark ? "hover:bg-white/10 text-white/50" : "hover:bg-gray-100 text-gray-400"}`}>
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Số thứ tự *</label>
-                  <input value={form.num} onChange={(e) => setForm((f) => ({ ...f, num: e.target.value }))}
-                    className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
-                    placeholder="01" />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Tên dự án *</label>
-                  <input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                    className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
-                    placeholder="VinFast Toàn Cầu" />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Phân loại (Tag)*</label>
-                  <input value={form.cat} onChange={(e) => setForm((f) => ({ ...f, cat: e.target.value }))}
-                    className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
-                    placeholder="WEB · STRATEGY" />
-                </div>
-                <div>
-                  <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Năm thực hiện *</label>
-                  <input value={form.year} onChange={(e) => setForm((f) => ({ ...f, year: e.target.value }))}
-                    className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
-                    placeholder="2024" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Chỉ số nổi bật *</label>
-                  <input value={form.result} onChange={(e) => setForm((f) => ({ ...f, result: e.target.value }))}
-                    className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
-                    placeholder="+340% traffic" />
-                </div>
-                <div>
-                  <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Màu nhấn chủ đạo *</label>
-                  <div className="flex gap-2 items-center">
-                    <input
-                      type="color"
-                      value={form.accent}
-                      onChange={(e) => setForm((f) => ({ ...f, accent: e.target.value }))}
-                      className="w-10 h-10 cursor-pointer rounded border border-gray-300 bg-transparent shrink-0"
-                    />
-                    <input
-                      type="text"
-                      value={form.accent}
-                      onChange={(e) => setForm((f) => ({ ...f, accent: e.target.value }))}
-                      className={`w-full rounded-xl px-3 py-2 text-xs transition ${t.input} font-mono`}
-                      placeholder="#C8A261"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className={`mb-1 block text-[10px] uppercase tracking-wider ${t.textFaint}`}>Bảng màu gợi ý</label>
-                <div className="flex flex-wrap gap-2 mt-1.5">
-                  {PRESET_COLORS.map((color) => (
-                    <button
-                      key={color}
-                      type="button"
-                      onClick={() => setForm((f) => ({ ...f, accent: color }))}
-                      className={`w-7 h-7 rounded-full border transition flex items-center justify-center ${form.accent.toLowerCase() === color.toLowerCase() ? "border-white scale-110 shadow-lg" : "border-transparent opacity-80 hover:opacity-100"}`}
-                      style={{ backgroundColor: color }}
-                    >
-                      {form.accent.toLowerCase() === color.toLowerCase() && (
-                        <Check className="h-3 w-3 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Hình ảnh dự án *</label>
-                <div className="flex gap-3 items-start">
-                  <div className="flex-1 flex flex-col gap-2">
-                    <input value={form.img} onChange={(e) => setForm((f) => ({ ...f, img: e.target.value }))}
-                      className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
-                      placeholder="https://example.com/image.jpg" />
-                    {form.img && (
-                      <div className="w-full aspect-video rounded-xl bg-gray-950 overflow-hidden border border-gray-800 relative">
-                        <img src={form.img} className="w-full h-full object-cover" alt="Preview" />
-                      </div>
-                    )}
-                  </div>
-                  <UploadButton onUploadComplete={(url) => setForm((f) => ({ ...f, img: url }))} />
-                </div>
-                <p className={`mt-1.5 text-xs ${t.textFaint}`}>Hãy tải lên ảnh có tỉ lệ 16:9 để hiển thị đẹp nhất.</p>
-              </div>
-
-              <div>
-                <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Đường dẫn liên kết (Tùy chọn)</label>
-                <input value={form.url || ""} onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
-                  className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
-                  placeholder="https://vinfastauto.com/" />
-              </div>
+            {/* Tab Navigation */}
+            <div className={`flex border-b ${isDark ? 'border-white/10' : 'border-gray-200'} mb-5`}>
+              <button
+                type="button"
+                onClick={() => setActiveTab("basic")}
+                className={`pb-2.5 px-4 text-sm font-semibold border-b-2 transition ${
+                  activeTab === "basic"
+                    ? isDark
+                      ? "border-[#C8A261] text-[#C8A261]"
+                      : "border-red-600 text-red-600"
+                    : `${t.textMuted} border-transparent hover:${t.text}`
+                }`}
+              >
+                Thông tin cơ bản
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("detail")}
+                className={`pb-2.5 px-4 text-sm font-semibold border-b-2 transition ${
+                  activeTab === "detail"
+                    ? isDark
+                      ? "border-[#C8A261] text-[#C8A261]"
+                      : "border-red-600 text-red-600"
+                    : `${t.textMuted} border-transparent hover:${t.text}`
+                }`}
+              >
+                Chi tiết Case Study
+              </button>
             </div>
-            <div className="mt-6 flex justify-end gap-3">
+
+            {/* Tab Contents */}
+            <div className="space-y-4">
+              {activeTab === "basic" ? (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Số thứ tự *</label>
+                      <input value={form.num} onChange={(e) => setForm((f) => ({ ...f, num: e.target.value }))}
+                        className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
+                        placeholder="01" />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Tên dự án *</label>
+                      <input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                        className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
+                        placeholder="VinFast Toàn Cầu" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Phân loại (Tag)*</label>
+                      <input value={form.cat} onChange={(e) => setForm((f) => ({ ...f, cat: e.target.value }))}
+                        className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
+                        placeholder="WEB · STRATEGY" />
+                    </div>
+                    <div>
+                      <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Năm thực hiện *</label>
+                      <input value={form.year} onChange={(e) => setForm((f) => ({ ...f, year: e.target.value }))}
+                        className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
+                        placeholder="2024" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Chỉ số nổi bật *</label>
+                      <input value={form.result} onChange={(e) => setForm((f) => ({ ...f, result: e.target.value }))}
+                        className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
+                        placeholder="+340% traffic" />
+                    </div>
+                    <div>
+                      <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Màu nhấn chủ đạo *</label>
+                      <div className="flex gap-2 items-center">
+                        <input
+                          type="color"
+                          value={form.accent}
+                          onChange={(e) => setForm((f) => ({ ...f, accent: e.target.value }))}
+                          className="w-10 h-10 cursor-pointer rounded border border-gray-300 bg-transparent shrink-0"
+                        />
+                        <input
+                          type="text"
+                          value={form.accent}
+                          onChange={(e) => setForm((f) => ({ ...f, accent: e.target.value }))}
+                          className={`w-full rounded-xl px-3 py-2 text-xs transition ${t.input} font-mono`}
+                          placeholder="#C8A261"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className={`mb-1 block text-[10px] uppercase tracking-wider ${t.textFaint}`}>Bảng màu gợi ý</label>
+                    <div className="flex flex-wrap gap-2 mt-1.5">
+                      {PRESET_COLORS.map((color) => (
+                        <button
+                          key={color}
+                          type="button"
+                          onClick={() => setForm((f) => ({ ...f, accent: color }))}
+                          className={`w-7 h-7 rounded-full border transition flex items-center justify-center ${form.accent.toLowerCase() === color.toLowerCase() ? "border-white scale-110 shadow-lg" : "border-transparent opacity-80 hover:opacity-100"}`}
+                          style={{ backgroundColor: color }}
+                        >
+                          {form.accent.toLowerCase() === color.toLowerCase() && (
+                            <Check className="h-3 w-3 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Hình ảnh đại diện dự án *</label>
+                    <div className="flex gap-3 items-start">
+                      <div className="flex-1 flex flex-col gap-2">
+                        <input value={form.img} onChange={(e) => setForm((f) => ({ ...f, img: e.target.value }))}
+                          className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
+                          placeholder="https://example.com/image.jpg" />
+                        {form.img && (
+                          <div className="w-full aspect-video rounded-xl bg-gray-950 overflow-hidden border border-gray-800 relative">
+                            <img src={form.img} className="w-full h-full object-cover" alt="Preview" />
+                          </div>
+                        )}
+                      </div>
+                      <UploadButton onUploadComplete={(url) => setForm((f) => ({ ...f, img: url }))} />
+                    </div>
+                    <p className={`mt-1.5 text-xs ${t.textFaint}`}>Hãy tải lên ảnh có tỉ lệ 16:9 để hiển thị đẹp nhất.</p>
+                  </div>
+
+                  <div>
+                    <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Đường dẫn liên kết (Tùy chọn)</label>
+                    <input value={form.url || ""} onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
+                      className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
+                      placeholder="https://vinfastauto.com/" />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Đường dẫn thân thiện (Slug)</label>
+                    <input value={form.slug || ""} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
+                      className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
+                      placeholder="sunhouse-real-estate" />
+                    <p className={`mt-1 text-xs ${t.textFaint}`}>Để trống sẽ tự động tạo từ tên dự án. Ví dụ: "sunhouse-real-estate"</p>
+                  </div>
+
+                  <div>
+                    <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Tổng quan dự án</label>
+                    <textarea value={form.overview || ""} onChange={(e) => setForm((f) => ({ ...f, overview: e.target.value }))}
+                      className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input} h-20 resize-none`}
+                      placeholder="Mô tả tóm tắt tổng quan về dự án..." />
+                  </div>
+
+                  <div>
+                    <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Vai trò của LOOP (Mỗi dòng là 1 vai trò)</label>
+                    <textarea value={form.roles?.join("\n") || ""} onChange={(e) => setForm((f) => ({ ...f, roles: e.target.value.split("\n").filter(Boolean) }))}
+                      className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input} h-20 resize-none`}
+                      placeholder="Phân tích & Tư vấn UX&#10;Thiết kế Giao diện (UI Design)&#10;Phát triển Web / App" />
+                  </div>
+
+                  <div>
+                    <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Thách thức & Bối cảnh</label>
+                    <textarea value={form.challenge || ""} onChange={(e) => setForm((f) => ({ ...f, challenge: e.target.value }))}
+                      className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input} h-20 resize-none`}
+                      placeholder="Mô tả bối cảnh thị trường và những khó khăn cần giải quyết..." />
+                  </div>
+
+                  <div>
+                    <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Ảnh minh họa Thách thức (Mockup Image)</label>
+                    <div className="flex gap-3 items-start">
+                      <div className="flex-1 flex flex-col gap-2">
+                        <input value={form.mockupImg || ""} onChange={(e) => setForm((f) => ({ ...f, mockupImg: e.target.value }))}
+                          className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
+                          placeholder="https://example.com/mockup.jpg" />
+                        {form.mockupImg && (
+                          <div className="w-full aspect-video rounded-xl bg-gray-950 overflow-hidden border border-gray-800 relative">
+                            <img src={form.mockupImg} className="w-full h-full object-cover" alt="Mockup Preview" />
+                          </div>
+                        )}
+                      </div>
+                      <UploadButton onUploadComplete={(url) => setForm((f) => ({ ...f, mockupImg: url }))} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Giải pháp Đột phá</label>
+                    <textarea value={form.solution || ""} onChange={(e) => setForm((f) => ({ ...f, solution: e.target.value }))}
+                      className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input} h-20 resize-none`}
+                      placeholder="Mô tả các giải pháp đột phá đã áp dụng cho dự án..." />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Ảnh giải pháp chi tiết 1</label>
+                      <div className="flex gap-3 items-start">
+                        <div className="flex-1 flex flex-col gap-2">
+                          <input value={form.solutionImg1 || ""} onChange={(e) => setForm((f) => ({ ...f, solutionImg1: e.target.value }))}
+                            className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
+                            placeholder="https://example.com/solution1.jpg" />
+                          {form.solutionImg1 && (
+                            <div className="w-full aspect-video rounded-xl bg-gray-950 overflow-hidden border border-gray-800 relative">
+                              <img src={form.solutionImg1} className="w-full h-full object-cover" alt="Solution 1 Preview" />
+                            </div>
+                          )}
+                        </div>
+                        <UploadButton onUploadComplete={(url) => setForm((f) => ({ ...f, solutionImg1: url }))} />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Ảnh giải pháp chi tiết 2</label>
+                      <div className="flex gap-3 items-start">
+                        <div className="flex-1 flex flex-col gap-2">
+                          <input value={form.solutionImg2 || ""} onChange={(e) => setForm((f) => ({ ...f, solutionImg2: e.target.value }))}
+                            className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
+                            placeholder="https://example.com/solution2.jpg" />
+                          {form.solutionImg2 && (
+                            <div className="w-full aspect-video rounded-xl bg-gray-950 overflow-hidden border border-gray-800 relative">
+                              <img src={form.solutionImg2} className="w-full h-full object-cover" alt="Solution 2 Preview" />
+                            </div>
+                          )}
+                        </div>
+                        <UploadButton onUploadComplete={(url) => setForm((f) => ({ ...f, solutionImg2: url }))} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="mt-6 flex justify-end gap-3 border-t border-white/10 pt-4">
               <button onClick={closeModal} className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition ${t.btnGhost}`}>Hủy</button>
               <button onClick={saveForm} className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition ${t.btn}`}>
                 {isAdding ? "Thêm mới" : "Lưu thay đổi"}

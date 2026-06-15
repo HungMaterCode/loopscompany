@@ -110,6 +110,336 @@ async function main() {
       },
     });
   }
+
+  const domains = [
+    { id: "dm_01", label: ".com", price: 350000, order: 1, active: true },
+    { id: "dm_02", label: ".vn", price: 438000, order: 2, active: true },
+    { id: "dm_03", label: ".com.vn", price: 563000, order: 3, active: true },
+    { id: "dm_04", label: ".net", price: 400000, order: 4, active: true },
+    { id: "dm_05", label: ".org", price: 438000, order: 5, active: true },
+    { id: "dm_06", label: ".info", price: 313000, order: 6, active: true },
+    { id: "dm_07", label: ".biz", price: 350000, order: 7, active: true },
+    { id: "dm_08", label: ".io", price: 875000, order: 8, active: true },
+  ];
+
+  for (const domain of domains) {
+    await (prisma as any).domain.upsert({
+      where: { id: domain.id },
+      update: domain,
+      create: domain,
+    });
+  }
+
+  const hostings = [
+    { id: "ht_01", label: "Khởi đầu", price: 540000, order: 1, active: true },
+    { id: "ht_02", label: "Tiêu chuẩn", price: 918000, order: 2, active: true },
+    { id: "ht_03", label: "Nâng cao", price: 1836000, order: 3, active: true },
+    { id: "ht_04", label: "Doanh nghiệp", price: 3366000, order: 4, active: true },
+  ];
+
+  for (const hosting of hostings) {
+    await (prisma as any).hosting.upsert({
+      where: { id: hosting.id },
+      update: hosting,
+      create: hosting,
+    });
+  }
+
+  const seoPackages = [
+    { id: "seo_01", label: "Miễn phí", description: "5 bài /tháng", price: 0, order: 1, active: true },
+    { id: "seo_02", label: "Cơ bản", description: "10 bài /tháng", price: 2000000, order: 2, active: true },
+    { id: "seo_03", label: "Doanh nghiệp", description: "15 bài /tháng", price: 6000000, order: 3, active: true },
+    { id: "seo_04", label: "Phổ biến", description: "20 bài /tháng", price: 36000000, order: 4, active: true },
+  ];
+
+  for (const seoPack of seoPackages) {
+    await (prisma as any).seoPackage.upsert({
+      where: { id: seoPack.id },
+      update: seoPack,
+      create: seoPack,
+    });
+  }
+
+  const defaultWebPages = [
+    // Mua gói website (isRental: false)
+    {
+      code: "W-01",
+      name: "Landing Page",
+      tag: "Khởi đầu",
+      subtitle: "Trang đích chuyển đổi cao",
+      price: 3890000,
+      cover: "https://images.unsplash.com/photo-1634084462412-b54873c0a56d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900&q=80",
+      icon: "Zap",
+      highlight: false,
+      features: ["1 trang đích tối ưu CRO", "Form liên hệ + Zalo OA tích hợp", "Responsive hoàn hảo mọi thiết bị", "SEO cơ bản On-page", "Tên miền phụ miễn phí", "Băng thông không giới hạn"],
+      missing: ["SSL bảo mật cao cấp", "Email doanh nghiệp", "Blog & nội dung"],
+      order: 1,
+      active: true,
+      isRental: false,
+    },
+    {
+      code: "W-02",
+      name: "Bán Hàng Online",
+      tag: "Tiêu chuẩn",
+      subtitle: "Cửa hàng online đầy đủ tính năng",
+      price: 6890000,
+      cover: "https://images.unsplash.com/photo-1631125915902-d8abe9225ff2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900&q=80",
+      icon: "ShoppingBag",
+      highlight: false,
+      features: ["Danh mục sản phẩm & giỏ hàng", "Quản lý đơn hàng tự động", "Thanh toán online đa cổng", "SSL bảo mật miễn phí", "Tên miền riêng .com/.vn", "Hỗ trợ ưu tiên"],
+      missing: ["SEO nâng cao", "Email doanh nghiệp"],
+      order: 2,
+      active: true,
+      isRental: false,
+    },
+    {
+      code: "W-03",
+      name: "Doanh Nghiệp",
+      tag: "Phổ biến nhất",
+      subtitle: "Website tổ chức chuyên nghiệp",
+      price: 9890000,
+      cover: "https://images.unsplash.com/photo-1766330977451-de1b64b5e641?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900&q=80",
+      icon: "Building2",
+      highlight: true,
+      features: ["Đa trang + Blog tích hợp", "Thiết kế premium cao cấp", "SEO nâng cao & Core Web Vitals", "Google Analytics & Heatmap", "Tên miền + Email doanh nghiệp", "Hỗ trợ VIP 24/7", "Sao lưu dữ liệu hàng tuần"],
+      missing: [],
+      order: 3,
+      active: true,
+      isRental: false,
+    },
+    {
+      code: "W-04",
+      name: "Theo Yêu Cầu",
+      tag: "Enterprise",
+      subtitle: "Giải pháp tùy chỉnh độc quyền",
+      price: 12890000,
+      cover: "https://images.unsplash.com/photo-1709486511766-76bdd8b51713?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900&q=80",
+      icon: "Wand2",
+      highlight: false,
+      features: ["Thiết kế UI/UX độc quyền 100%", "Tích hợp hệ thống CRM/ERP", "Bảo mật nâng cao enterprise", "Báo cáo thống kê hàng tháng", "Hosting VIP + CDN toàn cầu", "Hotline hỗ trợ riêng 24/7", "Cập nhật nội dung không giới hạn"],
+      missing: [],
+      order: 4,
+      active: true,
+      isRental: false,
+    },
+    // Thuê website (isRental: true)
+    {
+      code: "R-01",
+      name: "Landing Page",
+      tag: "Khởi đầu",
+      subtitle: "Trang đích chuyển đổi cao",
+      price: 189000,
+      cover: "https://images.unsplash.com/photo-1634084462412-b54873c0a56d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900&q=80",
+      icon: "Zap",
+      highlight: false,
+      features: [
+        "Landing Page đơn giản chuẩn CRO",
+        "Responsive mọi thiết bị",
+        "Tên miền phụ miễn phí",
+        "Hỗ trợ kỹ thuật cơ bản",
+        "Băng thông không giới hạn"
+      ],
+      missing: ["SSL bảo mật", "SEO tối ưu", "Email doanh nghiệp"],
+      isRental: true,
+      order: 1,
+      active: true
+    },
+    {
+      code: "R-02",
+      name: "Bán Hàng Online",
+      tag: "Tiêu chuẩn",
+      subtitle: "Cửa hàng online đầy đủ tính năng",
+      price: 589000,
+      cover: "https://images.unsplash.com/photo-1631125915902-d8abe9225ff2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900&q=80",
+      icon: "ShoppingBag",
+      highlight: false,
+      features: [
+        "Landing Page tùy chỉnh thương hiệu",
+        "Form liên hệ + Zalo OA",
+        "SSL bảo mật miễn phí",
+        "Hỗ trợ ưu tiên",
+        "Tên miền riêng .com/.vn"
+      ],
+      missing: ["SEO nâng cao", "Email doanh nghiệp"],
+      isRental: true,
+      order: 2,
+      active: true
+    },
+    {
+      code: "R-03",
+      name: "Doanh Nghiệp",
+      tag: "Phổ biến nhất",
+      subtitle: "Website tổ chức chuyên nghiệp",
+      price: 889000,
+      cover: "https://images.unsplash.com/photo-1766330977451-de1b64b5e641?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900&q=80",
+      icon: "Building2",
+      highlight: true,
+      features: [
+        "Landing Page đa phần + Blog",
+        "Thiết kế premium cao cấp",
+        "SEO cơ bản & Core Web Vitals",
+        "Google Analytics tích hợp",
+        "Hỗ trợ 24/7",
+        "Tên miền + Email doanh nghiệp",
+        "Sao lưu dữ liệu hàng tuần"
+      ],
+      missing: [],
+      isRental: true,
+      order: 3,
+      active: true
+    },
+    {
+      code: "R-04",
+      name: "Theo Yêu Cầu",
+      tag: "Enterprise",
+      subtitle: "Giải pháp tùy chỉnh hoàn toàn",
+      price: 1189000,
+      cover: "https://images.unsplash.com/photo-1709486511766-76bdd8b51713?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=900&q=80",
+      icon: "Wand2",
+      highlight: false,
+      features: [
+        "Website đầy đủ tính năng",
+        "Thiết kế độc quyền theo brand",
+        "SEO nâng cao & tối ưu tốc độ",
+        "Báo cáo thống kê hàng tháng",
+        "Hỗ trợ VIP 24/7 + hotline riêng",
+        "Hosting VIP + CDN toàn cầu",
+        "Cập nhật nội dung không giới hạn",
+        "Bảo mật nâng cao"
+      ],
+      missing: [],
+      isRental: true,
+      order: 4,
+      active: true
+    }
+  ];
+
+  for (const page of defaultWebPages) {
+    await (prisma.webPage as any).upsert({
+      where: { code: page.code },
+      update: page,
+      create: page,
+    });
+  }
+
+  const teamMembers = [
+    {
+      id: "team_01",
+      name: "Nguyễn An",
+      role: "Giám đốc Sáng tạo",
+      roleEn: "Creative Director",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400&q=80",
+      years: 10,
+      projects: 120,
+      bio: "Kiến trúc sư của những trải nghiệm thị giác — nơi thẩm mỹ gặp gỡ hiệu năng. Với 10+ năm trong ngành thiết kế, An đã dẫn dắt hơn 200 dự án thương hiệu tại 15 quốc gia.",
+      skills: ["Brand Identity", "UI/UX Design", "Creative Strategy", "Art Direction"],
+      gradient: "linear-gradient(145deg, #C8A261 0%, #E8D4A8 40%, #B89240 100%)",
+      email: "an@loops.vn",
+      zalo: "https://zalo.me/0901234567",
+      facebook: "https://facebook.com/nguyenan",
+      phone: "0901234567",
+      order: 1,
+      active: true,
+    },
+    {
+      id: "team_02",
+      name: "Trần Đức",
+      role: "Kiến trúc sư Trải nghiệm",
+      roleEn: "Experience Architect",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400&q=80",
+      years: 7,
+      projects: 85,
+      bio: "Người dệt những hành trình kỹ thuật số từng điểm chạm, từng khoảnh khắc. Đức chuyên về UX research và interaction design, giúp người dùng cảm nhận sự khác biệt.",
+      skills: ["UX Research", "Interaction Design", "Prototyping", "Motion Design"],
+      gradient: "linear-gradient(145deg, #2A2520 0%, #1A1A1A 50%, #3A3530 100%)",
+      email: "duc@loops.vn",
+      zalo: "https://zalo.me/0901234567",
+      facebook: "https://facebook.com/tranduc",
+      phone: "0901234567",
+      order: 2,
+      active: true,
+    },
+    {
+      id: "team_03",
+      name: "Lê Minh",
+      role: "Giám đốc Công nghệ",
+      roleEn: "Chief Technology Officer",
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400&q=80",
+      years: 8,
+      projects: 95,
+      bio: "Kỹ sư của những hệ thống vô hình — mạnh mẽ, thanh lịch và không thể thay thế. Minh xây dựng kiến trúc kỹ thuật đằng sau mỗi sản phẩm số của LOOPS.",
+      skills: ["Full-Stack Dev", "System Architecture", "AI Integration", "DevOps"],
+      gradient: "linear-gradient(145deg, #8C8276 0%, #B0A898 50%, #7A7068 100%)",
+      email: "minh@loops.vn",
+      zalo: "https://zalo.me/0901234567",
+      facebook: "https://facebook.com/leminh",
+      phone: "0901234567",
+      order: 3,
+      active: true,
+    },
+    {
+      id: "team_04",
+      name: "Phạm Linh",
+      role: "Giám đốc Marketing",
+      roleEn: "Head of Marketing",
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400&q=80",
+      years: 6,
+      projects: 110,
+      bio: "Chiến lược gia marketing với tư duy dữ liệu và trái tim nghệ sĩ. Linh đã tạo ra các chiến dịch viral thu hút hàng triệu người dùng trên khắp Đông Nam Á.",
+      skills: ["Digital Marketing", "Content Strategy", "Performance Ads", "Analytics"],
+      gradient: "linear-gradient(145deg, #4A3560 0%, #6B5080 50%, #3A2550 100%)",
+      email: "linh@loops.vn",
+      zalo: "https://zalo.me/0901234567",
+      facebook: "https://facebook.com/phamlinh",
+      phone: "0901234567",
+      order: 4,
+      active: true,
+    },
+    {
+      id: "team_05",
+      name: "Hoàng Nam",
+      role: "Đạo diễn Sáng tạo",
+      roleEn: "Creative Producer",
+      avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400&q=80",
+      years: 5,
+      projects: 75,
+      bio: "Nhà sản xuất phim thương mại và content creator với con mắt điện ảnh sắc bén. Nam tạo ra những câu chuyện thương hiệu chạm đến trái tim người xem.",
+      skills: ["Video Production", "Storytelling", "Photography", "Post-Production"],
+      gradient: "linear-gradient(145deg, #1E3A3A 0%, #2A5050 50%, #163030 100%)",
+      email: "nam@loops.vn",
+      zalo: "https://zalo.me/0901234567",
+      facebook: "https://facebook.com/hoangnam",
+      phone: "0901234567",
+      order: 5,
+      active: true,
+    },
+    {
+      id: "team_06",
+      name: "Vũ Mai",
+      role: "Trưởng nhóm Content",
+      roleEn: "Content Lead",
+      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400&q=80",
+      years: 6,
+      projects: 200,
+      bio: "Người kể chuyện với ngôn từ và hình ảnh. Mai xây dựng chiến lược nội dung giúp thương hiệu tạo ra giá trị thực sự và kết nối sâu sắc với cộng đồng.",
+      skills: ["Copywriting", "SEO Content", "Editorial", "Brand Voice"],
+      gradient: "linear-gradient(145deg, #3A2020 0%, #5A3030 50%, #2A1818 100%)",
+      email: "mai@loops.vn",
+      zalo: "https://zalo.me/0901234567",
+      facebook: "https://facebook.com/vumai",
+      phone: "0901234567",
+      order: 6,
+      active: true,
+    }
+  ];
+
+  for (const member of teamMembers) {
+    await (prisma.teamMember as any).upsert({
+      where: { id: member.id },
+      update: member,
+      create: member,
+    });
+  }
 }
 
 main()
