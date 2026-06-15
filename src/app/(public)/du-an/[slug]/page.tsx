@@ -8,7 +8,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const config = await fetchSiteConfig();
   const projects = config.portfolio.projects || [];
   
-  const project = projects.find(p => generateSlug(p.title) === resolvedParams.slug);
+  const project = projects.find(p => (p.slug || generateSlug(p.title)) === resolvedParams.slug);
   
   if (!project) return { title: "Dự án không tồn tại" };
 
@@ -23,7 +23,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const config = await fetchSiteConfig();
   const projects = config.portfolio.projects || [];
   
-  const project = projects.find(p => generateSlug(p.title) === resolvedParams.slug);
+  const project = projects.find(p => (p.slug || generateSlug(p.title)) === resolvedParams.slug);
   
   if (!project) {
     notFound();

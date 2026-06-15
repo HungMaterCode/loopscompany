@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useInView } from "motion/react";
 import { Check, ArrowRight, MapPin, Phone, Mail } from "lucide-react";
 import { SectionBg, Orb, GridPattern } from "@/components/ui/SectionBg";
@@ -17,6 +17,21 @@ export function ContactSection() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const { config } = useSiteData();
+  const [user, setUser] = useState<{ name: string; email: string; avatar: string | null } | null>(null);
+  const [loadingAuth, setLoadingAuth] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) {
+          setUser(data.user);
+          setEmail(data.user.email);
+        }
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoadingAuth(false));
+  }, []);
 
   return (
     <section id="lien-he" style={{ position: "relative", padding: "100px 24px", overflow: "hidden" }}>
@@ -61,9 +76,58 @@ export function ContactSection() {
           </div>
 
           {/* Right — glass form */}
-          <motion.div style={{ ...GLASS_LIGHT, borderRadius: 24, padding: 32 }}
+          <motion.div style={{ ...GLASS_LIGHT, borderRadius: 24, padding: 32, position: "relative", overflow: "hidden" }}
             initial={{ opacity: 0, x: 32 }} animate={inView ? { opacity: 1, x: 0 } : {}} transition={{ delay: 0.2, duration: 0.75, ease: EASE }}>
-            {submitted ? (
+            {loadingAuth ? (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 380, gap: 12 }}>
+                <div className="contact-spinner" style={{ width: 24, height: 24, borderRadius: "50%", border: `2px solid ${BORDER_M}`, borderTopColor: RED }} />
+                <span style={{ color: TEXT60, fontSize: 13 }}>Đang tải...</span>
+                <style>{`
+                  .contact-spinner {
+                    animation: spin 1s linear infinite;
+                  }
+                  @keyframes spin {
+                    to { transform: rotate(360deg); }
+                  }
+                `}</style>
+              </div>
+            ) : !user ? (
+              <div style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: 320,
+                gap: 20,
+                textAlign: "center"
+              }}>
+                <p style={{ color: TEXT, fontSize: 18, fontWeight: 600, margin: 0 }}>Đăng ký tư vấn miễn phí</p>
+                <p style={{ color: TEXT60, fontSize: 13, margin: "0 0 8px", lineHeight: 1.6, maxWidth: 280 }}>
+                  Vui lòng đăng nhập bằng tài khoản Google để gửi yêu cầu tư vấn trực tiếp cho chúng tôi.
+                </p>
+                <a href="/dang-nhap"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    backgroundColor: RED,
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 40,
+                    padding: "13px 28px",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    textDecoration: "none",
+                    boxShadow: "0 4px 12px rgba(255,107,157,0.25)",
+                    transition: "all 0.2s"
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.backgroundColor = "#bb3218"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.backgroundColor = RED; e.currentTarget.style.transform = "none"; }}>
+                  Đăng nhập ngay <ArrowRight size={15} />
+                </a>
+              </div>
+            ) : submitted ? (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 320, gap: 16, textAlign: "center" }}>
                 <div style={{ width: 60, height: 60, borderRadius: "50%", backgroundColor: RED_MED, display: "flex", alignItems: "center", justifyContent: "center", border: `1px solid ${RED}` }}>
                   <Check size={26} color={RED} />
@@ -105,8 +169,23 @@ export function ContactSection() {
                 <div>
                   <label style={{ display: "block", color: TEXT35, fontSize: 12, marginBottom: 7, fontWeight: 500 }}>Email</label>
                   <input type="email" placeholder="email@congty.vn" required value={email} onChange={e => setEmail(e.target.value)}
-                    style={{ width: "100%", backgroundColor: "var(--vw-bg-input)", backdropFilter: "blur(8px)", border: `1px solid ${BORDER_M}`, borderRadius: 10, padding: "10px 14px", fontSize: 14, color: TEXT, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
-                    onFocus={e => (e.currentTarget.style.borderColor = RED)} onBlur={e => (e.currentTarget.style.borderColor = BORDER_M)} />
+                    readOnly={!!user}
+                    style={{
+                      width: "100%",
+                      backgroundColor: user ? "rgba(255, 255, 255, 0.05)" : "var(--vw-bg-input)",
+                      backdropFilter: "blur(8px)",
+                      border: `1px solid ${BORDER_M}`,
+                      borderRadius: 10,
+                      padding: "10px 14px",
+                      fontSize: 14,
+                      color: user ? "var(--sc-text-60)" : TEXT,
+                      outline: "none",
+                      boxSizing: "border-box",
+                      transition: "border-color 0.2s",
+                      cursor: user ? "not-allowed" : "text",
+                    }}
+                    onFocus={e => { if (!user) e.currentTarget.style.borderColor = RED; }}
+                    onBlur={e => { if (!user) e.currentTarget.style.borderColor = BORDER_M; }} />
                 </div>
                 <div>
                   <label style={{ display: "block", color: TEXT35, fontSize: 12, marginBottom: 7, fontWeight: 500 }}>Yêu cầu cần tư vấn / Lời nhắn</label>

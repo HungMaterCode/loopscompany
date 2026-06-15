@@ -19,8 +19,7 @@ export function Footer() {
           {/* Brand */}
           <div>
             <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, textDecoration: "none" }}>
-              <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: RED, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 800, letterSpacing: "-0.04em" }}>LP</div>
-              <span style={{ color: TEXT, fontWeight: 800, fontSize: 16, letterSpacing: "-0.04em" }}>LOOP</span>
+              <img src="/LOOP_LOGO_removeBG.png" alt="LOOP Logo" style={{ height: '42px', objectFit: 'contain' }} />
             </Link>
             <p style={{ color: TEXT60, fontSize: 13, lineHeight: 1.7, margin: "0 0 18px", maxWidth: 240 }}>
               Đơn vị thiết kế và cho thuê website chuyên nghiệp hàng đầu cho doanh nghiệp Việt Nam.

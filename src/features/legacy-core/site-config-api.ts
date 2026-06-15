@@ -23,6 +23,14 @@ export interface ProjectItemConfig {
   img: string;
   accent: string;
   url?: string;
+  slug?: string;
+  overview?: string;
+  challenge?: string;
+  solution?: string;
+  roles?: string[];
+  mockupImg?: string;
+  solutionImg1?: string;
+  solutionImg2?: string;
 }
 
 export interface SiteConfig {

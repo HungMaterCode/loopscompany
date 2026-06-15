@@ -44,12 +44,7 @@ const plans = [
   },
 ];
 
-const addons = [
-  { id: 'seo',     label: 'SEO Package',    price: 299000,  desc: 'Từ khóa, link building, báo cáo tuần' },
-  { id: 'content', label: 'Content Monthly', price: 499000,  desc: '8 bài blog + social posts/tháng' },
-  { id: 'ads',     label: 'Ads Management', price: 799000,  desc: 'Google & Meta Ads, báo cáo ROI' },
-  { id: 'media',   label: 'Photo & Video',  price: 1200000, desc: '1 buổi chụp + 2 video ngắn/tháng' },
-];
+
 
 function fmt(n: number) { return n.toLocaleString('vi-VN') + ' ₫'; }
 
@@ -87,9 +82,9 @@ function InquiryModal({ planId, onClose }: { planId: string; onClose: () => void
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {[
-                { k: 'name',  l: 'Họ và tên *',      ph: 'Nguyễn Văn A'    },
-                { k: 'phone', l: 'Số điện thoại *',   ph: '0901 234 567'    },
-                { k: 'email', l: 'Email',              ph: 'email@company.com' },
+                { k: 'name', l: 'Họ và tên *', ph: 'Nguyễn Văn A' },
+                { k: 'phone', l: 'Số điện thoại *', ph: '0901 234 567' },
+                { k: 'email', l: 'Email', ph: 'email@company.com' },
               ].map(f => (
                 <div key={f.k}>
                   <label style={{ fontFamily: F, fontSize: '10px', letterSpacing: '0.1em', color: 'var(--sc-text-35)', display: 'block', marginBottom: '5px' }}>{f.l}</label>
@@ -121,22 +116,15 @@ function InquiryModal({ planId, onClose }: { planId: string; onClose: () => void
 
 export function WebsiteRentalPricingSection() {
   const router = useRouter();
-  const ref    = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const { isMobile, isTablet } = useBreakpoint();
-  const [yearly, setYearly]              = useState(false);
-  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
-  const [activePlan, setActivePlan]      = useState<string | null>(null);
+  const [yearly, setYearly] = useState(false);
+  const [activePlan, setActivePlan] = useState<string | null>(null);
   const { config } = useSiteData();
-
-  const toggleAddon = (id: string) =>
-    setSelectedAddons(p => p.includes(id) ? p.filter(a => a !== id) : [...p, id]);
-
-  const addonTotal = addons.filter(a => selectedAddons.includes(a.id)).reduce((s, a) => s + a.price, 0);
 
   // Responsive grid: mobile=1col, tablet=2col, desktop=4col
   const planCols = isMobile ? '1fr' : isTablet ? 'repeat(2,1fr)' : 'repeat(4,1fr)';
-  const addonCols = isMobile ? '1fr' : isTablet ? 'repeat(2,1fr)' : 'repeat(auto-fit,minmax(200px,1fr))';
 
   return (
     <>
@@ -192,8 +180,8 @@ export function WebsiteRentalPricingSection() {
           {/* Plan cards — responsive grid */}
           <div style={{ display: 'grid', gridTemplateColumns: planCols, gap: 'clamp(12px,2vw,16px)', marginBottom: '40px' }}>
             {plans.map((plan, i) => {
-              const price   = yearly ? plan.yearlyPrice : plan.monthlyPrice;
-              const isFeat  = plan.accentClass;
+              const price = yearly ? plan.yearlyPrice : plan.monthlyPrice;
+              const isFeat = plan.accentClass;
               return (
                 <motion.div key={plan.id}
                   initial={{ opacity: 0, y: 40 }}
@@ -221,11 +209,13 @@ export function WebsiteRentalPricingSection() {
 
                     <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: `1px solid var(--sc-border-m)` }}>
                       <AnimatePresence mode="wait">
-                        <motion.div key={price} initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }} transition={{ duration: 0.2 }}>
+                        <motion.div key={price} initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }} transition={{ duration: 0.2 }}
+                          style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
                           <span style={{ fontFamily: F, fontSize: 'clamp(18px,2.2vw,28px)', color: isFeat ? 'var(--sc-accent)' : 'var(--sc-text)', fontWeight: 800 }}>{fmt(price)}</span>
+                          <span style={{ fontFamily: F, fontSize: '13px', color: 'var(--sc-text-45)', fontWeight: 500 }}>/tháng</span>
                         </motion.div>
                       </AnimatePresence>
-                      <div style={{ fontFamily: F, fontSize: '10px', color: 'var(--sc-text-35)', marginTop: '3px' }}>/tháng · GÓI LANDING PAGE</div>
+                      <div style={{ fontFamily: F, fontSize: '10px', color: 'var(--sc-text-35)', marginTop: '3px' }}>GÓI LANDING PAGE</div>
                       <div style={{ fontFamily: F, fontSize: '10px', color: 'var(--sc-accent)', marginTop: '4px', opacity: yearly ? 1 : 0, transition: 'opacity 0.3s', minHeight: '15px' }}>
                         Tiết kiệm {fmt(plan.monthlyPrice - plan.yearlyPrice)}/tháng
                       </div>
@@ -263,50 +253,7 @@ export function WebsiteRentalPricingSection() {
             })}
           </div>
 
-          {/* Add-ons */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.5 }}
-          >
-            <GlassCard className="premium-glass" style={{
-              padding: 'clamp(20px,4vw,32px)',
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
-                <div>
-                  <div style={{ fontFamily: F, fontSize: '10px', letterSpacing: '0.18em', color: 'var(--sc-accent)', fontWeight: 700, marginBottom: '5px' }}>CÁ NHÂN HÓA GÓI</div>
-                  <h3 style={{ fontFamily: F, fontSize: 'clamp(16px,2vw,22px)', color: 'var(--sc-text)', margin: 0, fontWeight: 800 }}>
-                    Thêm dịch vụ <em style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--sc-text-45)' }}>tùy chỉnh</em>
-                  </h3>
-                </div>
-                {addonTotal > 0 && (
-                  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-                    style={{ fontFamily: F, fontSize: '14px', color: 'var(--sc-accent)', fontWeight: 700 }}>
-                    +{fmt(addonTotal)}/tháng
-                  </motion.div>
-                )}
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: addonCols, gap: '12px' }}>
-                {addons.map(a => {
-                  const on = selectedAddons.includes(a.id);
-                  return (
-                    <motion.button key={a.id} onClick={() => toggleAddon(a.id)}
-                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                      style={{ textAlign: 'left', padding: '14px 16px', borderRadius: '12px', cursor: 'pointer', background: 'var(--sc-card-bg)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid', borderColor: on ? 'var(--sc-accent)' : 'var(--sc-card-border)', boxShadow: on ? '0 0 0 1px var(--sc-accent)' : 'none', transition: 'all 0.2s' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
-                        <span style={{ fontFamily: F, fontSize: '13px', fontWeight: 700, color: 'var(--sc-text)' }}>{a.label}</span>
-                        <div style={{ width: '18px', height: '18px', borderRadius: '50%', background: on ? 'var(--sc-accent)' : 'var(--sc-card-bg)', border: on ? 'none' : '1px solid var(--sc-border-m)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'background 0.2s' }}>
-                          {on ? <Check size={10} color="#fff" strokeWidth={3} /> : <span style={{ color: 'var(--sc-text-45)', fontSize: '14px', lineHeight: 1 }}>+</span>}
-                        </div>
-                      </div>
-                      <div style={{ fontFamily: F, fontSize: '11px', color: 'var(--sc-text-45)', lineHeight: 1.5, marginBottom: '8px' }}>{a.desc}</div>
-                      <div style={{ fontFamily: F, fontSize: '12px', color: 'var(--sc-text)', fontWeight: 700 }}>+{fmt(a.price)}/tháng</div>
-                    </motion.button>
-                  );
-                })}
-              </div>
-            </GlassCard>
-          </motion.div>
+
 
           <motion.p
             initial={{ opacity: 0 }}

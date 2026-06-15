@@ -4,12 +4,16 @@ import { useState, useEffect } from "react";
 import {
   BarChart3, Eye, Layers3, LogOut, MonitorSmartphone, Palette,
   Search, Settings2, ShieldCheck, Sparkles, Globe, Menu, X,
-  BookOpen, Users, UserSquare2,
+  BookOpen, Users, UserSquare2, Laptop, Server, TrendingUp,
 } from "lucide-react";
 import { tc, type AdminTheme, type AdminTab } from "./admin/types";
 import { Dashboard } from "./admin/Dashboard";
 import { SectionManager } from "./admin/SectionManager";
 import { PricingManager } from "./admin/PricingManager";
+import { WebPageManager } from "./admin/WebPageManager";
+import { HostingManager } from "./admin/HostingManager";
+import { DomainManager } from "./admin/DomainManager";
+import { SeoPackageManager } from "./admin/SeoPackageManager";
 import { PortfolioManager } from "./admin/PortfolioManager";
 import { ServicesManager } from "./admin/ServicesManager";
 import { BlogManager } from "./admin/BlogManager";
@@ -24,6 +28,10 @@ const NAV_ITEMS: { id: AdminTab; label: string; icon: typeof Layers3; group?: st
   { id: "dashboard",   label: "Tổng quan",    icon: BarChart3,         group: "main" },
   { id: "sections",    label: "Section",      icon: Layers3,           group: "content" },
   { id: "pricing",     label: "Bảng giá",     icon: MonitorSmartphone, group: "content" },
+  { id: "webpages",    label: "Gói web", icon: Laptop,         group: "content" },
+  { id: "hostings",    label: "Gói hosting",  icon: Server,            group: "content" },
+  { id: "domains",     label: "Gói tên miền",  icon: Globe,             group: "content" },
+  { id: "seoPackages", label: "Gói SEO",       icon: TrendingUp,        group: "content" },
   { id: "portfolio",   label: "Dự án",        icon: BarChart3,         group: "content" },
   { id: "services",    label: "Dịch vụ",      icon: Sparkles,          group: "content" },
   { id: "blog",        label: "Bài viết",     icon: BookOpen,          group: "content" },
@@ -89,12 +97,9 @@ export function Admin({
     <>
       {/* Logo */}
       <div className={`flex h-16 items-center gap-3 px-5 border-b ${t.divider}`}>
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#C8A261]">
-          <ShieldCheck className="h-4 w-4 text-white" />
-        </div>
-        <div>
-          <div className={`text-sm font-bold ${t.text}`}>Việt Web</div>
-          <div className={`text-[10px] uppercase tracking-widest ${t.textFaint}`}>Admin Panel</div>
+        <img src="/LOOP_LOGO_removeBG.png" alt="LOOP Logo" className="h-9 object-contain" />
+        <div className={`border-l ${t.divider} pl-3 py-1`}>
+          <div className={`text-[10px] uppercase tracking-widest ${t.textFaint} font-semibold`}>Admin Panel</div>
         </div>
       </div>
 
@@ -215,6 +220,10 @@ export function Admin({
             {activeTab === "dashboard"  && <Dashboard t={t} isDark={isDark} onNavigate={navigate2Tab} />}
             {activeTab === "sections"   && <SectionManager t={t} isDark={isDark} />}
             {activeTab === "pricing"    && <PricingManager t={t} isDark={isDark} />}
+            {activeTab === "webpages"   && <WebPageManager t={t} isDark={isDark} />}
+            {activeTab === "hostings"   && <HostingManager t={t} isDark={isDark} />}
+            {activeTab === "domains"    && <DomainManager t={t} isDark={isDark} />}
+            {activeTab === "seoPackages" && <SeoPackageManager t={t} isDark={isDark} />}
             {activeTab === "portfolio"  && <PortfolioManager t={t} isDark={isDark} />}
             {activeTab === "services"   && <ServicesManager t={t} isDark={isDark} />}
             {activeTab === "blog"       && <BlogManager t={t} isDark={isDark} />}
