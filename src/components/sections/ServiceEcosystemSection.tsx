@@ -92,7 +92,7 @@ function ServiceCard({
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.75, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
       whileHover={{ scale: 1.02, y: -6 }}
-      onClick={() => router.push('/bao-gia')}
+      onClick={() => router.push(svc.num === '01' ? '/bao-gia' : '/coming-soon')}
       style={{
         gridColumn: isLarge ? 'span 2' : 'span 1',
         borderRadius: '20px', overflow: 'hidden',
