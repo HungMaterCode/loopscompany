@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Save, Globe, FileSearch, Gauge, Tags, AlertCircle, CheckCircle2, ExternalLink, Copy, Check } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Save, Globe, FileSearch, Gauge, Tags, AlertCircle, CheckCircle2, ExternalLink, Copy, Check, Upload, Loader2 } from "lucide-react";
 import type { TC } from "./types";
 
 interface SeoPage {
@@ -11,6 +11,7 @@ interface SeoPage {
   ogTitle: string;
   ogDescription: string;
   canonical: string;
+  ogImage?: string;
 }
 
 interface Props {
@@ -28,6 +29,7 @@ const INITIAL_PAGES: SeoPage[] = [
     ogTitle: "Thiết Kế & Thuê Website Chuyên Nghiệp — Việt Web",
     ogDescription: "Giao website trong 5 ngày, từ 189K/tháng. Hỗ trợ Zalo 24/7. Không lo kỹ thuật.",
     canonical: "https://vietweb.vn/",
+    ogImage: "",
   },
   {
     id: "services",
@@ -38,6 +40,7 @@ const INITIAL_PAGES: SeoPage[] = [
     ogTitle: "Dịch Vụ Việt Web — Thiết Kế & SEO",
     ogDescription: "6 dịch vụ web chuyên nghiệp: landing page, e-commerce, SEO, thương hiệu và hỗ trợ 24/7.",
     canonical: "https://vietweb.vn/#dich-vu",
+    ogImage: "",
   },
   {
     id: "pricing",
@@ -48,6 +51,7 @@ const INITIAL_PAGES: SeoPage[] = [
     ogTitle: "Bảng Giá Thuê Website Việt Web — Từ 189K/tháng",
     ogDescription: "4 gói rõ ràng, từ 189K đến 1.189K/tháng. Domain, hosting, SSL bao gồm tất cả.",
     canonical: "https://vietweb.vn/#bang-gia",
+    ogImage: "",
   },
   {
     id: "team",
@@ -58,6 +62,7 @@ const INITIAL_PAGES: SeoPage[] = [
     ogTitle: "Đội Ngũ Việt Web — Chuyên Gia Thiết Kế Website",
     ogDescription: "6 chuyên gia, hơn 500 dự án. Gặp gỡ team đằng sau những website đẹp nhất.",
     canonical: "https://vietweb.vn/doi-ngu",
+    ogImage: "",
   },
 ];
 
@@ -68,6 +73,63 @@ const TECH_SCORES = [
   { id: "mobile", icon: Globe, label: "Mobile-friendly", score: 96, tip: "Responsive hoàn toàn, font size ≥ 16px, tap targets đủ lớn." },
 ];
 
+const UploadButton = ({ onUploadComplete, acceptType = "image/*", t, type }: { onUploadComplete: (url: string) => void; acceptType?: string; t: TC; type?: string }) => {
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const url = type ? `/api/upload?type=${type}` : '/api/upload';
+      const res = await fetch(url, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      onUploadComplete(data.url);
+    } catch (err) {
+      console.error(err);
+      alert('Tải tệp lên thất bại!');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  return (
+    <div className="shrink-0">
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept={acceptType}
+        className="hidden"
+      />
+      <button
+        type="button"
+        onClick={() => fileInputRef.current?.click()}
+        disabled={isUploading}
+        className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${t.btnGhost} disabled:opacity-50 cursor-pointer`}
+      >
+        {isUploading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Upload className="h-4 w-4" />
+        )}
+        Tải lên
+      </button>
+    </div>
+  );
+};
+
 const CHAR_LIMITS = { title: 60, description: 160 };
 
 export function SeoManager({ t, isDark }: Props) {
@@ -75,7 +137,40 @@ export function SeoManager({ t, isDark }: Props) {
   const [activePageId, setActivePageId] = useState("home");
   const [activeSubTab, setActiveSubTab] = useState<"meta" | "technical">("meta");
   const [saved, setSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  // Load SEO pages from API on mount
+  useEffect(() => {
+    const fetchPages = async () => {
+      try {
+        const res = await fetch("/api/seo");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            const mapped = INITIAL_PAGES.map(initial => {
+              const dbPage = data.find((d: any) => d.pageId === initial.id);
+              return dbPage ? {
+                id: dbPage.pageId,
+                label: dbPage.label,
+                title: dbPage.title,
+                description: dbPage.description,
+                keywords: dbPage.keywords || "",
+                ogTitle: dbPage.ogTitle || "",
+                ogDescription: dbPage.ogDescription || "",
+                canonical: dbPage.canonical,
+                ogImage: dbPage.ogImage || "",
+              } : initial;
+            });
+            setPages(mapped);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load SEO pages:", err);
+      }
+    };
+    void fetchPages();
+  }, []);
 
   const activePage = pages.find((p) => p.id === activePageId)!;
 
@@ -83,9 +178,37 @@ export function SeoManager({ t, isDark }: Props) {
     setPages((prev) => prev.map((p) => p.id === activePageId ? { ...p, [field]: value } : p));
   };
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+  const handleSave = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+    setSaved(false);
+    try {
+      const res = await fetch("/api/seo", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pageId: activePage.id,
+          title: activePage.title,
+          description: activePage.description,
+          keywords: activePage.keywords,
+          ogTitle: activePage.ogTitle,
+          ogDescription: activePage.ogDescription,
+          canonical: activePage.canonical,
+          ogImage: activePage.ogImage || "",
+        }),
+      });
+      if (res.ok) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2500);
+      } else {
+        alert("Lưu SEO thất bại.");
+      }
+    } catch (err) {
+      console.error("Failed to save SEO page:", err);
+      alert("Lỗi kết nối khi lưu SEO.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const copyText = (text: string, key: string) => {
@@ -228,6 +351,22 @@ export function SeoManager({ t, isDark }: Props) {
                     <input value={activePage.canonical} onChange={(e) => updatePage("canonical", e.target.value)}
                       className={`w-full rounded-xl px-4 py-2.5 pr-10 text-sm transition ${t.input}`} />
                     <ExternalLink className={`absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 ${t.textFaint}`} />
+                  </div>
+                </div>
+                <div>
+                  <label className={`mb-1.5 block text-xs font-medium ${t.textMuted}`}>OG Image (Ảnh đại diện khi chia sẻ)</label>
+                  <div className="flex gap-3 items-start">
+                    <div className="flex-1 flex flex-col gap-2">
+                      <input value={activePage.ogImage || ""} onChange={(e) => updatePage("ogImage", e.target.value)}
+                        className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
+                        placeholder="Đường dẫn ảnh đại diện (ví dụ: https://... hoặc /og-image.jpg)" />
+                      {activePage.ogImage && (
+                        <div className="w-full aspect-[1.91/1] max-w-[280px] rounded-xl bg-gray-800 overflow-hidden border border-gray-700 relative">
+                          <img src={activePage.ogImage} className="w-full h-full object-cover" alt="Preview OG" />
+                        </div>
+                      )}
+                    </div>
+                    <UploadButton onUploadComplete={(url) => updatePage("ogImage", url)} t={t} type="og" />
                   </div>
                 </div>
               </div>

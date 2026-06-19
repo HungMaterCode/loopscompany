@@ -21,6 +21,9 @@ const r2Client = new S3Client({
 
 export async function POST(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const type = searchParams.get("type");
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     if (!file) {
@@ -52,11 +55,19 @@ export async function POST(request: Request) {
 
     // Upload to Cloudinary using upload_stream (default for images)
     const result = await new Promise<any>((resolve, reject) => {
+      const uploadOptions: any = {
+        folder: "loops",
+        resource_type: "auto", // Automatically detects image or video
+      };
+
+      if (type === "og") {
+        uploadOptions.transformation = [
+          { width: 1200, height: 630, crop: "fill", gravity: "auto" }
+        ];
+      }
+
       const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: "loops",
-          resource_type: "auto", // Automatically detects image or video
-        },
+        uploadOptions,
         (error, result) => {
           if (error) reject(error);
           else resolve(result);
