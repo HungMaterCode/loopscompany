@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, useInView } from "motion/react";
 import { ArrowRight, Clock, Calendar } from "lucide-react";
@@ -92,19 +92,44 @@ function ArticleCard({ article, index }: { article: typeof ARTICLES[0]; index: n
 }
 
 export function BlogPreviewSection() {
-  const latestArticles = ARTICLES.slice(0, 3);
+  const [latestArticles, setLatestArticles] = useState<typeof ARTICLES>(ARTICLES.slice(0, 3));
+
+  useEffect(() => {
+    fetch("/api/articles?publishedOnly=true")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped = data.map((a: any) => ({
+            slug: a.slug,
+            category: a.category,
+            categoryColor: a.categoryColor,
+            title: a.title,
+            excerpt: a.excerpt,
+            content: a.content,
+            cover: a.cover,
+            author: a.author,
+            authorRole: a.authorRole,
+            date: new Date(a.publishedAt).toLocaleDateString("vi-VN"),
+            readTime: a.readTime,
+            tags: a.tags,
+          }));
+          setLatestArticles(mapped.slice(0, 3));
+        }
+      })
+      .catch((err) => console.error("Error fetching latest articles:", err));
+  }, []);
 
   return (
     <section id="bai-viet" style={{ position: "relative", padding: "120px 24px", overflow: "hidden", backgroundColor: "var(--sc-bg-1)" }}>
       {/* Background Pattern */}
       <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(45deg,var(--sc-grid-line) 0px,var(--sc-grid-line) 1px,transparent 1px,transparent 40px),repeating-linear-gradient(-45deg,var(--sc-grid-line) 0px,var(--sc-grid-line) 1px,transparent 1px,transparent 40px)', pointerEvents: 'none' }} />
-      
+
       {/* Glowing Orbs */}
       <div className="orb" style={{ width: '600px', height: '600px', top: '-200px', right: '-200px', background: 'var(--sc-orb-1-bg)', filter: 'blur(80px)' }} />
       <div className="orb" style={{ width: '500px', height: '500px', bottom: '-150px', left: '-150px', background: 'var(--sc-orb-3-bg)', filter: 'blur(80px)', animationDelay: '2s' }} />
 
       <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 10 }}>
-        
+
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", marginBottom: 60 }}>
           <SectionLabel>Kiến thức & Chia sẻ</SectionLabel>
           <h2 style={{ color: TEXT, fontSize: "clamp(32px, 4vw, 48px)", fontWeight: 800, letterSpacing: "-0.04em", margin: "16px 0 20px" }}>

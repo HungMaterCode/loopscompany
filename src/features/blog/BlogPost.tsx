@@ -8,7 +8,7 @@ import { ArrowLeft, Clock, Calendar, Tag, ArrowRight, Share2, ChevronRight } fro
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingZalo } from "@/components/layout/FloatingZalo";
-import { ARTICLES, CATEGORIES } from "@/features/legacy-core/articles";
+import { ARTICLES, CATEGORIES, type Article } from "@/features/legacy-core/articles";
 import { RED, TEXT, TEXT60, TEXT35, BORDER, BORDER_M, BG, EASE, GLASS, GLOBAL_CSS } from "@/features/legacy-core/tokens";
 
 // ─── Markdown-like renderer ──────────────────────────────────────────────────
@@ -176,9 +176,9 @@ function RelatedCard({ article, index }: { article: typeof ARTICLES[0]; index: n
 
 // ─── Blog Post Page ────────────────────────────────────────────────────────────
 
-export function BlogPost({ slug, bgUrl }: { slug: string; bgUrl?: string }) {
+export function BlogPost({ article, allArticles, bgUrl }: { article: Article; allArticles?: Article[]; bgUrl?: string }) {
   const router = useRouter();
-  const article = ARTICLES.find(a => a.slug === slug);
+  const articlesList = allArticles || ARTICLES;
 
   const { scrollYProgress } = useScroll();
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
@@ -188,9 +188,9 @@ export function BlogPost({ slug, bgUrl }: { slug: string; bgUrl?: string }) {
     return null;
   }
 
-  const related = ARTICLES.filter(a => a.slug !== slug && a.category === article.category).slice(0, 3);
+  const related = articlesList.filter(a => a.slug !== article.slug && a.category === article.category).slice(0, 3);
   const moreArticles = related.length < 3
-    ? [...related, ...ARTICLES.filter(a => a.slug !== slug && !related.includes(a)).slice(0, 3 - related.length)]
+    ? [...related, ...articlesList.filter(a => a.slug !== article.slug && !related.includes(a)).slice(0, 3 - related.length)]
     : related;
 
   const categoryLabel = CATEGORIES.find(c => c.id === article.category)?.label;

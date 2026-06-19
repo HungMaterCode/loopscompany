@@ -273,7 +273,7 @@ function AddonRow({ icon: Icon, label, desc, options, value, onChange }: {
   value: number; onChange: (v: number) => void;
 }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", borderRadius: 14, background: CONFIG.glassBg, border: `1px solid ${CONFIG.border}` }}>
+    <div className="bw-addon-row" style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", borderRadius: 14, background: CONFIG.glassBg, border: `1px solid ${CONFIG.border}` }}>
       <div style={{ width: 36, height: 36, borderRadius: 10, background: a(0.1), display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
         <Icon size={16} color={CONFIG.accent} />
       </div>
@@ -498,12 +498,30 @@ function PreviewPanel({ pkg, selectedDomains, hosting, seo, dbSeoPackages, onSub
 
 // ── 5e. Form Modal ────────────────────────────────────────────────────────────
 
-function FormModal({ pkg, total, selectedDomains, loggedInEmail, onClose, onSuccess, yearly = false }: {
-  pkg: AnyPkg; total: number; selectedDomains: { label: string; price: number }[]; loggedInEmail: string; onClose: () => void; onSuccess: (name: string, phone: string, email: string) => void; yearly?: boolean;
+function FormModal({ pkg, total, selectedDomains, hostingPrice, seoPrice, dbHostings, dbSeoPackages, loggedInEmail, onClose, onSuccess, yearly = false }: {
+  pkg: AnyPkg; total: number; selectedDomains: { label: string; price: number }[]; hostingPrice: number; seoPrice: number; dbHostings: any[]; dbSeoPackages: any[]; loggedInEmail: string; onClose: () => void; onSuccess: (name: string, phone: string, email: string, notes: string) => void; yearly?: boolean;
 }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState(loggedInEmail || "");
   const [notes, setNotes] = useState("");
+
+  useEffect(() => {
+    if (loggedInEmail) {
+      setEmail(loggedInEmail);
+    }
+  }, [loggedInEmail]);
+
+  const selectedHosting = dbHostings.find(h => h.price === hostingPrice) || 
+    (hostingPrice === 500000 ? { label: "5GB NVMe", price: 500000 } :
+     hostingPrice === 1000000 ? { label: "10GB NVMe", price: 1000000 } :
+     { label: "2GB NVMe (Mặc định)", price: 0 });
+
+  const selectedSeo = dbSeoPackages.find(s => s.price === seoPrice) ||
+    (seoPrice === 2000000 ? { label: "Cơ bản", description: "10 bài/tháng", price: 2000000 } :
+     seoPrice === 6000000 ? { label: "Doanh nghiệp", description: "15 bài/tháng", price: 6000000 } :
+     seoPrice === 36000000 ? { label: "Phổ biến", description: "20 bài/tháng", price: 36000000 } :
+     { label: "Miễn phí", description: "5 bài/tháng", price: 0 });
 
   const inp: CSSProperties = { width: "100%", boxSizing: "border-box", background: CONFIG.glassBg, border: `1.5px solid ${CONFIG.borderM}`, borderRadius: 12, padding: "13px 16px", fontSize: 14, color: CONFIG.text, outline: "none", transition: "border-color 0.2s, box-shadow 0.2s" };
 
@@ -529,54 +547,123 @@ function FormModal({ pkg, total, selectedDomains, loggedInEmail, onClose, onSucc
             </div>
           </div>
 
-          {!pkg.isRental && selectedDomains && selectedDomains.length > 0 && (
-            <div style={{ background: "rgba(255,255,255,0.02)", border: `1px solid ${CONFIG.border}`, borderRadius: 12, padding: "10px 14px", marginBottom: 20 }}>
-              <p style={{ fontSize: 10, fontWeight: 700, color: CONFIG.text35, textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 6px" }}>Tên miền đã đăng ký mua:</p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                {selectedDomains.map(d => (
-                  <span key={d.label} style={{ fontSize: 12, fontWeight: 700, color: CONFIG.accent, background: a(0.12), border: `1px solid ${a(0.25)}`, padding: "2px 8px", borderRadius: 20 }}>
-                    {d.label} ({fmt(d.price)})
+          {!pkg.isRental && (
+            <div style={{ background: "rgba(255,255,255,0.02)", border: `1px solid ${CONFIG.border}`, borderRadius: 12, padding: "12px 14px", marginBottom: 20, display: "flex", flexDirection: "column", gap: 10 }}>
+              {selectedDomains && selectedDomains.length > 0 && (
+                <div>
+                  <p style={{ fontSize: 10, fontWeight: 700, color: CONFIG.text35, textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 4px" }}>Tên miền đã đăng ký mua:</p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {selectedDomains.map(d => (
+                      <span key={d.label} style={{ fontSize: 12, fontWeight: 700, color: CONFIG.accent, background: a(0.12), border: `1px solid ${a(0.25)}`, padding: "2px 8px", borderRadius: 20 }}>
+                        {d.label} ({fmt(d.price)})
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <p style={{ fontSize: 10, fontWeight: 700, color: CONFIG.text35, textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 4px" }}>Hosting NVMe đã chọn:</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: CONFIG.accent, background: a(0.12), border: `1px solid ${a(0.25)}`, padding: "2px 8px", borderRadius: 20 }}>
+                    {selectedHosting.label} ({selectedHosting.price > 0 ? `+${fmt(selectedHosting.price)}` : "Kèm theo gói"})
                   </span>
-                ))}
+                </div>
+              </div>
+
+              <div>
+                <p style={{ fontSize: 10, fontWeight: 700, color: CONFIG.text35, textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 4px" }}>Gói dịch vụ SEO đã chọn:</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: CONFIG.accent, background: a(0.12), border: `1px solid ${a(0.25)}`, padding: "2px 8px", borderRadius: 20 }}>
+                    {selectedSeo.label} {selectedSeo.description ? `(${selectedSeo.description})` : ""} ({selectedSeo.price > 0 ? `+${fmt(selectedSeo.price)}` : "Miễn phí"})
+                  </span>
+                </div>
               </div>
             </div>
           )}
 
-          <form onSubmit={(e) => { e.preventDefault(); onSuccess(name, phone, loggedInEmail); }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <input type="hidden" name="email" value={loggedInEmail} />
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <div>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: CONFIG.text35, marginBottom: 7, textTransform: "uppercase", letterSpacing: "0.06em" }}>Họ và tên *</label>
-                  <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Nguyễn Văn A" style={inp}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = CONFIG.accent; e.currentTarget.style.boxShadow = `0 0 0 3px ${a(0.14)}`; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = CONFIG.borderM; e.currentTarget.style.boxShadow = "none"; }} />
-                </div>
-                <div>
-                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: CONFIG.text35, marginBottom: 7, textTransform: "uppercase", letterSpacing: "0.06em" }}>Zalo / SĐT *</label>
-                  <input required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0901 234 567" style={inp}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = CONFIG.accent; e.currentTarget.style.boxShadow = `0 0 0 3px ${a(0.14)}`; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = CONFIG.borderM; e.currentTarget.style.boxShadow = "none"; }} />
-                </div>
+          {!loggedInEmail ? (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", paddingTop: 10, gap: 16, textAlign: "center" }}>
+              <div style={{ width: 44, height: 44, borderRadius: "50%", background: a(0.12), display: "flex", alignItems: "center", justifyContent: "center", border: `1px solid ${CONFIG.accent}` }}>
+                <ShieldCheck size={20} color={CONFIG.accent} />
               </div>
-              <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: CONFIG.text35, marginBottom: 7, textTransform: "uppercase", letterSpacing: "0.06em" }}>Gmail tài khoản</label>
-                <input readOnly value={loggedInEmail || "Chưa đăng nhập"} style={{ ...inp, opacity: 0.6, cursor: "not-allowed", background: "rgba(0,0,0,0.15)" }} />
-              </div>
-              <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: CONFIG.text35, marginBottom: 7, textTransform: "uppercase", letterSpacing: "0.06em" }}>Ý tưởng / Ghi chú</label>
-                <textarea value={notes} onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Phong cách thiết kế, màu sắc thương hiệu, website tham khảo..."
-                  rows={3} style={{ ...inp, resize: "none" }}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = CONFIG.accent; e.currentTarget.style.boxShadow = `0 0 0 3px ${a(0.14)}`; }}
-                  onBlur={(e) => { e.currentTarget.style.borderColor = CONFIG.borderM; e.currentTarget.style.boxShadow = "none"; }} />
-              </div>
-              <motion.button type="submit" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                style={{ width: "100%", padding: "15px", borderRadius: 14, background: CONFIG.accent, border: "none", color: "#fff", fontSize: 14, fontWeight: 800, cursor: "pointer", letterSpacing: "0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: `0 8px 28px ${a(0.35)}` }}>
-                <BadgeCheck size={16} /> XÁC NHẬN & GỬI YÊU CẦU
-              </motion.button>
+              <p style={{ color: CONFIG.text60, fontSize: 13, margin: 0, lineHeight: 1.6, maxWidth: 320 }}>
+                Vui lòng đăng nhập tài khoản để điền thông tin và gửi yêu cầu đăng ký gói website.
+              </p>
+              <a href="/dang-nhap"
+                style={{
+                  width: "100%",
+                  boxSizing: "border-box",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  backgroundColor: CONFIG.accent,
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 14,
+                  padding: "14px",
+                  fontSize: 14,
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  textDecoration: "none",
+                  boxShadow: `0 8px 24px ${a(0.35)}`,
+                  transition: "all 0.2s"
+                }}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = CONFIG.accentHover; }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = CONFIG.accent; }}>
+                Đăng nhập ngay <ArrowRight size={14} />
+              </a>
             </div>
-          </form>
+          ) : (
+            <form onSubmit={(e) => { e.preventDefault(); onSuccess(name, phone, email, notes); }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: CONFIG.text35, marginBottom: 7, textTransform: "uppercase", letterSpacing: "0.06em" }}>Họ và tên *</label>
+                    <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Nguyễn Văn A" style={inp}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = CONFIG.accent; e.currentTarget.style.boxShadow = `0 0 0 3px ${a(0.14)}`; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = CONFIG.borderM; e.currentTarget.style.boxShadow = "none"; }} />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: CONFIG.text35, marginBottom: 7, textTransform: "uppercase", letterSpacing: "0.06em" }}>Zalo / SĐT *</label>
+                    <input required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0901 234 567" style={inp}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = CONFIG.accent; e.currentTarget.style.boxShadow = `0 0 0 3px ${a(0.14)}`; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = CONFIG.borderM; e.currentTarget.style.boxShadow = "none"; }} />
+                  </div>
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: CONFIG.text35, marginBottom: 7, textTransform: "uppercase", letterSpacing: "0.06em" }}>Gmail tài khoản *</label>
+                  <input 
+                    required 
+                    type="email"
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    placeholder="name@gmail.com" 
+                    readOnly={!!loggedInEmail}
+                    style={{ 
+                      ...inp, 
+                      ...(loggedInEmail ? { opacity: 0.6, cursor: "not-allowed", background: "rgba(0,0,0,0.15)" } : {}) 
+                    }}
+                    onFocus={(e) => { if (!loggedInEmail) { e.currentTarget.style.borderColor = CONFIG.accent; e.currentTarget.style.boxShadow = `0 0 0 3px ${a(0.14)}`; } }}
+                    onBlur={(e) => { if (!loggedInEmail) { e.currentTarget.style.borderColor = CONFIG.borderM; e.currentTarget.style.boxShadow = "none"; } }} 
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: CONFIG.text35, marginBottom: 7, textTransform: "uppercase", letterSpacing: "0.06em" }}>Ý tưởng / Ghi chú</label>
+                  <textarea value={notes} onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Phong cách thiết kế, màu sắc thương hiệu, website tham khảo..."
+                    rows={3} style={{ ...inp, resize: "none" }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = CONFIG.accent; e.currentTarget.style.boxShadow = `0 0 0 3px ${a(0.14)}`; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = CONFIG.borderM; e.currentTarget.style.boxShadow = "none"; }} />
+                </div>
+                <motion.button type="submit" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                  style={{ width: "100%", padding: "15px", borderRadius: 14, background: CONFIG.accent, border: "none", color: "#fff", fontSize: 14, fontWeight: 800, cursor: "pointer", letterSpacing: "0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: `0 8px 28px ${a(0.35)}` }}>
+                  <BadgeCheck size={16} /> XÁC NHẬN & GỬI YÊU CẦU
+                </motion.button>
+              </div>
+            </form>
+          )}
         </div>
       </motion.div>
     </motion.div>
@@ -585,9 +672,20 @@ function FormModal({ pkg, total, selectedDomains, loggedInEmail, onClose, onSucc
 
 // ── 5f. Success Screen ────────────────────────────────────────────────────────
 
-function SuccessScreen({ name, phone, email, pkg, total, selectedDomains, onBack, yearly = false }: {
-  name: string; phone: string; email: string; pkg: AnyPkg; total: number; selectedDomains: { label: string; price: number }[]; onBack?: () => void; yearly?: boolean;
+function SuccessScreen({ name, phone, email, pkg, total, selectedDomains, hostingPrice, seoPrice, dbHostings, dbSeoPackages, onBack, yearly = false }: {
+  name: string; phone: string; email: string; pkg: AnyPkg; total: number; selectedDomains: { label: string; price: number }[]; hostingPrice: number; seoPrice: number; dbHostings: any[]; dbSeoPackages: any[]; onBack?: () => void; yearly?: boolean;
 }) {
+  const selectedHosting = dbHostings.find(h => h.price === hostingPrice) || 
+    (hostingPrice === 500000 ? { label: "5GB NVMe", price: 500000 } :
+     hostingPrice === 1000000 ? { label: "10GB NVMe", price: 1000000 } :
+     { label: "2GB NVMe (Mặc định)", price: 0 });
+
+  const selectedSeo = dbSeoPackages.find(s => s.price === seoPrice) ||
+    (seoPrice === 2000000 ? { label: "Cơ bản", description: "10 bài/tháng", price: 2000000 } :
+     seoPrice === 6000000 ? { label: "Doanh nghiệp", description: "15 bài/tháng", price: 6000000 } :
+     seoPrice === 36000000 ? { label: "Phổ biến", description: "20 bài/tháng", price: 36000000 } :
+     { label: "Miễn phí", description: "5 bài/tháng", price: 0 });
+
   return (
     <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "80px 24px", textAlign: "center" }}>
       <div style={{ maxWidth: 520 }}>
@@ -608,6 +706,8 @@ function SuccessScreen({ name, phone, email, pkg, total, selectedDomains, onBack
           {[
             { l: "Gói", v: pkg.name },
             ...(!pkg.isRental && selectedDomains.length > 0 ? [{ l: "Tên miền", v: selectedDomains.map(d => d.label).join(", ") }] : []),
+            ...(!pkg.isRental ? [{ l: "Hosting NVMe", v: `${selectedHosting.label} (${selectedHosting.price > 0 ? `+${fmt(selectedHosting.price)}` : "Kèm theo gói"})` }] : []),
+            ...(!pkg.isRental ? [{ l: "Dịch vụ SEO", v: `${selectedSeo.label} ${selectedSeo.description ? `(${selectedSeo.description})` : ""} (${selectedSeo.price > 0 ? `+${fmt(selectedSeo.price)}` : "Miễn phí"})` }] : []),
             ...(email ? [{ l: "Gmail", v: email }] : []),
             { l: pkg.isRental ? (yearly ? "Chi phí/tháng (Thu chu kỳ năm)" : "Chi phí/tháng") : "Tổng", v: fmt(total), a: true }
           ].map((r) => (
@@ -645,7 +745,7 @@ function DomainAddonRow({
     : "Domain mới cho website";
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", borderRadius: 14, background: CONFIG.glassBg, border: `1px solid ${CONFIG.border}` }}>
+    <div className="bw-addon-row" style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", borderRadius: 14, background: CONFIG.glassBg, border: `1px solid ${CONFIG.border}` }}>
       <div style={{ width: 36, height: 36, borderRadius: 10, background: a(0.1), display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
         <Globe size={16} color={CONFIG.accent} />
       </div>
@@ -1028,6 +1128,7 @@ function DomainInlineChecker({
               return (
                 <div
                   key={domainName}
+                  className="bw-domain-result-row"
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -1153,6 +1254,7 @@ function DomainInlineChecker({
               return (
                 <div
                   key={domainName}
+                  className="bw-domain-result-row"
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -1510,7 +1612,53 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
     setSeo(dbSeoPackages.length > 0 ? dbSeoPackages[0].price : 0);
   };
 
-  const handleSuccess = (n: string, p: string, e: string) => {
+  const handleSuccess = async (n: string, p: string, e: string, notes: string) => {
+    // 1. Prepare details based on mode
+    let details: any = null;
+    if (isRentalMode) {
+      details = {
+        packageName: activePkg.name,
+        packagePrice: yearly ? getYearlyPrice(activePkg.price) : activePkg.price,
+        billingCycle: yearly ? "yearly" : "monthly"
+      };
+    } else {
+      const selectedHosting = dbHostings.find(h => h.price === hosting) || { label: "2GB NVMe (Mặc định)", price: 0 };
+      const selectedSeo = dbSeoPackages.find(s => s.price === seo) || { label: "Miễn phí", price: 0 };
+      details = {
+        packageName: activePkg.name,
+        packagePrice: activePkg.price,
+        domains: selectedDomains.map(d => ({ name: d.label, price: d.price })),
+        hosting: {
+          label: selectedHosting.label,
+          price: selectedHosting.price
+        },
+        seoPackage: {
+          label: selectedSeo.label,
+          price: selectedSeo.price
+        }
+      };
+    }
+
+    // 2. Call API to save to ContactLead
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: n,
+          email: e,
+          phone: p,
+          message: notes || `Đăng ký gói ${activePkg.name}`,
+          source: isRentalMode ? "rental" : "purchase",
+          details
+        })
+      });
+    } catch (err) {
+      console.error("Lỗi khi lưu contact lead:", err);
+    }
+
     setCustName(n); setCustPhone(p); setCustEmail(e);
     setShowForm(false); setSuccess(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1524,7 +1672,7 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
 
       {/* ── HERO ── */}
       {!success && (
-        <section style={{ position: "relative", height: "56vh", minHeight: 420, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+        <section style={{ position: "relative", height: "auto", minHeight: 500, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", padding: "120px 24px 80px" }}>
           <img src={CONFIG.heroImageUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
           <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to bottom, var(--vw-bg-nav, rgba(2,2,2,0.55)) 0%, ${CONFIG.bg} 100%)` }} />
           <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at 25% 60%, ${a(0.2)} 0%, transparent 50%)` }} />
@@ -1543,6 +1691,48 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
               <p style={{ color: CONFIG.text60, fontSize: "clamp(13px,1.5vw,16px)", lineHeight: 1.75, margin: 0 }}>
                 Bấm chọn gói bên dưới — cột phải hiển thị ngay toàn bộ thông tin, tính năng và báo giá chi tiết.
               </p>
+
+              {/* Payment Mode Switcher & Billing Cycle Toggle */}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, marginTop: 28, maxWidth: 500, marginInline: "auto", width: "100%" }}>
+                <div className="bw-type-switcher" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, background: CONFIG.glassBg, border: `1px solid ${CONFIG.border}`, borderRadius: 18, padding: 5, width: "100%" }}>
+                  {([
+                    { id: "thue", label: "Thuê website", sub: "Thanh toán hàng tháng", Icon: RefreshCw },
+                    { id: "mua", label: "Mua gói website", sub: "Thanh toán một lần", Icon: CreditCard },
+                  ] as const).map(({ id, label, sub, Icon }) => (
+                    <motion.button key={id} type="button" onClick={() => handleModeChange(id)} whileTap={{ scale: 0.97 }}
+                       style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 18px", borderRadius: 14, border: "none", cursor: "pointer", textAlign: "left", background: mode === id ? CONFIG.accent : "transparent", transition: "background 0.25s, box-shadow 0.25s", boxShadow: mode === id ? `0 4px 20px ${a(0.35)}` : "none" }}>
+                      <div style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: mode === id ? "rgba(255,255,255,0.2)" : a(0.10) }}>
+                        <Icon size={17} color={mode === id ? "#fff" : CONFIG.accent} />
+                      </div>
+                      <div>
+                        <motion.p animate={{ scale: mode === id ? [1.05, 1] : 1 }} transition={{ duration: 0.2 }} style={{ fontSize: 14, fontWeight: 800, color: mode === id ? "#fff" : CONFIG.text, margin: "0 0 2px", letterSpacing: "-0.01em", transformOrigin: "left center" }}>{label}</motion.p>
+                        <motion.p animate={{ opacity: mode === id ? [0.5, 1] : 1 }} transition={{ duration: 0.2 }} style={{ fontSize: 11, color: mode === id ? "rgba(255,255,255,0.7)" : CONFIG.text35, margin: 0 }}>{sub}</motion.p>
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+
+                {isRentalMode && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3, ease: EASE }}
+                    style={{ display: "flex", justifyContent: "center" }}
+                  >
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 12, background: CONFIG.glassBg, backdropFilter: "blur(12px)", border: `1px solid ${CONFIG.border}`, borderRadius: "9999px", padding: "6px 8px 6px 20px" }}>
+                      <span style={{ fontSize: "12px", color: yearly ? CONFIG.text35 : CONFIG.text, fontWeight: yearly ? 400 : 700, cursor: "pointer" }} onClick={() => setYearly(false)}>Tháng</span>
+                      <button type="button" onClick={() => setYearly(y => !y)} style={{ width: "44px", height: "24px", borderRadius: "9999px", border: "none", cursor: "pointer", background: yearly ? CONFIG.accent : CONFIG.borderM, position: "relative", transition: "background 0.3s" }}>
+                        <div style={{ position: "absolute", top: "3px", left: yearly ? "calc(100% - 21px)" : "3px", width: "18px", height: "18px", borderRadius: "50%", background: "#fff", transition: "left 0.3s" }} />
+                      </button>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, paddingRight: "10px" }}>
+                        <span style={{ fontSize: "12px", color: yearly ? CONFIG.text : CONFIG.text35, fontWeight: yearly ? 700 : 400, cursor: "pointer" }} onClick={() => setYearly(true)}>Năm</span>
+                        <span style={{ fontSize: "10px", background: a(0.15), color: CONFIG.accent, borderRadius: "9999px", padding: "2px 8px", fontWeight: 700 }}>−20%</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
             </motion.div>
           </div>
         </section>
@@ -1551,7 +1741,7 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
       {/* ── SUCCESS ── */}
       {success && (
         <div style={{ paddingTop: 80 }}>
-          <SuccessScreen name={custName} phone={custPhone} email={custEmail} pkg={activePkg} total={total} selectedDomains={selectedDomains} yearly={yearly}
+          <SuccessScreen name={custName} phone={custPhone} email={custEmail} pkg={activePkg} total={total} selectedDomains={selectedDomains} hostingPrice={hosting} seoPrice={seo} dbHostings={dbHostings} dbSeoPackages={dbSeoPackages} yearly={yearly}
             onBack={() => { setSuccess(false); setCustName(""); setCustPhone(""); setCustEmail(""); setSelectedDomains([]); }} />
         </div>
       )}
@@ -1574,52 +1764,6 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
               } : {})
             }}
           >
-
-            {/* Tab switcher & Billing toggle */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: EASE }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: CONFIG.text35, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 10px" }}>Hình thức thanh toán</p>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, background: CONFIG.glassBg, border: `1px solid ${CONFIG.border}`, borderRadius: 18, padding: 5 }}>
-                  {([
-                    { id: "thue", label: "Thuê website", sub: "Thanh toán hàng tháng", Icon: RefreshCw },
-                    { id: "mua", label: "Mua gói website", sub: "Thanh toán một lần", Icon: CreditCard },
-                  ] as const).map(({ id, label, sub, Icon }) => (
-                    <motion.button key={id} type="button" onClick={() => handleModeChange(id)} whileTap={{ scale: 0.97 }}
-                      style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", borderRadius: 14, border: "none", cursor: "pointer", textAlign: "left", background: mode === id ? CONFIG.accent : "transparent", transition: "background 0.25s, box-shadow 0.25s", boxShadow: mode === id ? `0 4px 20px ${a(0.35)}` : "none" }}>
-                      <div style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: mode === id ? "rgba(255,255,255,0.2)" : a(0.10) }}>
-                        <Icon size={17} color={mode === id ? "#fff" : CONFIG.accent} />
-                      </div>
-                      <div>
-                        <motion.p animate={{ scale: mode === id ? [1.05, 1] : 1 }} transition={{ duration: 0.2 }} style={{ fontSize: 14, fontWeight: 800, color: mode === id ? "#fff" : CONFIG.text, margin: "0 0 2px", letterSpacing: "-0.01em", transformOrigin: "left center" }}>{label}</motion.p>
-                        <motion.p animate={{ opacity: mode === id ? [0.5, 1] : 1 }} transition={{ duration: 0.2 }} style={{ fontSize: 11, color: mode === id ? "rgba(255,255,255,0.7)" : CONFIG.text35, margin: 0 }}>{sub}</motion.p>
-                      </div>
-                    </motion.button>
-                  ))}
-                </div>
-              </motion.div>
-
-              {isRentalMode && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3, ease: EASE }}
-                  style={{ display: "flex", justifyContent: "center" }}
-                >
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: 12, background: CONFIG.glassBg, backdropFilter: "blur(12px)", border: `1px solid ${CONFIG.border}`, borderRadius: "9999px", padding: "6px 8px 6px 20px" }}>
-                    <span style={{ fontSize: "12px", color: yearly ? CONFIG.text35 : CONFIG.text, fontWeight: yearly ? 400 : 700, cursor: "pointer" }} onClick={() => setYearly(false)}>Tháng</span>
-                    <button type="button" onClick={() => setYearly(y => !y)} style={{ width: "44px", height: "24px", borderRadius: "9999px", border: "none", cursor: "pointer", background: yearly ? CONFIG.accent : CONFIG.borderM, position: "relative", transition: "background 0.3s" }}>
-                      <div style={{ position: "absolute", top: "3px", left: yearly ? "calc(100% - 21px)" : "3px", width: "18px", height: "18px", borderRadius: "50%", background: "#fff", transition: "left 0.3s" }} />
-                    </button>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, paddingRight: "10px" }}>
-                      <span style={{ fontSize: "12px", color: yearly ? CONFIG.text : CONFIG.text35, fontWeight: yearly ? 700 : 400, cursor: "pointer" }} onClick={() => setYearly(true)}>Năm</span>
-                      <span style={{ fontSize: "10px", background: a(0.15), color: CONFIG.accent, borderRadius: "9999px", padding: "2px 8px", fontWeight: 700 }}>−20%</span>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </div>
-
             {/* Step 01 */}
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
@@ -1710,14 +1854,44 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
 
       <AnimatePresence>
         {showForm && (
-          <FormModal pkg={activePkg} total={total} selectedDomains={selectedDomains} loggedInEmail={loggedInEmail} onClose={() => setShowForm(false)} onSuccess={handleSuccess} yearly={yearly} />
+          <FormModal pkg={activePkg} total={total} selectedDomains={selectedDomains} hostingPrice={hosting} seoPrice={seo} dbHostings={dbHostings} dbSeoPackages={dbSeoPackages} loggedInEmail={loggedInEmail} onClose={() => setShowForm(false)} onSuccess={handleSuccess} yearly={yearly} />
         )}
       </AnimatePresence>
 
 
       <style>{`
         @media (max-width: 960px) { .bw-main-grid { grid-template-columns: 1fr !important; } }
-        @media (max-width: 560px) { .bw-pkg-grid  { grid-template-columns: 1fr !important; } }
+        @media (max-width: 560px) { 
+          .bw-pkg-grid  { grid-template-columns: 1fr !important; } 
+          .bw-type-switcher { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 480px) {
+          .bw-addon-row {
+            flex-wrap: wrap !important;
+            align-items: flex-start !important;
+          }
+          .bw-addon-row > div:nth-child(2) {
+            flex-basis: calc(100% - 60px) !important;
+          }
+          .bw-addon-row > :nth-child(3) {
+            margin-left: 50px !important;
+            flex-grow: 1 !important;
+          }
+          .bw-addon-row > :text-child,
+          .bw-addon-row > span {
+            align-self: center !important;
+          }
+          .bw-domain-result-row {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+          }
+          .bw-domain-result-row > button {
+            align-self: flex-start !important;
+            width: 100% !important;
+            justify-content: center !important;
+          }
+        }
       `}</style>
     </div>
   );

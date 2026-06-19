@@ -7,7 +7,7 @@ import { SectionHeader } from '../shared/SectionHeader';
 import { GlassCard } from '../shared/GlassCard';
 import { useSiteData } from '@/features/legacy-core/SiteDataContext';
 
-const F = "'Be Vietnam Pro', sans-serif";
+const F = "inherit";
 
 const plans = [
   {
@@ -118,13 +118,9 @@ export function WebsiteRentalPricingSection() {
   const router = useRouter();
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
-  const { isMobile, isTablet } = useBreakpoint();
   const [yearly, setYearly] = useState(false);
   const [activePlan, setActivePlan] = useState<string | null>(null);
   const { config } = useSiteData();
-
-  // Responsive grid: mobile=1col, tablet=2col, desktop=4col
-  const planCols = isMobile ? '1fr' : isTablet ? 'repeat(2,1fr)' : 'repeat(4,1fr)';
 
   return (
     <>
@@ -178,7 +174,7 @@ export function WebsiteRentalPricingSection() {
           </motion.div>
 
           {/* Plan cards — responsive grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: planCols, gap: 'clamp(12px,2vw,16px)', marginBottom: '40px' }}>
+          <div className="bw-rental-pricing-grid" style={{ gap: 'clamp(12px,2vw,16px)', marginBottom: '40px' }}>
             {plans.map((plan, i) => {
               const price = yearly ? plan.yearlyPrice : plan.monthlyPrice;
               const isFeat = plan.accentClass;
@@ -269,6 +265,23 @@ export function WebsiteRentalPricingSection() {
       <AnimatePresence>
         {activePlan && <InquiryModal planId={activePlan} onClose={() => setActivePlan(null)} />}
       </AnimatePresence>
+
+      <style>{`
+        .bw-rental-pricing-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+        }
+        @media (min-width: 640px) {
+          .bw-rental-pricing-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        @media (min-width: 1024px) {
+          .bw-rental-pricing-grid {
+            grid-template-columns: repeat(4, 1fr);
+          }
+        }
+      `}</style>
     </>
   );
 }

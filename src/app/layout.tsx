@@ -11,6 +11,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://loops.vn",
   ),
+  icons: {
+    icon: "/LOOP_LOGO_removeBG.png",
+    shortcut: "/LOOP_LOGO_removeBG.png",
+    apple: "/LOOP_LOGO_removeBG.png",
+  },
   openGraph: {
     locale: "vi_VN",
     siteName: "LOOP",

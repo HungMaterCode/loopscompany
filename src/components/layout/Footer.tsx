@@ -3,11 +3,37 @@
 import Link from "next/link";
 import { Settings } from "lucide-react";
 import { RED, TEXT, TEXT60, TEXT35, BORDER, GLASS } from "@/features/legacy-core/tokens";
+import { SITE } from "@/lib/site";
 
 const COLS = [
-  { title: "Dịch vụ", links: [{ label: "Landing Page", href: "/#services" }, { label: "Website doanh nghiệp", href: "/#services" }] },
-  { title: "Bảng giá", links: [{ label: "W-01 — 189K/tháng", href: "/bao-gia" }, { label: "Tất cả bảng giá", href: "/bao-gia" }] },
-  { title: "Công ty",  links: [{ label: "Đội ngũ", href: "/doi-ngu" }, { label: "Danh mục dự án", href: "/du-an" }, { label: "Blog & Kiến thức", href: "/bai-viet" }] },
+  {
+    title: "Dịch vụ",
+    links: [
+      { label: "Landing Page", href: "/#services" },
+      { label: "Cửa hàng online", href: "/#services" },
+      { label: "Website doanh nghiệp", href: "/#services" },
+      { label: "SEO & Google", href: "/#services" },
+      { label: "Thiết kế thương hiệu", href: "/#services" }
+    ]
+  },
+  {
+    title: "Bảng giá",
+    links: [
+      { label: "W-01 — 189K/tháng", href: "/bao-gia" },
+      { label: "W-02 — 589K/tháng", href: "/bao-gia" },
+      { label: "W-03 — 889K/tháng", href: "/bao-gia" },
+      { label: "W-04 — 1.189K/tháng", href: "/bao-gia" },
+      { label: "Tất cả bảng giá", href: "/bao-gia" }
+    ]
+  },
+  {
+    title: "Công ty",
+    links: [
+      { label: "Đội ngũ", href: "/doi-ngu" },
+      { label: "Danh mục dự án", href: "/du-an" },
+      { label: "Blog & Kiến thức", href: "/bai-viet" }
+    ]
+  },
 ];
 
 export function Footer() {
@@ -21,14 +47,42 @@ export function Footer() {
             <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, textDecoration: "none" }}>
               <img src="/LOOP_LOGO_removeBG.png" alt="LOOP Logo" style={{ height: '42px', objectFit: 'contain' }} />
             </Link>
-            <p style={{ color: TEXT60, fontSize: 13, lineHeight: 1.7, margin: "0 0 18px", maxWidth: 240 }}>
+            <p style={{ color: TEXT60, fontSize: 13, lineHeight: 1.7, margin: "0 0 16px", maxWidth: 240 }}>
               Đơn vị thiết kế và cho thuê website chuyên nghiệp hàng đầu cho doanh nghiệp Việt Nam.
             </p>
+            
+            {/* Contact Details */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20, fontSize: 12, color: TEXT60 }}>
+              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                <span style={{ color: TEXT, fontWeight: 500 }}>Hotline:</span>
+                <a href={`tel:${SITE.hotline.replace(/[^\d+]/g, "")}`} style={{ color: TEXT60, textDecoration: "none", transition: "color 0.2s" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = TEXT)}
+                  onMouseLeave={e => (e.currentTarget.style.color = TEXT60)}>{SITE.hotline}</a>
+              </div>
+              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                <span style={{ color: TEXT, fontWeight: 500 }}>Email:</span>
+                <a href={`mailto:${SITE.email}`} style={{ color: TEXT60, textDecoration: "none", transition: "color 0.2s" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = TEXT)}
+                  onMouseLeave={e => (e.currentTarget.style.color = TEXT60)}>{SITE.email}</a>
+              </div>
+              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                <span style={{ color: TEXT, fontWeight: 500 }}>Địa chỉ:</span>
+                <span>{SITE.address}</span>
+              </div>
+            </div>
+
+            {/* Social Links */}
             <div style={{ display: "flex", gap: 8 }}>
-              {["ZA","FB","YT"].map(s => (
-                <div key={s} style={{ width: 32, height: 32, borderRadius: 8, ...GLASS, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                  <span style={{ color: TEXT60, fontSize: 9, fontWeight: 700 }}>{s}</span>
-                </div>
+              {[
+                { label: "ZA", href: `https://zalo.me/${SITE.zalo.replace(/[^\d]/g, "")}` },
+                { label: "FB", href: "https://facebook.com" },
+                { label: "YT", href: "https://youtube.com" }
+              ].map(s => (
+                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" style={{ width: 32, height: 32, borderRadius: 8, ...GLASS, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", cursor: "pointer", transition: "border-color 0.2s" }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--sc-accent)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--vw-glass-border)"; }}>
+                  <span style={{ color: TEXT60, fontSize: 9, fontWeight: 700 }}>{s.label}</span>
+                </a>
               ))}
             </div>
           </div>

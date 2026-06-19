@@ -4,7 +4,7 @@ import { MessageCircle, Facebook, Phone, Mail, ArrowUpRight } from 'lucide-react
 import { useTilt3D } from '@/hooks/useTilt3D';
 import { useTheme } from '@/features/legacy-core/theme-context';
 
-const F = "'Plus Jakarta Sans', sans-serif";
+const F = "inherit";
 const SERIF = "'Instrument Serif', serif";
 
 const team = [
@@ -112,12 +112,9 @@ const FRAME_DEPTH = 14;
 
 function TeamCard({ member, index }: { member: TeamMember; index: number }) {
   const tilt = useTilt3D(6, 900);
-  const isLight = index === 0;
-  const edgeDark = isLight ? '#C8C3B5' : '#111';
-  const edgeDark2 = isLight ? '#B0ABA0' : '#0a0a0a';
-  const frameShadow = isLight
-    ? `${FRAME_DEPTH}px ${FRAME_DEPTH}px 0 #C8C3B5, ${FRAME_DEPTH * 2}px ${FRAME_DEPTH * 2}px 0 #B0ABA0, ${FRAME_DEPTH * 2}px ${FRAME_DEPTH * 2}px 36px rgba(26,20,10,0.12)`
-    : `${FRAME_DEPTH}px ${FRAME_DEPTH}px 0 #111, ${FRAME_DEPTH * 2}px ${FRAME_DEPTH * 2}px 0 #090909, ${FRAME_DEPTH * 2}px ${FRAME_DEPTH * 2}px 40px rgba(0,0,0,0.5)`;
+  const edgeDark = '#C8C3B5';
+  const edgeDark2 = '#B0ABA0';
+  const frameShadow = `${FRAME_DEPTH}px ${FRAME_DEPTH}px 0 #C8C3B5, ${FRAME_DEPTH * 2}px ${FRAME_DEPTH * 2}px 0 #B0ABA0, ${FRAME_DEPTH * 2}px ${FRAME_DEPTH * 2}px 36px rgba(26,20,10,0.12)`;
 
   return (
     <motion.div
@@ -138,7 +135,7 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
           <div style={{
             height: '300px',
             background: member.gradient,
-            border: `1px solid ${isLight ? '#EAE5DA' : '#2A2520'}`,
+            border: '1px solid #EAE5DA',
             borderRadius: '4px',
             position: 'relative',
             overflow: 'hidden',

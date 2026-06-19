@@ -1,23 +1,18 @@
+import { useState, useEffect } from "react";
 import { BarChart3, Globe, Layers3, MonitorSmartphone, Sparkles, TrendingUp, Zap, ArrowUpRight, BookOpen, Users, UserSquare2 } from "lucide-react";
 import { PLANS, SERVICES, PORTFOLIO, TEAM } from "@/features/legacy-core/data";
 import { ARTICLES } from "@/features/legacy-core/articles";
 import { WEBSITE_MODULES } from "@/features/legacy-core/site-config";
 import type { TC } from "./types";
 
-const RECENT_ACTIVITY = [
-  { action: "Cập nhật bảng giá W-03", time: "5 phút trước", type: "pricing" },
-  { action: "Bật section Danh mục dự án", time: "2 giờ trước", type: "section" },
-  { action: "Chỉnh sửa SEO trang chủ", time: "Hôm qua", type: "seo" },
-  { action: "Thêm dự án mới: Phòng khám Y khoa", time: "2 ngày trước", type: "portfolio" },
-  { action: "Cập nhật thông tin dịch vụ Landing Page", time: "3 ngày trước", type: "service" },
-];
-
-const QUICK_ACTIONS = [
-  { label: "Chỉnh bảng giá",  icon: MonitorSmartphone, tab: "pricing",   color: "from-amber-400 to-red-500" },
-  { label: "Thêm bài viết",   icon: BookOpen,           tab: "blog",      color: "from-rose-400 to-fuchsia-500" },
-  { label: "Cập nhật SEO",    icon: Globe,              tab: "seo",       color: "from-blue-400 to-indigo-500" },
-  { label: "Quản lý đội ngũ", icon: UserSquare2,        tab: "team",      color: "from-emerald-400 to-teal-500" },
-];
+interface DashboardStats {
+  userCount: number;
+  articleCount: number;
+  teamCount: number;
+  contactCount: number;
+  orderCount: number;
+  recentActivities: { action: string; time: string; type: string }[];
+}
 
 interface Props {
   t: TC;
@@ -26,14 +21,69 @@ interface Props {
 }
 
 export function Dashboard({ t, isDark, onNavigate }: Props) {
+  const [statsData, setStatsData] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/admin/dashboard-stats")
+      .then((res) => {
+        if (!res.ok) throw new Error("API failed");
+        return res.json();
+      })
+      .then((data) => {
+        setStatsData(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch dashboard stats:", err);
+        setLoading(false);
+      });
+  }, []);
+
   const enabledCount = WEBSITE_MODULES.filter((m) => m.status === "Đang bật").length;
 
   const stats = [
-    { label: "Section đang bật", value: `${enabledCount}/${WEBSITE_MODULES.length}`, icon: Layers3,       gradient: "from-red-500 to-orange-400",    change: "+1 hôm nay",   tab: "sections" },
-    { label: "Bài viết đã đăng", value: ARTICLES.length.toString().padStart(2, "0"),  icon: BookOpen,      gradient: "from-rose-400 to-fuchsia-500",  change: "Xem tất cả",   tab: "blog" },
-    { label: "Người dùng",       value: "07",                                          icon: Users,         gradient: "from-blue-400 to-indigo-500",   change: "+1 tuần này",  tab: "users" },
-    { label: "Thành viên nhóm",  value: TEAM.length.toString().padStart(2, "0"),       icon: UserSquare2,   gradient: "from-emerald-400 to-teal-500",  change: "Đội ngũ chính",tab: "team" },
+    {
+      label: "Section đang bật",
+      value: `${enabledCount}/${WEBSITE_MODULES.length}`,
+      icon: Layers3,
+      gradient: "from-red-500 to-orange-400",
+      change: "+1 hôm nay",
+      tab: "sections"
+    },
+    {
+      label: "Bài viết đã đăng",
+      value: loading
+        ? "..."
+        : (statsData?.articleCount ?? ARTICLES.length).toString().padStart(2, "0"),
+      icon: BookOpen,
+      gradient: "from-rose-400 to-fuchsia-500",
+      change: "Xem tất cả",
+      tab: "blog"
+    },
+    {
+      label: "Người dùng",
+      value: loading
+        ? "..."
+        : (statsData?.userCount ?? 0).toString().padStart(2, "0"),
+      icon: Users,
+      gradient: "from-blue-400 to-indigo-500",
+      change: "Quản lý",
+      tab: "users"
+    },
+    {
+      label: "Thành viên nhóm",
+      value: loading
+        ? "..."
+        : (statsData?.teamCount ?? TEAM.length).toString().padStart(2, "0"),
+      icon: UserSquare2,
+      gradient: "from-emerald-400 to-teal-500",
+      change: "Đội ngũ chính",
+      tab: "team"
+    },
   ];
+
+  const recentActivities = statsData?.recentActivities ?? [];
 
   return (
     <div className="space-y-6">
@@ -67,7 +117,12 @@ export function Dashboard({ t, isDark, onNavigate }: Props) {
         <div className={`rounded-2xl p-5 ${t.card}`}>
           <h3 className={`mb-4 font-semibold ${t.text}`}>Thao tác nhanh</h3>
           <div className="grid grid-cols-2 gap-3">
-            {QUICK_ACTIONS.map((action) => {
+            {[
+              { label: "Chỉnh bảng giá",  icon: MonitorSmartphone, tab: "pricing",   color: "from-amber-400 to-red-500" },
+              { label: "Thêm bài viết",   icon: BookOpen,           tab: "blog",      color: "from-rose-400 to-fuchsia-500" },
+              { label: "Cập nhật SEO",    icon: Globe,              tab: "seo",       color: "from-blue-400 to-indigo-500" },
+              { label: "Quản lý đội ngũ", icon: UserSquare2,        tab: "team",      color: "from-emerald-400 to-teal-500" },
+            ].map((action) => {
               const Icon = action.icon;
               return (
                 <button
@@ -91,22 +146,33 @@ export function Dashboard({ t, isDark, onNavigate }: Props) {
             <h3 className={`font-semibold ${t.text}`}>Hoạt động gần đây</h3>
             <Zap className={`h-4 w-4 ${t.textFaint}`} />
           </div>
-          <div className="space-y-3">
-            {RECENT_ACTIVITY.map((item, i) => (
-              <div key={i} className={`flex items-center gap-3 py-2 ${i < RECENT_ACTIVITY.length - 1 ? `border-b ${t.divider}` : ""}`}>
-                <div className={`h-2 w-2 flex-shrink-0 rounded-full ${
-                  item.type === "pricing" ? "bg-amber-400" :
-                  item.type === "seo" ? "bg-blue-400" :
-                  item.type === "portfolio" ? "bg-emerald-400" :
-                  "bg-red-400"
-                }`} />
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm truncate ${t.text}`}>{item.action}</p>
-                  <p className={`text-xs ${t.textFaint}`}>{item.time}</p>
+          
+          {loading ? (
+            <div className="flex h-[200px] items-center justify-center">
+              <span className={`text-sm ${t.textMuted}`}>Đang tải hoạt động...</span>
+            </div>
+          ) : recentActivities.length === 0 ? (
+            <div className="flex h-[200px] items-center justify-center">
+              <span className={`text-sm ${t.textMuted}`}>Chưa có hoạt động mới nào.</span>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {recentActivities.map((item, i) => (
+                <div key={i} className={`flex items-center gap-3 py-2 ${i < recentActivities.length - 1 ? `border-b ${t.divider}` : ""}`}>
+                  <div className={`h-2 w-2 flex-shrink-0 rounded-full ${
+                    item.type === "pricing" ? "bg-amber-400" :
+                    item.type === "seo" ? "bg-blue-400" :
+                    item.type === "portfolio" ? "bg-emerald-400" :
+                    "bg-red-400"
+                  }`} />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm truncate ${t.text}`}>{item.action}</p>
+                    <p className={`text-xs ${t.textFaint}`}>{item.time}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -133,3 +199,4 @@ export function Dashboard({ t, isDark, onNavigate }: Props) {
     </div>
   );
 }
+

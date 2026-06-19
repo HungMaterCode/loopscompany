@@ -26,6 +26,14 @@ export function HeroCarousel() {
 
   useEffect(() => {
     setProgress(0);
+    const activeSlide = config.hero.slides[current];
+    const isVideo = activeSlide?.mediaType === 'video' || (activeSlide?.bgUrl && (activeSlide.bgUrl.endsWith('.mp4') || activeSlide.bgUrl.endsWith('.webm') || activeSlide.bgUrl.includes('/video/upload/')));
+
+    if (isVideo) {
+      // Transition is driven by the video player's event listeners
+      return;
+    }
+
     const start = performance.now();
     let raf: number;
     const tick = (now: number) => {
@@ -37,11 +45,12 @@ export function HeroCarousel() {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [current, config.hero.slides.length]);
+  }, [current, config.hero.slides]);
 
   const slide = config.hero.slides[current];
   if (!slide) return null;
   const bgSrc = slide.bgUrl;
+  const isVideo = slide.mediaType === 'video' || (bgSrc && (bgSrc.endsWith('.mp4') || bgSrc.endsWith('.webm') || bgSrc.includes('/video/upload/')));
 
   // Hardcode mockups per slide index since we didn't add them to config yet
   const mockups = [
@@ -52,81 +61,115 @@ export function HeroCarousel() {
 
   return (
     <section data-theme="dark" style={{ position: "relative", height: "100vh", minHeight: 580, overflow: "hidden", backgroundColor: "var(--vw-bg)" }}>
-      {/* Ken Burns background */}
+      {/* Background (Ken Burns for images, direct cover for videos) */}
       <AnimatePresence mode="sync">
         <motion.div key={`bg-${current}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 1.2 }}
           style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
-          <img src={bgSrc} alt="" key={`img-${current}`} className="hero-kb"
-            style={{ position: "absolute", inset: 0, transformOrigin: "center center" }} />
+          {isVideo ? (
+            <video
+              key={`video-${current}`}
+              src={bgSrc}
+              autoPlay
+              muted
+              playsInline
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+              onTimeUpdate={(e) => {
+                const video = e.currentTarget;
+                if (video.duration) {
+                  setProgress(video.currentTime / video.duration);
+                }
+              }}
+              onEnded={() => {
+                const len = config.hero.slides.length || 1;
+                setCurrent(c => (c + 1) % len);
+              }}
+              onError={() => {
+                // If video fails to load, fallback to a quick transition
+                const len = config.hero.slides.length || 1;
+                setTimeout(() => setCurrent(c => (c + 1) % len), 3000);
+              }}
+            />
+          ) : (
+            <img src={bgSrc} alt="" key={`img-${current}`} className="hero-kb"
+              style={{ position: "absolute", inset: 0, transformOrigin: "center center" }} />
+          )}
         </motion.div>
       </AnimatePresence>
 
       {/* Overlays */}
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(110deg,rgba(2,2,2,0.96) 0%,rgba(2,2,2,0.80) 50%,rgba(2,2,2,0.45) 100%)", zIndex: 1 }} />
-      <div style={{ position: "absolute", top: "15%", left: "-5%", width: 700, height: 700, background: `radial-gradient(circle,rgba(212,59,31,0.20) 0%,transparent 70%)`, zIndex: 1, pointerEvents: "none", animation: "floatOrb 9s ease-in-out infinite" }} />
-      <div style={{ position: "absolute", bottom: "-10%", right: "5%", width: 500, height: 500, background: `radial-gradient(circle,rgba(212,59,31,0.09) 0%,transparent 70%)`, zIndex: 1, pointerEvents: "none", animation: "floatOrb2 11s ease-in-out infinite" }} />
+      {!isVideo ? (
+        <>
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(110deg,rgba(2,2,2,0.96) 0%,rgba(2,2,2,0.80) 50%,rgba(2,2,2,0.45) 100%)", zIndex: 1 }} />
+          <div style={{ position: "absolute", top: "15%", left: "-5%", width: 700, height: 700, background: `radial-gradient(circle,rgba(212,59,31,0.20) 0%,transparent 70%)`, zIndex: 1, pointerEvents: "none", animation: "floatOrb 9s ease-in-out infinite" }} />
+          <div style={{ position: "absolute", bottom: "-10%", right: "5%", width: 500, height: 500, background: `radial-gradient(circle,rgba(212,59,31,0.09) 0%,transparent 70%)`, zIndex: 1, pointerEvents: "none", animation: "floatOrb2 11s ease-in-out infinite" }} />
+        </>
+      ) : (
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "150px", background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)", zIndex: 1, pointerEvents: "none" }} />
+      )}
 
       {/* Content */}
-      <div style={{ position: "relative", zIndex: 3, height: "100%", display: "flex", alignItems: "center", maxWidth: 1280, margin: "0 auto", width: "100%", padding: "80px 20px 80px", boxSizing: "border-box" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "center", width: "100%" }} className="hero-grid">
-          {/* Left */}
-          <div>
+      {!isVideo && (
+        <div style={{ position: "relative", zIndex: 3, height: "100%", display: "flex", alignItems: "center", maxWidth: 1280, margin: "0 auto", width: "100%", padding: "80px 20px 80px", boxSizing: "border-box" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "center", width: "100%" }} className="hero-grid">
+            {/* Left */}
+            <div>
+              <AnimatePresence mode="wait">
+                <motion.div key={`content-${current}`} initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.6, ease: EASE }}>
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, backgroundColor: RED_DIM, border: "1px solid rgba(212,59,31,0.3)", borderRadius: 40, padding: "6px 14px", marginBottom: 24 }}>
+                    <div style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: RED, animation: "pulse 2s ease infinite" }} />
+                    <span style={{ color: RED, fontSize: 12, fontWeight: 600, letterSpacing: "0.02em" }}>{slide.badge}</span>
+                  </div>
+
+                  <h1 style={{ color: slide.textColor || TEXT, fontSize: "clamp(30px,4.5vw,60px)", fontWeight: 700, lineHeight: 1.08, letterSpacing: "-0.03em", margin: "0 0 20px" }}>
+                    {[slide.title1, slide.title2, slide.title3].filter(Boolean).map((line, li) => (
+                      <span key={li} style={{ display: "block", color: li === slide.accentIndex ? (slide.accentColor || RED) : (slide.textColor || TEXT) }}>{line}</span>
+                    ))}
+                  </h1>
+
+                  <p style={{ color: TEXT60, fontSize: "clamp(13px,1.4vw,16px)", lineHeight: 1.75, margin: "0 0 32px", maxWidth: 440 }}>{slide.sub}</p>
+
+                  <div className="hero-ctas" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                    <button 
+                      onClick={() => router.push('/bao-gia')}
+                      style={{ display: "flex", alignItems: "center", gap: 8, backgroundColor: RED, color: "#fff", border: "none", borderRadius: 40, padding: "12px 22px", fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "background-color 0.2s" }}
+                      onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.backgroundColor = "#bb3218")}
+                      onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.backgroundColor = RED)}>
+                      {slide.cta} <ArrowRight size={14} />
+                    </button>
+                    <button 
+                      onClick={handleScrollToServices}
+                      style={{ display: "flex", alignItems: "center", gap: 8, backgroundColor: "transparent", color: TEXT, border: `1px solid ${BORDER_M}`, borderRadius: 40, padding: "12px 20px", fontSize: 14, fontWeight: 500, cursor: "pointer" }}>
+                      Xem danh mục
+                    </button>
+                  </div>
+
+                  <div className="hero-stats" style={{ display: "flex", gap: 28, marginTop: 40, paddingTop: 24, borderTop: `1px solid ${BORDER}`, flexWrap: "wrap" }}>
+                    {[["500+","Dự án"],["5 ngày","Giao hàng"],["24/7","Hỗ trợ"]].map(([n,l]) => (
+                      <div key={l}>
+                        <div style={{ color: TEXT, fontSize: 20, fontWeight: 700, letterSpacing: "-0.03em" }}>{n}</div>
+                        <div style={{ color: TEXT35, fontSize: 11, marginTop: 2 }}>{l}</div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Right – floating mockups */}
             <AnimatePresence mode="wait">
-              <motion.div key={`content-${current}`} initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.6, ease: EASE }}>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: 8, backgroundColor: RED_DIM, border: "1px solid rgba(212,59,31,0.3)", borderRadius: 40, padding: "6px 14px", marginBottom: 24 }}>
-                  <div style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: RED, animation: "pulse 2s ease infinite" }} />
-                  <span style={{ color: RED, fontSize: 12, fontWeight: 600, letterSpacing: "0.02em" }}>{slide.badge}</span>
+              <motion.div key={`mockups-${current}`} initial={{ opacity: 0, x: 36, scale: 0.95 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.7, ease: EASE }}
+                style={{ position: "relative", height: 460 }} className="hero-mockup">
+                <div className="mockup-f1" style={{ position: "absolute", top: 0, left: 0, right: 30 }}>
+                  <BrowserMockup src={mockups.ui1} />
                 </div>
-
-                <h1 style={{ color: slide.textColor || TEXT, fontSize: "clamp(30px,4.5vw,60px)", fontWeight: 700, lineHeight: 1.08, letterSpacing: "-0.03em", margin: "0 0 20px" }}>
-                  {[slide.title1, slide.title2, slide.title3].filter(Boolean).map((line, li) => (
-                    <span key={li} style={{ display: "block", color: li === slide.accentIndex ? (slide.accentColor || RED) : (slide.textColor || TEXT) }}>{line}</span>
-                  ))}
-                </h1>
-
-                <p style={{ color: TEXT60, fontSize: "clamp(13px,1.4vw,16px)", lineHeight: 1.75, margin: "0 0 32px", maxWidth: 440 }}>{slide.sub}</p>
-
-                <div className="hero-ctas" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                  <button 
-                    onClick={() => router.push('/bao-gia')}
-                    style={{ display: "flex", alignItems: "center", gap: 8, backgroundColor: RED, color: "#fff", border: "none", borderRadius: 40, padding: "12px 22px", fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "background-color 0.2s" }}
-                    onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.backgroundColor = "#bb3218")}
-                    onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.backgroundColor = RED)}>
-                    {slide.cta} <ArrowRight size={14} />
-                  </button>
-                  <button 
-                    onClick={handleScrollToServices}
-                    style={{ display: "flex", alignItems: "center", gap: 8, backgroundColor: "transparent", color: TEXT, border: `1px solid ${BORDER_M}`, borderRadius: 40, padding: "12px 20px", fontSize: 14, fontWeight: 500, cursor: "pointer" }}>
-                    Xem danh mục
-                  </button>
-                </div>
-
-                <div className="hero-stats" style={{ display: "flex", gap: 28, marginTop: 40, paddingTop: 24, borderTop: `1px solid ${BORDER}`, flexWrap: "wrap" }}>
-                  {[["500+","Dự án"],["5 ngày","Giao hàng"],["24/7","Hỗ trợ"]].map(([n,l]) => (
-                    <div key={l}>
-                      <div style={{ color: TEXT, fontSize: 20, fontWeight: 700, letterSpacing: "-0.03em" }}>{n}</div>
-                      <div style={{ color: TEXT35, fontSize: 11, marginTop: 2 }}>{l}</div>
-                    </div>
-                  ))}
+                <div className="mockup-f2" style={{ position: "absolute", bottom: 0, right: 0, left: 50, zIndex: 2 }}>
+                  <BrowserMockup src={mockups.ui2} style={{ boxShadow: "0 28px 80px rgba(0,0,0,0.85)" }} />
                 </div>
               </motion.div>
             </AnimatePresence>
           </div>
-
-          {/* Right – floating mockups */}
-          <AnimatePresence mode="wait">
-            <motion.div key={`mockups-${current}`} initial={{ opacity: 0, x: 36, scale: 0.95 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.7, ease: EASE }}
-              style={{ position: "relative", height: 460 }} className="hero-mockup">
-              <div className="mockup-f1" style={{ position: "absolute", top: 0, left: 0, right: 30 }}>
-                <BrowserMockup src={mockups.ui1} />
-              </div>
-              <div className="mockup-f2" style={{ position: "absolute", bottom: 0, right: 0, left: 50, zIndex: 2 }}>
-                <BrowserMockup src={mockups.ui2} style={{ boxShadow: "0 28px 80px rgba(0,0,0,0.85)" }} />
-              </div>
-            </motion.div>
-          </AnimatePresence>
         </div>
-      </div>
+      )}
 
       {/* Progress + dots */}
       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 4 }}>
@@ -139,11 +182,32 @@ export function HeroCarousel() {
             style={{ width: 32, height: 32, borderRadius: "50%", ...GLASS, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: TEXT, border: "none" }}>
             <ChevronLeft size={14} />
           </button>
-          <div style={{ display: "flex", gap: 7 }}>
-            {config.hero.slides.map((_, i) => (
-              <button key={i} onClick={() => setCurrent(i)}
-                style={{ width: i === current ? 22 : 7, height: 7, borderRadius: 4, border: "none", cursor: "pointer", backgroundColor: i === current ? RED : "var(--vw-ghost-22)", transition: "all 0.3s ease" }} />
-            ))}
+          <div style={{ display: "flex", gap: 7, alignItems: "center" }}>
+            {config.hero.slides.map((s, i) => {
+              const isVid = s.mediaType === 'video' || (s.bgUrl && (s.bgUrl.endsWith('.mp4') || s.bgUrl.endsWith('.webm') || s.bgUrl.includes('/video/upload/')));
+              return (
+                <button key={i} onClick={() => setCurrent(i)}
+                  title={isVid ? "Slide Video" : "Slide Hình ảnh"}
+                  style={{ 
+                    width: i === current ? (isVid ? 26 : 22) : 10, 
+                    height: 10, 
+                    borderRadius: 5, 
+                    border: "none", 
+                    cursor: "pointer", 
+                    backgroundColor: i === current ? RED : "var(--vw-ghost-22)", 
+                    transition: "all 0.3s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: 0
+                  }}
+                >
+                  {isVid && (
+                    <span style={{ fontSize: 6, color: i === current ? "#fff" : "var(--vw-ghost-80)", fontWeight: "bold", marginLeft: 0.5 }}>▶</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
           <button onClick={() => setCurrent(c => (c + 1) % config.hero.slides.length)}
             style={{ width: 32, height: 32, borderRadius: "50%", ...GLASS, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: TEXT, border: "none" }}>

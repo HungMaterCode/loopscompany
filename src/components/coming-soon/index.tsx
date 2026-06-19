@@ -45,7 +45,7 @@ export default function ComingSoonPage() {
         </div>
         
         <h1 style={{ 
-          fontFamily: "'Be Vietnam Pro', sans-serif", 
+          fontFamily: "inherit", 
           fontSize: 'clamp(28px, 4vw, 48px)', 
           fontWeight: 700, 
           marginBottom: '1rem',
@@ -58,7 +58,7 @@ export default function ComingSoonPage() {
         </h1>
         
         <p style={{
-          fontFamily: "'Be Vietnam Pro', sans-serif",
+          fontFamily: "inherit",
           fontSize: '16px',
           color: 'rgba(255, 255, 255, 0.7)',
           maxWidth: '500px',
@@ -77,7 +77,7 @@ export default function ComingSoonPage() {
           color: '#000',
           borderRadius: '9999px',
           textDecoration: 'none',
-          fontFamily: "'Be Vietnam Pro', sans-serif",
+          fontFamily: "inherit",
           fontWeight: 600,
           fontSize: '15px',
           transition: 'transform 0.2s ease, opacity 0.2s ease',

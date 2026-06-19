@@ -11,6 +11,7 @@ interface ContactLead {
   source: string;
   status: string;
   createdAt: string;
+  details?: any;
 }
 
 interface Props {
@@ -80,6 +81,36 @@ export function ContactManager({ t, isDark }: Props) {
     setDeleteIdx(null);
   };
 
+  const handleCreateOrder = async (lead: ContactLead) => {
+    try {
+      const res = await fetch("/api/admin/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          leadId: lead.id,
+          name: lead.name,
+          email: lead.email,
+          phone: lead.phone,
+          type: lead.source,
+          details: lead.details 
+            ? { ...lead.details, message: lead.message } 
+            : { message: lead.message }
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setLeads((prev) => prev.map((l) => l.id === lead.id ? { ...l, status: "đã lên đơn" } : l));
+        setViewLead(null);
+        alert(`Đã tạo đơn hàng thành công cho khách hàng ${lead.name}!`);
+      } else {
+        alert("Có lỗi xảy ra: " + (data.error || "Không xác định"));
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Lỗi khi kết nối với server để tạo đơn hàng.");
+    }
+  };
+
   return (
     <div className="space-y-5">
       {/* Header */}
@@ -137,7 +168,12 @@ export function ContactManager({ t, isDark }: Props) {
                       {l.message}
                     </td>
                     <td className="px-5 py-4">
-                      {l.status === "contacted" ? (
+                      {l.status === "đã lên đơn" ? (
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-500 dark:text-amber-400 text-xs font-medium border border-amber-500/20">
+                          <Check className="h-3.5 w-3.5" />
+                          Đã lên đơn
+                        </div>
+                      ) : l.status === "contacted" ? (
                         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 text-xs font-medium border border-emerald-500/20">
                           <Check className="h-3.5 w-3.5" />
                           Đã liên hệ
@@ -218,6 +254,92 @@ export function ContactManager({ t, isDark }: Props) {
                 </div>
               </div>
 
+              {viewLead.source === "rental" && viewLead.details && (() => {
+                const pPrice = Number(viewLead.details.packagePrice || 0);
+                const billingText = viewLead.details.billingCycle === "yearly" ? "Thanh toán hàng năm (đã giảm 20%)" : "Thanh toán hàng tháng";
+                return (
+                  <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 space-y-2">
+                    <label className="text-xs uppercase font-semibold tracking-wider text-amber-500 block">Thông tin gói thuê</label>
+                    <div className="text-sm space-y-1.5">
+                      <p className={t.text}>
+                        <span className="opacity-70">Gói thuê:</span> <strong className="font-semibold">{viewLead.details.packageName || "N/A"}</strong>
+                      </p>
+                      <p className={t.text}>
+                        <span className="opacity-70">Đơn giá:</span> <strong className="font-semibold">{pPrice.toLocaleString("vi-VN")} đ/tháng</strong>
+                      </p>
+                      <p className={t.text}>
+                        <span className="opacity-70">Chu kỳ:</span> <strong className="font-semibold text-amber-400/90">{billingText}</strong>
+                      </p>
+                      <div className="border-t border-amber-500/20 my-2 pt-2 flex justify-between items-center">
+                        <span className="opacity-70 text-xs font-semibold">TỔNG CỘNG:</span>
+                        <strong className="font-bold text-amber-400 text-base">{pPrice.toLocaleString("vi-VN")} đ/tháng</strong>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {viewLead.source === "purchase" && viewLead.details && (() => {
+                const pkgPrice = Number(viewLead.details.packagePrice || 0);
+                const domainsPrice = (viewLead.details.domains || []).reduce((sum: number, d: any) => sum + Number(d.price || 0), 0);
+                const hostingPrice = Number(viewLead.details.hosting?.price || 0);
+                const seoPrice = Number(viewLead.details.seoPackage?.price || 0);
+                const subtotal = pkgPrice + domainsPrice + hostingPrice + seoPrice;
+                const vat = Math.round(subtotal * 0.1);
+                const total = subtotal + vat;
+
+                return (
+                  <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 space-y-3">
+                    <label className="text-xs uppercase font-semibold tracking-wider text-amber-500 block">Chi tiết mua website</label>
+                    <div className="text-sm space-y-2">
+                      <p className={t.text}>
+                        <span className="opacity-70">Gói web:</span> <strong className="font-semibold">{viewLead.details.packageName || "N/A"} ({pkgPrice.toLocaleString("vi-VN")}đ)</strong>
+                      </p>
+                      
+                      {viewLead.details.domains && Array.isArray(viewLead.details.domains) && viewLead.details.domains.length > 0 && (
+                        <div>
+                          <span className="opacity-70 text-xs block mb-1">Tên miền đã chọn:</span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {viewLead.details.domains.map((dom: any, idx: number) => (
+                              <span key={idx} className="px-2 py-0.5 text-xs rounded-md bg-black/30 border border-white/10 text-white">
+                                {dom.name} ({Number(dom.price).toLocaleString("vi-VN")}đ)
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {viewLead.details.hosting && (
+                        <p className={t.text}>
+                          <span className="opacity-70">Hosting:</span> <strong className="font-semibold">{viewLead.details.hosting.label || viewLead.details.hosting} {viewLead.details.hosting.price ? `(+${Number(viewLead.details.hosting.price).toLocaleString("vi-VN")}đ)` : ""}</strong>
+                        </p>
+                      )}
+
+                      {viewLead.details.seoPackage && (
+                        <p className={t.text}>
+                          <span className="opacity-70">Gói SEO:</span> <strong className="font-semibold">{viewLead.details.seoPackage.label || viewLead.details.seoPackage} {viewLead.details.seoPackage.price ? `(${Number(viewLead.details.seoPackage.price).toLocaleString("vi-VN")}đ)` : ""}</strong>
+                        </p>
+                      )}
+
+                      <div className="border-t border-amber-500/20 mt-3 pt-2.5 space-y-1">
+                        <div className="flex justify-between items-center text-xs opacity-75">
+                          <span>Tạm tính:</span>
+                          <span>{subtotal.toLocaleString("vi-VN")}đ</span>
+                        </div>
+                        <div className="flex justify-between items-center text-xs opacity-75">
+                          <span>Thuế VAT (10%):</span>
+                          <span>{vat.toLocaleString("vi-VN")}đ</span>
+                        </div>
+                        <div className="flex justify-between items-center pt-1.5 border-t border-dashed border-amber-500/10">
+                          <span className="text-xs font-semibold text-amber-500">TỔNG CỘNG:</span>
+                          <strong className="font-bold text-amber-400 text-base">{total.toLocaleString("vi-VN")}đ</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
               <div>
                 <label className={`text-xs uppercase tracking-wider ${t.textMuted}`}>Nội dung</label>
                 <div className={`mt-2 p-3 rounded-xl bg-black/20 border border-white/5 text-sm ${t.text} whitespace-pre-wrap`}>
@@ -237,8 +359,16 @@ export function ContactManager({ t, isDark }: Props) {
               </div>
             </div>
 
-            <div className="mt-8 flex justify-end">
+            <div className="mt-8 flex justify-end gap-3">
               <button onClick={() => setViewLead(null)} className={`px-5 py-2 text-sm font-medium rounded-xl transition-colors ${t.btnGhost}`}>Đóng</button>
+              {(viewLead.source === "rental" || viewLead.source === "purchase") && viewLead.status !== "đã lên đơn" && (
+                <button 
+                  onClick={() => handleCreateOrder(viewLead)}
+                  className="px-5 py-2 text-sm font-semibold rounded-xl bg-amber-500 hover:bg-amber-600 text-black shadow-sm transition-colors"
+                >
+                  Tạo đơn hàng
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -440,6 +440,101 @@ async function main() {
       create: member,
     });
   }
+
+  const defaultServices = [
+    {
+      id: "service_01",
+      label: "Tạo Website",
+      sub: "Landing page, web app, thương mại điện tử chuyên nghiệp.",
+      img: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
+      tags: ["Landing Page", "Web App", "E-commerce"],
+      size: "large",
+      glassBg: "rgba(15, 32, 67, 0.45)",
+      link: "/bao-gia",
+      order: 1,
+      active: true,
+    },
+    {
+      id: "service_02",
+      label: "Marketing",
+      sub: "Chiến lược digital, Google Ads, Meta Ads, tăng trưởng thực.",
+      img: "https://images.unsplash.com/photo-1683721003111-070bcc053d8b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
+      tags: ["Google Ads", "Meta Ads", "SEO"],
+      size: "small",
+      glassBg: "linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(236, 72, 153, 0.3) 100%)",
+      link: "/coming-soon",
+      order: 2,
+      active: true,
+    },
+    {
+      id: "service_03",
+      label: "Content",
+      sub: "Copywriting, bài viết blog, kịch bản thương hiệu chất lượng cao.",
+      img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
+      tags: ["Copywriting", "Blog", "Script"],
+      size: "small",
+      glassBg: "rgba(184, 134, 11, 0.3)",
+      link: "/coming-soon",
+      order: 3,
+      active: true,
+    },
+    {
+      id: "service_04",
+      label: "Media & Video",
+      sub: "Ảnh thương mại, video quảng cáo, reels viral chất lượng điện ảnh.",
+      img: "https://images.unsplash.com/photo-1497015289639-54688650d173?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
+      tags: ["Video Ads", "Reels", "Photography"],
+      size: "large",
+      glassBg: "rgba(139, 69, 19, 0.3)",
+      link: "/coming-soon",
+      order: 4,
+      active: true,
+    },
+    {
+      id: "service_05",
+      label: "Thương hiệu",
+      sub: "Logo, bộ nhận diện thương hiệu đồng bộ, design system.",
+      img: "https://images.unsplash.com/photo-1779261320306-8885b83599ff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
+      tags: ["Logo", "Brand Kit", "Design System"],
+      size: "small",
+      glassBg: "rgba(13, 148, 136, 0.3)",
+      link: "/coming-soon",
+      order: 5,
+      active: true,
+    },
+    {
+      id: "service_06",
+      label: "Analytics",
+      sub: "Đo lường hiệu quả, báo cáo ROI, tối ưu chiến dịch liên tục.",
+      img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
+      tags: ["Dashboard", "ROI Report", "A/B Test"],
+      size: "small",
+      glassBg: "rgba(4, 120, 87, 0.3)",
+      link: "/coming-soon",
+      order: 6,
+      active: true,
+    },
+    {
+      id: "service_07",
+      label: "Vận hành & Bảo trì",
+      sub: "Bảo mật, tối ưu tốc độ, nâng cấp hệ thống trơn tru 24/7.",
+      img: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
+      tags: ["Hosting", "Security", "Speed"],
+      size: "small",
+      glassBg: "rgba(200, 162, 97, 0.25)",
+      link: "/coming-soon",
+      order: 7,
+      active: true,
+    },
+  ];
+
+  for (const svc of defaultServices) {
+    await (prisma as any).service.upsert({
+      where: { id: svc.id },
+      update: svc,
+      create: svc,
+    });
+  }
 }
 
 main()
