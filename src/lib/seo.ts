@@ -22,6 +22,7 @@ export function buildMetadata(input: SeoInput): Metadata {
   const ogDescription = input.ogDescription ?? description;
   const robots = input.robots ?? "index, follow";
   const index = !robots.includes("noindex");
+  const ogImage = input.ogImage || getSiteUrl("/LOOP_LOGO_removeBG.png");
 
   return {
     title,
@@ -36,13 +37,13 @@ export function buildMetadata(input: SeoInput): Metadata {
       siteName: SITE.name,
       title: ogTitle,
       description: ogDescription,
-      images: input.ogImage ? [{ url: input.ogImage }] : undefined,
+      images: [{ url: ogImage }],
     },
     twitter: {
       card: "summary_large_image",
       title: ogTitle,
       description: ogDescription,
-      images: input.ogImage ? [input.ogImage] : undefined,
+      images: [ogImage],
     },
   };
 }

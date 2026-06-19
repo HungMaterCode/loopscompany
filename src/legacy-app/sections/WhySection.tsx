@@ -76,7 +76,7 @@ export function WhySection() {
               </div>
               <div>
                 <div style={{ color: TEXT, fontSize: 18, fontWeight: 700, letterSpacing: "-0.03em" }}>{whyConfig.stat1Number}</div>
-                <div style={{ color: TEXT35, fontSize: 11 }}>{whyConfig.stat1Label}</div>
+                <div style={{ color: TEXT60, fontSize: 11 }}>{whyConfig.stat1Label}</div>
               </div>
             </div>
           </motion.div>
@@ -90,7 +90,7 @@ export function WhySection() {
               ))}
             </div>
             <div style={{ color: TEXT, fontSize: 12, fontWeight: 600 }}>{whyConfig.stat2Title}</div>
-            <div style={{ color: TEXT35, fontSize: 10, marginTop: 2 }}>{whyConfig.stat2Sub}</div>
+            <div style={{ color: TEXT60, fontSize: 10, marginTop: 2 }}>{whyConfig.stat2Sub}</div>
           </motion.div>
         </motion.div>
 
