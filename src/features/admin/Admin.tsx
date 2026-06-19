@@ -100,7 +100,7 @@ export function Admin({
     <>
       {/* Logo */}
       <div className={`flex h-16 items-center gap-3 px-5 border-b ${t.divider}`}>
-        <img src="/LOOP_LOGO_removeBG.png" alt="LOOP Logo" className="h-9 object-contain" />
+        <img src={isDark ? "/logo_White.png" : "/LOOP_LOGO_removeBG.png"} alt="LOOP Logo" className="h-9 object-contain" />
         <div className={`border-l ${t.divider} pl-3 py-1`}>
           <div className={`text-[10px] uppercase tracking-widest ${t.textFaint} font-semibold`}>Admin Panel</div>
         </div>

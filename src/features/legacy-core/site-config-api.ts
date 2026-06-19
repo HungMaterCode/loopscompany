@@ -80,6 +80,7 @@ export interface SiteConfig {
   };
   whyChooseUs: {
     bgUrl: string;
+    imgUrl?: string;
     title: string;
     description: string;
     stat1Number: string;
@@ -196,6 +197,7 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
   pricing: { bgLight: "#fffaf5", bgDark: "#050400", accent: "#C8A261", bgUrl: "" },
   whyChooseUs: {
     bgUrl: "",
+    imgUrl: "/img/owner.jpg",
     title: "Chúng tôi hiểu doanh nghiệp Việt",
     description: "Hơn 8 năm phục vụ các doanh nghiệp vừa và nhỏ tại Việt Nam, chúng tôi hiểu bạn cần gì: một website đẹp, ra đơn hàng, dễ quản lý và giá phải chăng.",
     stat1Number: "+40%",

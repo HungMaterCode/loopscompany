@@ -14,7 +14,7 @@ export function SiteConfigManager({ t, isDark }: Props) {
   const [form, setForm] = useState<SiteConfig | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'banners' | 'philosophy' | 'whyChooseUs' | 'process'>('banners');
+  const [activeTab, setActiveTab] = useState<'banners' | 'philosophy' | 'whyChooseUs' | 'process' | 'sectionBgs'>('banners');
 
   // Sync form when config is loaded
   useEffect(() => {
@@ -227,8 +227,7 @@ export function SiteConfigManager({ t, isDark }: Props) {
           { id: 'philosophy', label: 'Triết lý của chúng tôi' },
           { id: 'whyChooseUs', label: 'Tại sao chọn chúng tôi' },
           { id: 'process', label: 'Quy trình làm việc' },
-          { id: 'blog', label: 'Bài viết (Blog)' },
-          { id: 'portfolio', label: 'Dự án (Portfolio)' },
+          { id: 'sectionBgs', label: 'Hình nền Section' },
         ].map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
             className={`px-6 py-3 text-sm font-semibold transition-all border-b-2 ${activeTab === tab.id ? 'border-red-500 text-red-500' : `border-transparent ${t.textMuted} hover:${t.text}`}`}>
@@ -239,21 +238,49 @@ export function SiteConfigManager({ t, isDark }: Props) {
 
       {/* Tab Content */}
       <div className="pt-2">
-        {activeTab === ('portfolio' as any) && (
+        {activeTab === 'sectionBgs' && (
           <div className={`rounded-2xl p-6 ${t.card}`}>
-            <h3 className={`mb-4 text-lg font-bold ${t.text}`}>Cấu hình trang Dự án (Portfolio)</h3>
-            <div className="grid grid-cols-1 gap-4">
-              <InputRow label="Hình nền chìm (Background URL)" value={form.portfolio?.bgUrl || ''} type="url"
-                onChange={(v: string) => setForm({ ...form, portfolio: { ...form.portfolio, bgUrl: v } })} />
-            </div>
-          </div>
-        )}
-        {activeTab === ('blog' as any) && (
-          <div className={`rounded-2xl p-6 ${t.card}`}>
-            <h3 className={`mb-4 text-lg font-bold ${t.text}`}>Cấu hình trang Bài viết (Blog)</h3>
-            <div className="grid grid-cols-1 gap-4">
-              <InputRow label="Hình nền chìm (Background URL)" value={form.blog?.bgUrl || ''} type="url"
-                onChange={(v: string) => setForm({ ...form, blog: { ...form.blog, bgUrl: v } })} />
+            <h3 className={`mb-6 text-lg font-bold ${t.text}`}>Cấu hình hình nền các Section</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-4 rounded-xl border border-white/[0.05] bg-white/[0.01]">
+                <h4 className={`text-sm font-semibold mb-3 ${t.text}`}>Section Dịch vụ</h4>
+                <InputRow label="Hình nền chìm (Background URL)" value={form.service?.bgUrl || ''} type="url"
+                  onChange={(v: string) => setForm({ ...form, service: { ...form.service, bgUrl: v } })} />
+              </div>
+              <div className="p-4 rounded-xl border border-white/[0.05] bg-white/[0.01]">
+                <h4 className={`text-sm font-semibold mb-3 ${t.text}`}>Section Thuê website</h4>
+                <InputRow label="Hình nền chìm (Background URL)" value={form.pricing?.bgUrl || ''} type="url"
+                  onChange={(v: string) => setForm({ ...form, pricing: { ...form.pricing, bgUrl: v } })} />
+              </div>
+              <div className="p-4 rounded-xl border border-white/[0.05] bg-white/[0.01] md:col-span-2">
+                <h4 className={`text-sm font-semibold mb-3 ${t.text}`}>Section Triết lý của chúng tôi</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <InputRow label="Video nền (Video URL)" value={form.creativeVision.videoUrl} type="url"
+                    onChange={(v: string) => setForm({ ...form, creativeVision: { ...form.creativeVision, videoUrl: v } })} />
+                  <InputRow label="Hình nền bổ sung (tuỳ chọn)" value={form.creativeVision.bgUrl} type="url"
+                    onChange={(v: string) => setForm({ ...form, creativeVision: { ...form.creativeVision, bgUrl: v } })} />
+                </div>
+              </div>
+              <div className="p-4 rounded-xl border border-white/[0.05] bg-white/[0.01]">
+                <h4 className={`text-sm font-semibold mb-3 ${t.text}`}>Section Tại sao chọn chúng tôi</h4>
+                <InputRow label="Hình nền chìm (Background URL)" value={form.whyChooseUs.bgUrl} type="url"
+                  onChange={(v: string) => setForm({ ...form, whyChooseUs: { ...form.whyChooseUs, bgUrl: v } })} />
+              </div>
+              <div className="p-4 rounded-xl border border-white/[0.05] bg-white/[0.01]">
+                <h4 className={`text-sm font-semibold mb-3 ${t.text}`}>Section Quy trình làm việc</h4>
+                <InputRow label="Hình nền chìm (Background URL)" value={form.process?.bgUrl || ''} type="url"
+                  onChange={(v: string) => setForm({ ...form, process: { ...form.process, bgUrl: v } })} />
+              </div>
+              <div className="p-4 rounded-xl border border-white/[0.05] bg-white/[0.01]">
+                <h4 className={`text-sm font-semibold mb-3 ${t.text}`}>Section Bài viết (Blog)</h4>
+                <InputRow label="Hình nền chìm (Background URL)" value={form.blog?.bgUrl || ''} type="url"
+                  onChange={(v: string) => setForm({ ...form, blog: { ...form.blog, bgUrl: v } })} />
+              </div>
+              <div className="p-4 rounded-xl border border-white/[0.05] bg-white/[0.01]">
+                <h4 className={`text-sm font-semibold mb-3 ${t.text}`}>Section Dự án (Portfolio)</h4>
+                <InputRow label="Hình nền chìm (Background URL)" value={form.portfolio?.bgUrl || ''} type="url"
+                  onChange={(v: string) => setForm({ ...form, portfolio: { ...form.portfolio, bgUrl: v } })} />
+              </div>
             </div>
           </div>
         )}
@@ -412,14 +439,8 @@ export function SiteConfigManager({ t, isDark }: Props) {
         {activeTab === 'philosophy' && (
           <div className={`rounded-2xl p-6 ${t.card}`}>
             <h3 className={`mb-4 text-lg font-bold ${t.text}`}>Triết lý của chúng tôi</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InputRow label="Video Background URL" value={form.creativeVision.videoUrl} type="url"
-                onChange={(v: string) => setForm({ ...form, creativeVision: { ...form.creativeVision, videoUrl: v } })} />
-              <InputRow label="Hình nền bổ sung (tuỳ chọn)" value={form.creativeVision.bgUrl} type="url"
-                onChange={(v: string) => setForm({ ...form, creativeVision: { ...form.creativeVision, bgUrl: v } })} />
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-gray-800/40 pt-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <InputRow label="Tiêu đề chính (Chữ đứng)" value={form.creativeVision.titleRegular || ''}
                 onChange={(v: string) => setForm({ ...form, creativeVision: { ...form.creativeVision, titleRegular: v } })} />
               <InputRow label="Tiêu đề chính (Chữ nghiêng)" value={form.creativeVision.titleItalic || ''}
@@ -557,8 +578,8 @@ export function SiteConfigManager({ t, isDark }: Props) {
             <h3 className={`mb-4 text-lg font-bold ${t.text}`}>Tại sao chọn chúng tôi</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InputRow label="Hình nền chìm (tuỳ chọn)" value={form.whyChooseUs.bgUrl} type="url"
-                onChange={(v: string) => setForm({ ...form, whyChooseUs: { ...form.whyChooseUs, bgUrl: v } })} />
+              <InputRow label="Hình ảnh bên trái (Left Image URL)" value={form.whyChooseUs.imgUrl || ''} type="url"
+                onChange={(v: string) => setForm({ ...form, whyChooseUs: { ...form.whyChooseUs, imgUrl: v } })} />
               <InputRow label="Tiêu đề chính" value={form.whyChooseUs.title} placeholder="Chúng tôi hiểu doanh nghiệp Việt"
                 onChange={(v: string) => setForm({ ...form, whyChooseUs: { ...form.whyChooseUs, title: v } })} />
             </div>
@@ -731,9 +752,7 @@ export function SiteConfigManager({ t, isDark }: Props) {
           <div className={`rounded-2xl p-6 ${t.card}`}>
             <h3 className={`mb-4 text-lg font-bold ${t.text}`}>Quy trình làm việc</h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InputRow label="Hình nền chìm (tuỳ chọn)" value={form.process?.bgUrl || ''} type="url"
-                onChange={(v: string) => setForm({ ...form, process: { ...form.process, bgUrl: v } })} />
+            <div className="grid grid-cols-1 gap-4">
               <InputRow label="Tiêu đề phụ (nhãn đỏ)" value={form.process?.subtitle || ''} placeholder="Quy trình làm việc"
                 onChange={(v: string) => setForm({ ...form, process: { ...form.process, subtitle: v } })} />
             </div>

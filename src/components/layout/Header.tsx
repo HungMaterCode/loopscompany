@@ -46,6 +46,7 @@ export function Header() {
   const [mounted, setMounted] = useState(false);
   const lastY = useRef(0);
   const { isDark, toggleTheme } = useTheme();
+  const logoSrc = mounted && isDark ? "/logo_White.png" : "/LOOP_LOGO_removeBG.png";
 
 
   useEffect(() => {
@@ -149,7 +150,7 @@ export function Header() {
         }}>
           {/* Logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', flexShrink: 0 }}>
-            <img src="/LOOP_LOGO_removeBG.png" alt="LOOP Logo" style={{ height: '42px', objectFit: 'contain' }} />
+            <img src={logoSrc} alt="LOOP Logo" style={{ height: '42px', objectFit: 'contain' }} />
           </Link>
 
           {/* Desktop links — hidden on mobile via display none at <768px */}
@@ -458,7 +459,7 @@ export function Header() {
               transition={{ delay: 0.1 }}
               style={{ position: 'absolute', top: '24px', left: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}
             >
-              <img src="/LOOP_LOGO_removeBG.png" alt="LOOP Logo" style={{ height: '38px', objectFit: 'contain' }} />
+              <img src={logoSrc} alt="LOOP Logo" style={{ height: '38px', objectFit: 'contain' }} />
             </motion.div>
 
             {/* Close button */}
@@ -553,7 +554,7 @@ export function Header() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <img src="/LOOP_LOGO_removeBG.png" alt="LOOP Logo" style={{ height: '36px', objectFit: 'contain' }} />
+                    <img src={logoSrc} alt="LOOP Logo" style={{ height: '36px', objectFit: 'contain' }} />
                     <span style={{
                       backgroundColor: 'rgba(255,107,157,0.12)', color: 'var(--sc-accent)',
                       fontSize: '9px', fontWeight: 700, padding: '3px 8px', borderRadius: '999px',
