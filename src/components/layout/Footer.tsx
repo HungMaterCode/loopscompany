@@ -1,9 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Settings } from "lucide-react";
 import { RED, TEXT, TEXT60, TEXT35, BORDER, GLASS } from "@/features/legacy-core/tokens";
 import { SITE } from "@/lib/site";
+import { useTheme } from "@/features/legacy-core/theme-context";
 
 const COLS = [
   {
@@ -37,6 +39,13 @@ const COLS = [
 ];
 
 export function Footer() {
+  const { isDark } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  const logoSrc = mounted && isDark ? "/logo_White.png" : "/LOOP_LOGO_removeBG.png";
+
   return (
     <footer style={{ position: "relative", borderTop: `1px solid ${BORDER}`, padding: "60px 20px 28px", backgroundColor: "var(--vw-bg)" }}>
       <div style={{ position: "absolute", inset: 0, backgroundImage: `linear-gradient(var(--vw-gridline-color) 1px, transparent 1px), linear-gradient(90deg, var(--vw-gridline-color) 1px, transparent 1px)`, backgroundSize: "60px 60px", pointerEvents: "none" }} />
@@ -45,7 +54,7 @@ export function Footer() {
           {/* Brand */}
           <div>
             <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, textDecoration: "none" }}>
-              <img src="/LOOP_LOGO_removeBG.png" alt="LOOP Logo" style={{ height: '42px', objectFit: 'contain' }} />
+              <img src={logoSrc} alt="LOOP Logo" style={{ height: '42px', objectFit: 'contain' }} />
             </Link>
             <p style={{ color: TEXT60, fontSize: 13, lineHeight: 1.7, margin: "0 0 16px", maxWidth: 240 }}>
               Đơn vị thiết kế và cho thuê website chuyên nghiệp hàng đầu cho doanh nghiệp Việt Nam.

@@ -99,7 +99,37 @@ function a(alpha: number) {
 }
 
 function fmt(n: number) {
+  if (n === 0) return "Tặng";
   return n.toLocaleString("vi-VN") + "đ";
+}
+
+function checkIsDomainFree(domainName: string, activePkgCode: string) {
+  const code = activePkgCode || "";
+  const isLanding = code.includes("01");
+  const isStore = code.includes("02");
+  const isBusiness = code.includes("03");
+  const isCustom = code.includes("04");
+
+  if (isLanding && (domainName === ".xyz" || domainName.endsWith(".xyz") || domainName === ".one" || domainName.endsWith(".one"))) {
+    return true;
+  }
+  if (isStore && (domainName === ".com" || domainName.endsWith(".com"))) {
+    return true;
+  }
+  if (isBusiness) {
+    if (domainName === ".com" || domainName.endsWith(".com")) {
+      return true;
+    }
+    if ((domainName === ".vn" || domainName.endsWith(".vn")) && !domainName.endsWith(".com.vn")) {
+      return true;
+    }
+  }
+  if (isCustom) {
+    if (domainName === ".com" || domainName.endsWith(".com") || domainName === ".vn" || domainName.endsWith(".vn")) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function getYearlyPrice(price: number): number {
@@ -734,10 +764,12 @@ function DomainAddonRow({
   selectedDomains,
   isOpen,
   onToggle,
+  promoText,
 }: {
   selectedDomains: { label: string; price: number }[];
   isOpen: boolean;
   onToggle: () => void;
+  promoText?: string;
 }) {
   const totalPrice = selectedDomains.reduce((sum, d) => sum + d.price, 0);
   const displayDesc = selectedDomains.length > 0
@@ -751,9 +783,14 @@ function DomainAddonRow({
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 13, fontWeight: 700, color: CONFIG.text, margin: "0 0 1px" }}>Đăng ký tên miền</p>
-        <p style={{ fontSize: 11, color: selectedDomains.length > 0 ? CONFIG.accent : CONFIG.text35, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <p style={{ fontSize: 11, color: selectedDomains.length > 0 ? CONFIG.accent : CONFIG.text35, margin: promoText ? "0 0 2px" : 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {displayDesc}
         </p>
+        {promoText && (
+          <p style={{ fontSize: 11, color: CONFIG.accent, margin: 0, fontWeight: 600 }}>
+            {promoText}
+          </p>
+        )}
       </div>
 
       <button
@@ -797,10 +834,12 @@ function DomainInlineChecker({
   dbDomains,
   selectedDomains,
   onChangeSelectedDomains,
+  activePkgCode,
 }: {
   dbDomains: { id: string; label: string; price: number }[];
   selectedDomains: { label: string; price: number; years: number }[];
   onChangeSelectedDomains: (selected: { label: string; price: number; years: number }[]) => void;
+  activePkgCode: string;
 }) {
   const [prefix, setPrefix] = useState("");
   const [checkedExtensions, setCheckedExtensions] = useState<string[]>([]);
@@ -812,6 +851,10 @@ function DomainInlineChecker({
   }>({});
   const [domainYears, setDomainYears] = useState<{ [domainName: string]: number }>({});
 
+  const isDomainFree = (domainName: string) => {
+    return checkIsDomainFree(domainName, activePkgCode);
+  };
+
   useEffect(() => {
     if (selectedDomains.length > 0) {
       const newResults = { ...results };
@@ -821,9 +864,11 @@ function DomainInlineChecker({
       selectedDomains.forEach(d => {
         if (!newResults[d.label]) {
           const years = d.years || 1;
+          const ext = dbDomains.find(dbD => d.label.endsWith(dbD.label));
+          const standardBase = ext ? ext.price : (isDomainFree(d.label) ? (years > 1 ? d.price / (years - 1) : 350000) : d.price / years);
           newResults[d.label] = {
             status: "available",
-            price: d.price / years
+            price: standardBase
           };
           newYears[d.label] = years;
           updated = true;
@@ -865,9 +910,10 @@ function DomainInlineChecker({
         initialResults[d.label] = results[d.label];
       } else {
         const ext = dbDomains.find(dbD => d.label.endsWith(dbD.label));
+        const standardBase = ext ? ext.price : (isDomainFree(d.label) ? (d.years > 1 ? d.price / (d.years - 1) : 350000) : d.price / d.years);
         initialResults[d.label] = {
           status: "available",
-          price: ext ? ext.price : d.price / d.years
+          price: standardBase
         };
       }
     });
@@ -875,9 +921,10 @@ function DomainInlineChecker({
     // Mark checked extensions as loading
     checkedExtensions.forEach(ext => {
       const domainName = `${cleanPrefix}${ext}`;
+      const basePrice = dbDomains.find(d => d.label === ext)?.price || 0;
       initialResults[domainName] = {
         status: "loading",
-        price: dbDomains.find(d => d.label === ext)?.price || 0
+        price: basePrice
       };
     });
     setResults(initialResults);
@@ -921,9 +968,10 @@ function DomainInlineChecker({
           uncheckedExtensions.forEach(ext => {
             const domainName = `${cleanPrefix}${ext}`;
             if (!next[domainName]) {
+              const basePrice = dbDomains.find(d => d.label === ext)?.price || 0;
               next[domainName] = {
                 status: "loading",
-                price: dbDomains.find(d => d.label === ext)?.price || 0
+                price: basePrice
               };
             }
           });
@@ -965,9 +1013,10 @@ function DomainInlineChecker({
     } else {
       const basePrice = results[domainName]?.price || dbDomains.find(d => domainName.endsWith(d.label))?.price || 0;
       const years = domainYears[domainName] || 1;
+      const price = isDomainFree(domainName) ? basePrice * (years - 1) : basePrice * years;
       onChangeSelectedDomains([
         ...selectedDomains,
-        { label: domainName, price: basePrice * years, years }
+        { label: domainName, price, years }
       ]);
     }
   };
@@ -979,7 +1028,7 @@ function DomainInlineChecker({
       onChangeSelectedDomains(
         selectedDomains.map(d =>
           d.label === domainName
-            ? { ...d, years, price: basePrice * years }
+            ? { ...d, years, price: isDomainFree(domainName) ? basePrice * (years - 1) : basePrice * years }
             : d
         )
       );
@@ -1073,9 +1122,10 @@ function DomainInlineChecker({
 
       <div>
         <p style={{ fontSize: 10, fontWeight: 700, color: CONFIG.text35, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>Đuôi tên miền hỗ trợ:</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: 6 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 6 }}>
           {dbDomains.map(d => {
             const isChecked = checkedExtensions.includes(d.label);
+            const isFree = isDomainFree(d.label);
             return (
               <div
                 key={d.id}
@@ -1095,7 +1145,7 @@ function DomainInlineChecker({
                   transition: "all 0.15s"
                 }}
               >
-                <span>{d.label}</span>
+                <span>{d.label}{isFree ? " (Tặng)" : ""}</span>
                 <div style={{
                   width: 14,
                   height: 14,
@@ -1167,7 +1217,12 @@ function DomainInlineChecker({
                       <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
                         <p style={{ fontSize: 10, margin: 0, color: res.status === "loading" ? CONFIG.text35 : res.status === "available" ? "#16a34a" : res.status === "registered" ? "#dc2626" : "#eab308" }}>
                           {res.status === "loading" && "Đang kiểm tra..."}
-                          {res.status === "available" && `Chưa đăng ký — ${fmt(res.price * currentYears)}`}
+                          {res.status === "available" && (() => {
+                            const displayPrice = isDomainFree(domainName) ? res.price * (currentYears - 1) : res.price * currentYears;
+                            return displayPrice === 0
+                              ? "Chưa đăng ký — Tặng"
+                              : `Chưa đăng ký — ${fmt(displayPrice)}`;
+                          })()}
                           {res.status === "registered" && "Đã đăng ký (Không thể mua)"}
                           {res.status === "error" && "Không thể kiểm tra, thử lại sau"}
                         </p>
@@ -1274,7 +1329,12 @@ function DomainInlineChecker({
                       <p style={{ fontSize: 13, fontWeight: 700, color: CONFIG.text, margin: "0 0 3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{domainName}</p>
                       <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
                         <p style={{ fontSize: 10, margin: 0, color: "#16a34a" }}>
-                          Chưa đăng ký — {fmt(res.price * currentYears)}
+                          {(() => {
+                            const displayPrice = isDomainFree(domainName) ? res.price * (currentYears - 1) : res.price * currentYears;
+                            return displayPrice === 0
+                              ? "Chưa đăng ký — Tặng"
+                              : `Chưa đăng ký — ${fmt(displayPrice)}`;
+                          })()}
                         </p>
 
                         <div style={{ display: "flex", gap: 3 }}>
@@ -1573,6 +1633,21 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
   const isRentalMode = mode === "thue";
   const activePkg: AnyPkg = isRentalMode ? rentPkg : pkg;
 
+  // Re-calculate selected domains price when package or mode changes (for promos)
+  useEffect(() => {
+    setSelectedDomains(prev =>
+      prev.map(d => {
+        const ext = dbDomains.find(dbD => d.label.endsWith(dbD.label));
+        const basePrice = ext ? ext.price : 350000;
+        const isFree = checkIsDomainFree(d.label, activePkg.id);
+        return {
+          ...d,
+          price: isFree ? basePrice * (d.years - 1) : basePrice * d.years
+        };
+      })
+    );
+  }, [pkg, isRentalMode, dbDomains]);
+
   const hostingOpts = dbHostings.length > 0
     ? dbHostings.map((h) => {
       return {
@@ -1799,6 +1874,17 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
                       selectedDomains={selectedDomains}
                       isOpen={showDomainInline}
                       onToggle={() => setShowDomainInline(prev => !prev)}
+                      promoText={
+                        activePkg.id.includes("01") || activePkg.name.toLowerCase().includes("landing")
+                          ? "Tặng tên miền .XYZ/.ONE"
+                          : activePkg.id.includes("02") || activePkg.name.toLowerCase().includes("bán hàng") || activePkg.name.toLowerCase().includes("online")
+                          ? "Tặng tên miền .COM"
+                          : activePkg.id.includes("03") || activePkg.name.toLowerCase().includes("doanh nghiệp")
+                          ? "Tặng tên miền .COM và .VN"
+                          : activePkg.id.includes("04") || activePkg.name.toLowerCase().includes("yêu cầu") || activePkg.name.toLowerCase().includes("enterprise")
+                          ? "Tặng tên miền .COM, .VN và .COM.VN"
+                          : undefined
+                      }
                     />
                     <AnimatePresence initial={false}>
                       {showDomainInline && (
@@ -1812,6 +1898,7 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
                             dbDomains={dbDomains}
                             selectedDomains={selectedDomains}
                             onChangeSelectedDomains={setSelectedDomains}
+                            activePkgCode={activePkg.id}
                           />
                         </motion.div>
                       )}
