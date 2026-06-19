@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 
-const F = "'Be Vietnam Pro', sans-serif";
+const F = "inherit";
 
 interface SectionHeaderProps {
   /** Small-caps label above heading (e.g. "DỊCH VỤ") */

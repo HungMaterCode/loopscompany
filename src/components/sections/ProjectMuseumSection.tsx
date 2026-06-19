@@ -3,7 +3,7 @@ import { motion, useInView } from 'motion/react';
 import { ArrowUpRight, ExternalLink } from 'lucide-react';
 import { useSiteData } from '@/features/legacy-core/SiteDataContext';
 
-const F = "'Be Vietnam Pro', sans-serif";
+const F = "inherit";
 
 interface ProjectItem {
   num: string;

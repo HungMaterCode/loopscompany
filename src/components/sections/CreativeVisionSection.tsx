@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { motion, useInView } from 'motion/react';
 import { useSiteData } from '@/features/legacy-core/SiteDataContext';
 
-const F = "'Be Vietnam Pro', sans-serif";
+const F = "inherit";
 
 export function CreativeVisionSection() {
   const ref    = useRef<HTMLDivElement>(null);

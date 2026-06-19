@@ -6,7 +6,7 @@ const secret = new TextEncoder().encode(
   process.env.AUTH_SECRET ?? "loops-dev-secret-change-in-production",
 );
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/dang-nhap")) {

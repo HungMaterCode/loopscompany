@@ -14,7 +14,8 @@ export async function GET() {
         message: true,
         source: true,
         createdAt: true,
-        status: true
+        status: true,
+        details: true
       }
     });
     return NextResponse.json(leads);

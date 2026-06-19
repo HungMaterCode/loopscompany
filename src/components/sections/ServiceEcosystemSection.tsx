@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { motion, useInView } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -6,9 +6,23 @@ import { useBreakpoint } from '../ui/useBreakpoint';
 import { SectionHeader } from '../shared/SectionHeader';
 import { useSiteData } from '@/features/legacy-core/SiteDataContext';
 
-const F = "'Be Vietnam Pro', sans-serif";
+const F = "inherit";
 
-const services = [
+interface ServiceItem {
+  id: string;
+  num: string;
+  label: string;
+  sub: string;
+  img: string;
+  tags: string[];
+  size: string;
+  glassBg?: string | null;
+  link: string;
+  order: number;
+  active: boolean;
+}
+
+const STATIC_SERVICES = [
   {
     num: '01', label: 'Tạo Website',
     sub: 'Landing page, web app, thương mại điện tử chuyên nghiệp.',
@@ -76,15 +90,14 @@ const services = [
 ];
 
 function ServiceCard({
-  svc, delay, inView, forceSingleCol,
+  svc, delay, inView,
 }: {
-  svc: typeof services[0];
+  svc: ServiceItem;
   delay: number;
   inView: boolean;
-  forceSingleCol: boolean;
 }) {
-  const isLarge = svc.size === 'large' && !forceSingleCol;
   const router = useRouter();
+  const cardClass = svc.size === 'large' ? 'bw-service-card bw-service-card-large' : 'bw-service-card';
 
   return (
     <motion.div
@@ -92,12 +105,11 @@ function ServiceCard({
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.75, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
       whileHover={{ scale: 1.02, y: -6 }}
-      onClick={() => router.push(svc.num === '01' ? '/bao-gia' : '/coming-soon')}
+      onClick={() => router.push(svc.link || '/coming-soon')}
+      className={cardClass}
       style={{
-        gridColumn: isLarge ? 'span 2' : 'span 1',
         borderRadius: '20px', overflow: 'hidden',
         cursor: 'pointer', position: 'relative',
-        minHeight: isLarge ? '340px' : '260px',
         display: 'flex', flexDirection: 'column',
         border: '1px solid rgba(255, 255, 255, 0.08)',
         boxShadow: '0 8px 30px rgba(0, 0, 0, 0.3)',
@@ -106,7 +118,7 @@ function ServiceCard({
       {/* Image filling the entire card */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
         <img src={svc.img} alt={svc.label}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: svc.objectPosition || 'center', display: 'block', transition: 'transform 0.6s ease' }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.6s ease' }}
           onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.06)'}
           onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
         />
@@ -153,10 +165,59 @@ function ServiceCard({
 export function ServiceEcosystemSection() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
-  const { isMobile } = useBreakpoint();
   const { config } = useSiteData();
+  const [items, setItems] = useState<ServiceItem[]>([]);
 
-  const gridCols = isMobile ? '1fr' : 'repeat(auto-fill,minmax(280px,1fr))';
+  useEffect(() => {
+    fetch("/api/services?activeOnly=true")
+      .then((res) => {
+        if (!res.ok) throw new Error("API failed");
+        return res.json();
+      })
+      .then((data) => {
+        if (data && data.length > 0) {
+          const mapped = data.map((d: any, idx: number) => ({
+            ...d,
+            num: String(idx + 1).padStart(2, '0')
+          }));
+          setItems(mapped);
+        } else {
+          setItems(
+            STATIC_SERVICES.map((s, idx) => ({
+              id: `static_${idx}`,
+              num: s.num,
+              label: s.label,
+              sub: s.sub,
+              img: s.img,
+              tags: s.tags,
+              size: s.size,
+              glassBg: s.glassBg,
+              link: s.num === '01' ? '/bao-gia' : '/coming-soon',
+              order: idx,
+              active: true
+            }))
+          );
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch services:", err);
+        setItems(
+          STATIC_SERVICES.map((s, idx) => ({
+            id: `static_${idx}`,
+            num: s.num,
+            label: s.label,
+            sub: s.sub,
+            img: s.img,
+            tags: s.tags,
+            size: s.size,
+            glassBg: s.glassBg,
+            link: s.num === '01' ? '/bao-gia' : '/coming-soon',
+            order: idx,
+            active: true
+          }))
+        );
+      });
+  }, []);
 
   return (
     <section id="services" ref={ref} style={{
@@ -185,12 +246,34 @@ export function ServiceEcosystemSection() {
           inView={inView}
         />
 
-        <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: 'clamp(12px,2vw,20px)', gridAutoRows: 'auto' }}>
-          {services.map((svc, i) => (
-            <ServiceCard key={svc.num} svc={svc} delay={i * 0.08} inView={inView} forceSingleCol={isMobile} />
+        <div className="bw-services-grid" style={{ gap: 'clamp(12px,2vw,20px)', gridAutoRows: 'auto' }}>
+          {items.map((svc, i) => (
+            <ServiceCard key={svc.id} svc={svc} delay={i * 0.08} inView={inView} />
           ))}
         </div>
       </div>
+
+      <style>{`
+        .bw-services-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+        }
+        @media (min-width: 560px) {
+          .bw-services-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          }
+        }
+        
+        .bw-service-card {
+          min-height: 260px !important;
+        }
+        @media (min-width: 560px) {
+          .bw-service-card-large {
+            min-height: 340px !important;
+            grid-column: span 2 !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

@@ -1,6 +1,7 @@
 import { IMG } from "./images";
 
 export interface HeroSlideConfig {
+  mediaType?: 'image' | 'video';
   bgUrl: string;
   badge: string;
   title1: string;
@@ -112,6 +113,7 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
   hero: {
     slides: [
       {
+        mediaType: "image",
         bgUrl: IMG.heroBg,
         badge: "Hơn 500 doanh nghiệp Việt tin tưởng",
         title1: "Website đẹp —",
@@ -124,6 +126,7 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
         cta: "Xem gói từ 189K/tháng",
       },
       {
+        mediaType: "image",
         bgUrl: IMG.hero2,
         badge: "Giao đúng hẹn — không phát sinh thêm",
         title1: "Giao website",
@@ -136,6 +139,7 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
         cta: "Bắt đầu ngay hôm nay",
       },
       {
+        mediaType: "image",
         bgUrl: IMG.hero3,
         badge: "Không cần trả trước — thuê linh hoạt",
         title1: "Thuê website",

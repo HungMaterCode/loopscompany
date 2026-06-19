@@ -69,6 +69,7 @@ model ContactLead {
   source    String   @default("website")
   createdAt DateTime @default(now())
   status    String   @default("Mới")
+  details   Json?
 }
 
 model TeamMember {
@@ -166,3 +167,32 @@ model SeoPackage {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model Service {
+  id        String   @id @default(cuid())
+  label     String   // Tên dịch vụ
+  sub       String   // Mô tả ngắn
+  img       String   // Link ảnh nền
+  tags      String[] // Các tag phụ
+  size      String   @default("small") // "small" hoặc "large"
+  glassBg   String?  // Hiệu ứng kính (rgba hoặc gradient)
+  link      String   @default("/coming-soon") // Đường dẫn chuyển trang
+  order     Int      @default(0) // Sắp xếp
+  active    Boolean  @default(true) // Trạng thái kích hoạt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  email     String
+  phone     String?
+  type      String
+  details   Json
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, X, Check, ExternalLink, Eye, EyeOff, Tag, Clock, Calendar } from "lucide-react";
 import { ARTICLES, CATEGORIES, type Article } from "@/features/legacy-core/articles";
 import type { TC } from "./types";
 
-type BlogItem = Article & { status: "published" | "draft" };
+type BlogItem = Article & { id?: string; status: "published" | "draft" };
 
 interface Props {
   t: TC;
@@ -35,19 +35,78 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 const STATUS_LABELS: Record<string, { label: string; cls: string }> = {
   published: { label: "Đã đăng", cls: "bg-emerald-500/15 text-emerald-400" },
-  draft:     { label: "Nháp",    cls: "bg-amber-500/15 text-amber-400" },
+  draft: { label: "Nháp", cls: "bg-amber-500/15 text-amber-400" },
 };
 
 export function BlogManager({ t, isDark }: Props) {
-  const [items, setItems] = useState<BlogItem[]>(
-    ARTICLES.map((a) => ({ ...a, status: "published" as const }))
-  );
-  const [editIdx, setEditIdx]     = useState<number | null>(null);
-  const [isAdding, setIsAdding]   = useState(false);
-  const [form, setForm]           = useState<BlogItem>(EMPTY_FORM);
+  const [items, setItems] = useState<BlogItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
+  const [editIdx, setEditIdx] = useState<number | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
+  const [form, setForm] = useState<BlogItem>(EMPTY_FORM);
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
   const [tagsInput, setTagsInput] = useState("");
   const [filterCat, setFilterCat] = useState("all");
+
+  const fetchArticles = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/articles");
+      if (!res.ok) throw new Error("Failed to fetch articles");
+      const data = await res.json();
+      const mapped = data.map((a: any) => ({
+        id: a.id,
+        slug: a.slug,
+        category: a.category,
+        categoryColor: a.categoryColor,
+        title: a.title,
+        excerpt: a.excerpt,
+        content: a.content,
+        cover: a.cover,
+        author: a.author,
+        authorRole: a.authorRole,
+        date: new Date(a.publishedAt).toLocaleDateString("vi-VN"),
+        readTime: a.readTime,
+        tags: a.tags,
+        status: a.published ? "published" : "draft",
+      }));
+      setItems(mapped);
+    } catch (err) {
+      console.error(err);
+      // Fallback
+      setItems(ARTICLES.map((a) => ({ ...a, status: "published" as const })));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setIsUploading(true);
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Upload failed");
+      const result = await res.json();
+      setForm((f) => ({ ...f, cover: result.url }));
+    } catch (err: any) {
+      alert("Lỗi khi tải ảnh lên: " + err.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const filtered = filterCat === "all" ? items : items.filter((a) => a.category === filterCat);
 
@@ -68,33 +127,82 @@ export function BlogManager({ t, isDark }: Props) {
 
   const closeModal = () => { setEditIdx(null); setIsAdding(false); };
 
-  const save = () => {
+  const save = async () => {
     if (!form.title.trim()) return;
     const slug = form.slug || form.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
     const tags = tagsInput.split(",").map((t) => t.trim()).filter(Boolean);
     const catColor = CATEGORY_COLORS[form.category] || "#D43B1F";
-    const item: BlogItem = { ...form, slug, tags, categoryColor: catColor };
-    if (isAdding) {
-      setItems((prev) => [item, ...prev]);
-    } else if (editIdx !== null) {
-      setItems((prev) => prev.map((it, i) => i === editIdx ? item : it));
+    const item = { ...form, slug, tags, categoryColor: catColor };
+
+    try {
+      const url = "/api/articles";
+      const method = isAdding ? "POST" : "PUT";
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...item,
+          published: form.status === "published",
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Có lỗi xảy ra khi lưu bài viết");
+      }
+
+      await fetchArticles();
+      closeModal();
+    } catch (err: any) {
+      alert(err.message);
     }
-    closeModal();
   };
 
-  const doDelete = () => {
+  const doDelete = async () => {
     if (deleteIdx !== null) {
-      const realIdx = items.indexOf(filtered[deleteIdx]);
-      setItems((prev) => prev.filter((_, i) => i !== realIdx));
+      const itemToDelete = filtered[deleteIdx];
+      if (itemToDelete && itemToDelete.id) {
+        try {
+          const res = await fetch(`/api/articles?id=${itemToDelete.id}`, {
+            method: "DELETE",
+          });
+          if (!res.ok) {
+            const errData = await res.json();
+            throw new Error(errData.error || "Không thể xóa bài viết");
+          }
+          await fetchArticles();
+        } catch (err: any) {
+          alert(err.message);
+        }
+      } else {
+        const realIdx = items.indexOf(itemToDelete);
+        setItems((prev) => prev.filter((_, i) => i !== realIdx));
+      }
     }
     setDeleteIdx(null);
   };
 
-  const toggleStatus = (idx: number) => {
-    const realIdx = items.indexOf(filtered[idx]);
-    setItems((prev) => prev.map((it, i) =>
-      i === realIdx ? { ...it, status: it.status === "published" ? "draft" : "published" } : it
-    ));
+  const toggleStatus = async (idx: number) => {
+    const item = filtered[idx];
+    if (!item.id) return;
+    try {
+      const newStatus = item.status === "published" ? "draft" : "published";
+      const res = await fetch("/api/articles", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...item,
+          published: newStatus === "published",
+        }),
+      });
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Không thể thay đổi trạng thái");
+      }
+      await fetchArticles();
+    } catch (err: any) {
+      alert(err.message);
+    }
   };
 
   const showModal = isAdding || editIdx !== null;
@@ -118,11 +226,10 @@ export function BlogManager({ t, isDark }: Props) {
       <div className="flex flex-wrap gap-2">
         {CATEGORIES.map((cat) => (
           <button key={cat.id} onClick={() => setFilterCat(cat.id)}
-            className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
-              filterCat === cat.id
+            className={`rounded-full px-3 py-1 text-xs font-semibold transition ${filterCat === cat.id
                 ? "bg-red-600 text-white"
                 : isDark ? "bg-white/8 text-white/55 hover:bg-white/12" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            }`}>
+              }`}>
             {cat.label}
           </button>
         ))}
@@ -142,7 +249,7 @@ export function BlogManager({ t, isDark }: Props) {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((article, idx) => {
+            {!isLoading && filtered.map((article, idx) => {
               const catLabel = CATEGORIES.find((c) => c.id === article.category)?.label;
               const statusInfo = STATUS_LABELS[article.status];
               return (
@@ -205,9 +312,11 @@ export function BlogManager({ t, isDark }: Props) {
             })}
           </tbody>
         </table>
-        {filtered.length === 0 && (
+        {isLoading ? (
+          <div className={`py-16 text-center ${t.textFaint}`}>Đang tải danh sách bài viết từ CSDL...</div>
+        ) : filtered.length === 0 ? (
           <div className={`py-16 text-center ${t.textFaint}`}>Chưa có bài viết nào.</div>
-        )}
+        ) : null}
       </div>
 
       {/* Modal */}
@@ -259,10 +368,22 @@ export function BlogManager({ t, isDark }: Props) {
                   placeholder="## Tiêu đề&#10;&#10;Nội dung bài viết..." />
               </div>
               <div>
-                <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>URL ảnh bìa</label>
-                <input value={form.cover} onChange={(e) => setForm((f) => ({ ...f, cover: e.target.value }))}
-                  className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
-                  placeholder="https://images.unsplash.com/..." />
+                <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Ảnh bìa *</label>
+                <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                  {form.cover && (
+                    <img src={form.cover} alt="Preview" className="h-12 w-20 rounded-lg object-cover bg-black/20" />
+                  )}
+                  <div className="flex-1 w-full">
+                    <input value={form.cover} onChange={(e) => setForm((f) => ({ ...f, cover: e.target.value }))}
+                      className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input}`}
+                      placeholder="Nhập URL ảnh hoặc chọn file tải lên..." />
+                  </div>
+                </div>
+                <div className="mt-2">
+                  <input type="file" accept="image/*" onChange={handleImageUpload} disabled={isUploading}
+                    className="text-xs text-gray-400 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-red-500/20 file:text-red-400 hover:file:bg-red-500/30 file:cursor-pointer" />
+                  {isUploading && <span className="ml-2 text-xs text-amber-400">Đang tải ảnh lên...</span>}
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>

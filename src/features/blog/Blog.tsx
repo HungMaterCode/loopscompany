@@ -7,7 +7,7 @@ import { ArrowRight, Clock, Calendar, Search, Tag } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingZalo } from "@/components/layout/FloatingZalo";
-import { ARTICLES, CATEGORIES } from "@/features/legacy-core/articles";
+import { ARTICLES, CATEGORIES, type Article } from "@/features/legacy-core/articles";
 import { RED, TEXT, TEXT60, TEXT35, BORDER, BORDER_M, BG, EASE } from "@/features/legacy-core/tokens";
 import { GLOBAL_CSS } from "@/features/legacy-core/tokens";
 
@@ -151,11 +151,13 @@ function FeaturedArticle({ article }: { article: typeof ARTICLES[0] }) {
 
 // ─── Blog Page ────────────────────────────────────────────────────────────────
 
-export function Blog({ bgUrl }: { bgUrl?: string }) {
+export function Blog({ initialArticles, bgUrl }: { initialArticles?: Article[]; bgUrl?: string }) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filtered = ARTICLES.filter(a => {
+  const articles = initialArticles || ARTICLES;
+
+  const filtered = articles.filter(a => {
     const matchCat = activeCategory === "all" || a.category === activeCategory;
     const matchSearch = !searchQuery ||
       a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -163,24 +165,24 @@ export function Blog({ bgUrl }: { bgUrl?: string }) {
     return matchCat && matchSearch;
   });
 
-  const featured = ARTICLES[0];
+  const featured = articles[0] || ARTICLES[0];
   const rest = filtered.filter(a => a.slug !== featured.slug || activeCategory !== "all" || searchQuery);
 
   return (
     <div style={{ backgroundColor: "var(--sc-bg-1)", minHeight: "100vh", position: "relative" }}>
       <style>{GLOBAL_CSS}</style>
-      
+
       {bgUrl && (
         <div style={{ position: 'absolute', inset: 0, backgroundImage: `url(${bgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.15, pointerEvents: 'none', zIndex: 0 }} />
       )}
-      
+
       <Header />
 
       {/* ── Hero header ── */}
       <section style={{ position: "relative", paddingTop: 140, paddingBottom: 80, overflow: "hidden" }}>
         {/* Background Pattern */}
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(45deg,var(--sc-grid-line) 0px,var(--sc-grid-line) 1px,transparent 1px,transparent 40px),repeating-linear-gradient(-45deg,var(--sc-grid-line) 0px,var(--sc-grid-line) 1px,transparent 1px,transparent 40px)', pointerEvents: 'none' }} />
-        
+
         {/* Glowing Orbs */}
         <div className="orb" style={{ width: '600px', height: '600px', top: '-150px', right: '-150px', background: 'var(--sc-orb-1-bg)', filter: 'blur(80px)' }} />
         <div className="orb" style={{ width: '500px', height: '500px', bottom: '-150px', left: '-150px', background: 'var(--sc-orb-2-bg)', filter: 'blur(80px)', animationDelay: '2s' }} />
@@ -269,7 +271,7 @@ export function Blog({ bgUrl }: { bgUrl?: string }) {
             <span style={{ color: TEXT60, fontSize: 13, fontWeight: 600 }}>Chủ đề phổ biến</span>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {[...new Set(ARTICLES.flatMap(a => a.tags))].map(tag => (
+            {[...new Set(articles.flatMap(a => a.tags))].map(tag => (
               <span key={tag} style={{
                 padding: "5px 13px", borderRadius: 20, fontSize: 12, color: TEXT60,
                 background: "var(--vw-glass-bg)",

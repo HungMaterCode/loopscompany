@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { BlogPostPage } from "@/components/pages/blog-post-page";
-import { getArticleBySlug, getArticleSlugs } from "@/lib/site-config-server";
+import { getArticleBySlug, getArticleSlugs, getPublishedArticles } from "@/lib/site-config-server";
 import { ARTICLES } from "@/features/legacy-core/articles";
 import { articleJsonLd, buildMetadata } from "@/lib/seo";
 
@@ -36,6 +36,43 @@ export default async function BlogPostRoute({ params }: Props) {
 
   if (!dbArticle && !fallback) notFound();
 
+  const article = dbArticle
+    ? {
+        slug: dbArticle.slug,
+        category: dbArticle.category,
+        categoryColor: dbArticle.categoryColor,
+        title: dbArticle.title,
+        excerpt: dbArticle.excerpt,
+        content: dbArticle.content,
+        cover: dbArticle.cover,
+        author: dbArticle.author,
+        authorRole: dbArticle.authorRole,
+        date: dbArticle.publishedAt.toLocaleDateString("vi-VN"),
+        readTime: dbArticle.readTime,
+        tags: dbArticle.tags,
+      }
+    : fallback;
+
+  if (!article) notFound();
+
+  const dbArticles = await getPublishedArticles();
+  const allArticles = dbArticles.length > 0
+    ? dbArticles.map((a) => ({
+        slug: a.slug,
+        category: a.category,
+        categoryColor: a.categoryColor,
+        title: a.title,
+        excerpt: a.excerpt,
+        content: a.content,
+        cover: a.cover,
+        author: a.author,
+        authorRole: a.authorRole,
+        date: a.publishedAt.toLocaleDateString("vi-VN"),
+        readTime: a.readTime,
+        tags: a.tags,
+      }))
+    : ARTICLES;
+
   const jsonLd = dbArticle
     ? articleJsonLd({
         title: dbArticle.title,
@@ -59,7 +96,7 @@ export default async function BlogPostRoute({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <BlogPostPage slug={slug} bgUrl={bgUrl} />
+      <BlogPostPage article={article} allArticles={allArticles} bgUrl={bgUrl} />
     </>
   );
 }

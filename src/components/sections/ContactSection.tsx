@@ -41,7 +41,7 @@ export function ContactSection() {
       <Orb size={400} opacity={0.10} bottom="-5%" right="5%" delay={4} />
 
       <div ref={ref} style={{ position: "relative", zIndex: 1, maxWidth: 1100, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "start" }} className="contact-grid">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "stretch" }} className="contact-grid">
           {/* Left */}
           <div>
             <motion.div initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}}>
@@ -51,23 +51,23 @@ export function ContactSection() {
               initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.1, duration: 0.65, ease: EASE }}>
               Bắt đầu hành trình<br />số hóa của bạn
             </motion.h2>
-            <motion.p style={{ color: TEXT60, fontSize: 14, lineHeight: 1.78, margin: "0 0 32px" }}
+            <motion.p style={{ color: TEXT60, fontSize: 16, lineHeight: 1.78, margin: "0 0 32px" }}
               initial={{ opacity: 0, y: 12 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.2, duration: 0.6 }}>
               Điền form bên phải — chuyên viên sẽ liên hệ tư vấn miễn phí trong vòng 30 phút làm việc.
             </motion.p>
-            <motion.div style={{ ...GLASS_LIGHT, borderRadius: 20, overflow: "hidden", aspectRatio: "4/3" }}
+            <motion.div style={{ ...GLASS_LIGHT, borderRadius: 20, overflow: "hidden", aspectRatio: "16/10" }}
               initial={{ opacity: 0, y: 16 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.3, duration: 0.7, ease: EASE }}>
               <img src={IMG.team} alt="Đội ngũ Việt Web" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </motion.div>
-            <motion.div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 12 }}
+            <motion.div style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 14 }}
               initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ delay: 0.5 }}>
               {[{ Icon: MapPin, text: "Cần Thơ", href: "https://www.google.com/maps/search/?api=1&query=Cần+Thơ" },
                 { Icon: Phone,  text: "+84 378443602 (Zalo / Điện thoại)", href: "https://zalo.me/0378443602" },
                 { Icon: Mail,   text: "ducanhnhatbui@gmail.com", href: "mailto:ducanhnhatbui@gmail.com" }]
                 .map(({ Icon, text, href }) => (
                   <a key={text} href={href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-                    <Icon size={14} color={RED} />
-                    <span style={{ color: TEXT60, fontSize: 13, transition: "color 0.2s" }}
+                    <Icon size={16} color={RED} />
+                    <span style={{ color: TEXT60, fontSize: 14, transition: "color 0.2s" }}
                       onMouseEnter={e => (e.currentTarget.style.color = RED)}
                       onMouseLeave={e => (e.currentTarget.style.color = TEXT60)}>{text}</span>
                   </a>
@@ -75,8 +75,7 @@ export function ContactSection() {
             </motion.div>
           </div>
 
-          {/* Right — glass form */}
-          <motion.div style={{ ...GLASS_LIGHT, borderRadius: 24, padding: 32, position: "relative", overflow: "hidden" }}
+          <motion.div style={{ ...GLASS_LIGHT, borderRadius: 24, padding: 40, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "center" }}
             initial={{ opacity: 0, x: 32 }} animate={inView ? { opacity: 1, x: 0 } : {}} transition={{ delay: 0.2, duration: 0.75, ease: EASE }}>
             {loadingAuth ? (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 380, gap: 12 }}>
@@ -152,22 +151,22 @@ export function ContactSection() {
                 } finally {
                   setIsSubmitting(false);
                 }
-              }} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                <p style={{ color: TEXT, fontSize: 16, fontWeight: 600, margin: "0 0 4px", letterSpacing: "-0.02em" }}>Đăng ký tư vấn miễn phí</p>
+              }} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                <p style={{ color: TEXT, fontSize: 22, fontWeight: 700, margin: "0 0 10px", letterSpacing: "-0.02em" }}>Đăng ký tư vấn miễn phí</p>
                 <div>
-                  <label style={{ display: "block", color: TEXT35, fontSize: 12, marginBottom: 7, fontWeight: 500 }}>Họ và tên</label>
+                  <label style={{ display: "block", color: TEXT35, fontSize: 14, marginBottom: 8, fontWeight: 600 }}>Họ và tên</label>
                   <input type="text" placeholder="Nguyễn Văn A" required value={name} onChange={e => setName(e.target.value)}
-                    style={{ width: "100%", backgroundColor: "var(--vw-bg-input)", backdropFilter: "blur(8px)", border: `1px solid ${BORDER_M}`, borderRadius: 10, padding: "10px 14px", fontSize: 14, color: TEXT, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
+                    style={{ width: "100%", backgroundColor: "var(--vw-bg-input)", backdropFilter: "blur(8px)", border: `1px solid ${BORDER_M}`, borderRadius: 12, padding: "14px 18px", fontSize: 16, color: TEXT, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
                     onFocus={e => (e.currentTarget.style.borderColor = RED)} onBlur={e => (e.currentTarget.style.borderColor = BORDER_M)} />
                 </div>
                 <div>
-                  <label style={{ display: "block", color: TEXT35, fontSize: 12, marginBottom: 7, fontWeight: 500 }}>Số điện thoại / Zalo</label>
+                  <label style={{ display: "block", color: TEXT35, fontSize: 14, marginBottom: 8, fontWeight: 600 }}>Số điện thoại / Zalo</label>
                   <input type="tel" placeholder="0901 234 567" required value={phone} onChange={e => setPhone(e.target.value)}
-                    style={{ width: "100%", backgroundColor: "var(--vw-bg-input)", backdropFilter: "blur(8px)", border: `1px solid ${BORDER_M}`, borderRadius: 10, padding: "10px 14px", fontSize: 14, color: TEXT, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
+                    style={{ width: "100%", backgroundColor: "var(--vw-bg-input)", backdropFilter: "blur(8px)", border: `1px solid ${BORDER_M}`, borderRadius: 12, padding: "14px 18px", fontSize: 16, color: TEXT, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" }}
                     onFocus={e => (e.currentTarget.style.borderColor = RED)} onBlur={e => (e.currentTarget.style.borderColor = BORDER_M)} />
                 </div>
                 <div>
-                  <label style={{ display: "block", color: TEXT35, fontSize: 12, marginBottom: 7, fontWeight: 500 }}>Email</label>
+                  <label style={{ display: "block", color: TEXT35, fontSize: 14, marginBottom: 8, fontWeight: 600 }}>Email</label>
                   <input type="email" placeholder="email@congty.vn" required value={email} onChange={e => setEmail(e.target.value)}
                     readOnly={!!user}
                     style={{
@@ -175,9 +174,9 @@ export function ContactSection() {
                       backgroundColor: user ? "rgba(255, 255, 255, 0.05)" : "var(--vw-bg-input)",
                       backdropFilter: "blur(8px)",
                       border: `1px solid ${BORDER_M}`,
-                      borderRadius: 10,
-                      padding: "10px 14px",
-                      fontSize: 14,
+                      borderRadius: 12,
+                      padding: "14px 18px",
+                      fontSize: 16,
                       color: user ? "var(--sc-text-60)" : TEXT,
                       outline: "none",
                       boxSizing: "border-box",
@@ -188,14 +187,14 @@ export function ContactSection() {
                     onBlur={e => { if (!user) e.currentTarget.style.borderColor = BORDER_M; }} />
                 </div>
                 <div>
-                  <label style={{ display: "block", color: TEXT35, fontSize: 12, marginBottom: 7, fontWeight: 500 }}>Yêu cầu cần tư vấn / Lời nhắn</label>
-                  <textarea rows={3} placeholder="Ví dụ: Tôi muốn tư vấn thiết kế website..." required value={message} onChange={e => setMessage(e.target.value)}
-                    style={{ width: "100%", backgroundColor: "var(--vw-bg-input)", backdropFilter: "blur(8px)", border: `1px solid ${BORDER_M}`, borderRadius: 10, padding: "10px 14px", fontSize: 14, color: TEXT, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s", resize: "none" }}
+                  <label style={{ display: "block", color: TEXT35, fontSize: 14, marginBottom: 8, fontWeight: 600 }}>Yêu cầu cần tư vấn / Lời nhắn</label>
+                  <textarea placeholder="Ví dụ: Tôi muốn tư vấn thiết kế website..." required value={message} onChange={e => setMessage(e.target.value)}
+                    style={{ width: "100%", height: 140, backgroundColor: "var(--vw-bg-input)", backdropFilter: "blur(8px)", border: `1px solid ${BORDER_M}`, borderRadius: 12, padding: "14px 18px", fontSize: 16, color: TEXT, outline: "none", boxSizing: "border-box", transition: "border-color 0.2s", resize: "none" }}
                     onFocus={e => (e.currentTarget.style.borderColor = RED)}
                     onBlur={e => (e.currentTarget.style.borderColor = BORDER_M)} />
                 </div>
-                <button type="submit" disabled={isSubmitting}
-                  style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, backgroundColor: isSubmitting ? RED_MED : RED, color: "#fff", border: "none", borderRadius: 40, padding: "13px 24px", fontSize: 14, fontWeight: 600, cursor: isSubmitting ? "not-allowed" : "pointer", marginTop: 6, letterSpacing: "-0.01em", transition: "background-color 0.2s", opacity: isSubmitting ? 0.7 : 1 }}
+                <button type="submit" disabled={isSubmitting} className="w-full"
+                  style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", backgroundColor: isSubmitting ? RED_MED : RED, color: "#fff", border: "none", borderRadius: 40, padding: "16px 28px", fontSize: 16, fontWeight: 700, cursor: isSubmitting ? "not-allowed" : "pointer", marginTop: 12, letterSpacing: "-0.01em", transition: "background-color 0.2s", opacity: isSubmitting ? 0.7 : 1 }}
                   onMouseEnter={e => { if (!isSubmitting) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#bb3218" }}
                   onMouseLeave={e => { if (!isSubmitting) (e.currentTarget as HTMLButtonElement).style.backgroundColor = RED }}>
                   {isSubmitting ? "Đang gửi..." : "Gửi yêu cầu tư vấn"} <ArrowRight size={15} />

@@ -16,7 +16,8 @@ export type AdminTab =
   | "siteConfig"
   | "seo"
   | "appearance"
-  | "contacts";
+  | "contacts"
+  | "orders";
 
 export interface TC {
   page: string;

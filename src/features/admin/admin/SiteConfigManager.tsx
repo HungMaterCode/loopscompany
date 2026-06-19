@@ -49,6 +49,7 @@ export function SiteConfigManager({ t, isDark }: Props) {
     const newSlides = [
       ...form.hero.slides,
       {
+        mediaType: 'image' as const,
         bgUrl: 'https://images.unsplash.com/photo-1748591646636-ad5132fed078?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTc0ODU5MTcxMA&ixlib=rb-4.0.3&q=80&w=1080',
         badge: 'Nhãn slide mới',
         title1: 'Tiêu đề dòng 1',
@@ -80,7 +81,7 @@ export function SiteConfigManager({ t, isDark }: Props) {
     return <div className={`p-10 text-center ${t.textMuted}`}>Đang tải cấu hình...</div>;
   }
 
-  const UploadButton = ({ onUploadComplete }: { onUploadComplete: (url: string) => void }) => {
+  const UploadButton = ({ onUploadComplete, acceptType = "image/*,video/*" }: { onUploadComplete: (url: string) => void; acceptType?: string }) => {
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -116,7 +117,7 @@ export function SiteConfigManager({ t, isDark }: Props) {
           type="file"
           ref={fileInputRef}
           onChange={handleFileChange}
-          accept="image/*,video/*"
+          accept={acceptType}
           className="hidden"
         />
         <button
@@ -136,8 +137,8 @@ export function SiteConfigManager({ t, isDark }: Props) {
     );
   };
 
-  const InputRow = ({ label, value, onChange, type = 'text', hint = '' }: any) => {
-    const isVideo = value && (value.endsWith('.mp4') || value.includes('/video/upload/') || value.includes('videoUrl'));
+  const InputRow = ({ label, value, onChange, type = 'text', hint = '', isVideoOverride = undefined, acceptType = 'image/*,video/*' }: any) => {
+    const isVideo = isVideoOverride !== undefined ? isVideoOverride : (value && (value.endsWith('.mp4') || value.includes('/video/upload/') || value.includes('videoUrl')));
     return (
       <div className="mb-4">
         <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>{label}</label>
@@ -181,7 +182,7 @@ export function SiteConfigManager({ t, isDark }: Props) {
           </div>
 
           {type === 'url' && (
-            <UploadButton onUploadComplete={onChange} />
+            <UploadButton onUploadComplete={onChange} acceptType={acceptType} />
           )}
         </div>
         {hint && <p className={`mt-1.5 text-xs ${t.textFaint}`}>{hint}</p>}
@@ -261,7 +262,16 @@ export function SiteConfigManager({ t, isDark }: Props) {
             {form.hero.slides.map((slide, idx) => (
               <div key={idx} className={`rounded-2xl p-6 ${t.card} flex flex-col gap-2`}>
                 <div className="flex justify-between items-center mb-2">
-                  <h3 className={`text-lg font-bold ${t.text}`}>Banner Slide {idx + 1}</h3>
+                  <h3 className={`text-lg font-bold ${t.text} flex items-center gap-2`}>
+                    Banner Slide {idx + 1}
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold border ${
+                      slide.mediaType === 'video' 
+                        ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' 
+                        : 'bg-red-500/10 text-red-400 border-red-500/20'
+                    }`}>
+                      {slide.mediaType === 'video' ? 'Video' : 'Hình ảnh'}
+                    </span>
+                  </h3>
                   {form.hero.slides.length > 1 && (
                     <button
                       type="button"
@@ -273,85 +283,114 @@ export function SiteConfigManager({ t, isDark }: Props) {
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
-                  <InputRow label="Hình nền (Background URL)" value={slide.bgUrl} type="url"
-                    onChange={(v: string) => {
-                      const newSlides = [...form.hero.slides];
-                      newSlides[idx].bgUrl = v;
-                      setForm({ ...form, hero: { slides: newSlides } });
-                    }} />
-                  <InputRow label="Nhãn nổi bật (Badge đỏ)" value={slide.badge}
-                    onChange={(v: string) => {
-                      const newSlides = [...form.hero.slides];
-                      newSlides[idx].badge = v;
-                      setForm({ ...form, hero: { slides: newSlides } });
-                    }} />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
-                  <InputRow label="Tiêu đề Dòng 1" value={slide.title1}
-                    onChange={(v: string) => {
-                      const newSlides = [...form.hero.slides];
-                      newSlides[idx].title1 = v;
-                      setForm({ ...form, hero: { slides: newSlides } });
-                    }} />
-                  <InputRow label="Tiêu đề Dòng 2" value={slide.title2}
-                    onChange={(v: string) => {
-                      const newSlides = [...form.hero.slides];
-                      newSlides[idx].title2 = v;
-                      setForm({ ...form, hero: { slides: newSlides } });
-                    }} />
-                  <InputRow label="Tiêu đề Dòng 3" value={slide.title3}
-                    onChange={(v: string) => {
-                      const newSlides = [...form.hero.slides];
-                      newSlides[idx].title3 = v;
-                      setForm({ ...form, hero: { slides: newSlides } });
-                    }} />
-                </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2 items-start">
-                  <InputRow label="Màu chữ tiêu đề (Text Color)" value={slide.textColor} type="color"
-                    onChange={(v: string) => {
-                      const newSlides = [...form.hero.slides];
-                      newSlides[idx].textColor = v;
-                      setForm({ ...form, hero: { slides: newSlides } });
-                    }} />
-                  <InputRow label="Màu chữ nhấn (Accent Color)" value={slide.accentColor} type="color"
-                    onChange={(v: string) => {
-                      const newSlides = [...form.hero.slides];
-                      newSlides[idx].accentColor = v;
-                      setForm({ ...form, hero: { slides: newSlides } });
-                    }} />
                   <div className="mb-4">
-                    <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Dòng nào đổi màu nhấn?</label>
-                    <select value={slide.accentIndex} onChange={e => {
-                      const newSlides = [...form.hero.slides];
-                      newSlides[idx].accentIndex = parseInt(e.target.value);
-                      setForm({ ...form, hero: { slides: newSlides } });
-                    }}
+                    <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Loại banner (Media Type)</label>
+                    <select
+                      value={slide.mediaType || 'image'}
+                      onChange={(e) => {
+                        const newSlides = [...form.hero.slides];
+                        newSlides[idx].mediaType = e.target.value as 'image' | 'video';
+                        setForm({ ...form, hero: { slides: newSlides } });
+                      }}
                       className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input} mt-1`}>
-                      <option value={0}>Dòng 1</option>
-                      <option value={1}>Dòng 2</option>
-                      <option value={2}>Dòng 3</option>
-                      <option value={-1}>Không đổi màu</option>
+                      <option value="image">Hình ảnh (Image)</option>
+                      <option value="video">Video</option>
                     </select>
+                  </div>
+                  <div className="md:col-span-2">
+                    <InputRow 
+                      label={slide.mediaType === 'video' ? "Video nền (Video URL)" : "Hình nền (Background URL)"} 
+                      value={slide.bgUrl} 
+                      type="url"
+                      isVideoOverride={slide.mediaType === 'video'}
+                      acceptType={slide.mediaType === 'video' ? 'video/*' : 'image/*'}
+                      onChange={(v: string) => {
+                        const newSlides = [...form.hero.slides];
+                        newSlides[idx].bgUrl = v;
+                        setForm({ ...form, hero: { slides: newSlides } });
+                      }} 
+                    />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
-                  <InputRow label="Đoạn văn mô tả (Subtext)" value={slide.sub}
-                    onChange={(v: string) => {
-                      const newSlides = [...form.hero.slides];
-                      newSlides[idx].sub = v;
-                      setForm({ ...form, hero: { slides: newSlides } });
-                    }} />
-                  <InputRow label="Chữ nút bấm (CTA Button)" value={slide.cta}
-                    onChange={(v: string) => {
-                      const newSlides = [...form.hero.slides];
-                      newSlides[idx].cta = v;
-                      setForm({ ...form, hero: { slides: newSlides } });
-                    }} />
-                </div>
+                {slide.mediaType !== 'video' && (
+                  <>
+                    <div className="grid grid-cols-1 gap-y-2">
+                      <InputRow label="Nhãn nổi bật (Badge đỏ)" value={slide.badge}
+                        onChange={(v: string) => {
+                          const newSlides = [...form.hero.slides];
+                          newSlides[idx].badge = v;
+                          setForm({ ...form, hero: { slides: newSlides } });
+                        }} />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
+                      <InputRow label="Tiêu đề Dòng 1" value={slide.title1}
+                        onChange={(v: string) => {
+                          const newSlides = [...form.hero.slides];
+                          newSlides[idx].title1 = v;
+                          setForm({ ...form, hero: { slides: newSlides } });
+                        }} />
+                      <InputRow label="Tiêu đề Dòng 2" value={slide.title2}
+                        onChange={(v: string) => {
+                          const newSlides = [...form.hero.slides];
+                          newSlides[idx].title2 = v;
+                          setForm({ ...form, hero: { slides: newSlides } });
+                        }} />
+                      <InputRow label="Tiêu đề Dòng 3" value={slide.title3}
+                        onChange={(v: string) => {
+                          const newSlides = [...form.hero.slides];
+                          newSlides[idx].title3 = v;
+                          setForm({ ...form, hero: { slides: newSlides } });
+                        }} />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2 items-start">
+                      <InputRow label="Màu chữ tiêu đề (Text Color)" value={slide.textColor} type="color"
+                        onChange={(v: string) => {
+                          const newSlides = [...form.hero.slides];
+                          newSlides[idx].textColor = v;
+                          setForm({ ...form, hero: { slides: newSlides } });
+                        }} />
+                      <InputRow label="Màu chữ nhấn (Accent Color)" value={slide.accentColor} type="color"
+                        onChange={(v: string) => {
+                          const newSlides = [...form.hero.slides];
+                          newSlides[idx].accentColor = v;
+                          setForm({ ...form, hero: { slides: newSlides } });
+                        }} />
+                      <div className="mb-4">
+                        <label className={`mb-1.5 block text-sm font-medium ${t.textMuted}`}>Dòng nào đổi màu nhấn?</label>
+                        <select value={slide.accentIndex} onChange={e => {
+                          const newSlides = [...form.hero.slides];
+                          newSlides[idx].accentIndex = parseInt(e.target.value);
+                          setForm({ ...form, hero: { slides: newSlides } });
+                        }}
+                          className={`w-full rounded-xl px-4 py-2.5 text-sm transition ${t.input} mt-1`}>
+                          <option value={0}>Dòng 1</option>
+                          <option value={1}>Dòng 2</option>
+                          <option value={2}>Dòng 3</option>
+                          <option value={-1}>Không đổi màu</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
+                      <InputRow label="Đoạn văn mô tả (Subtext)" value={slide.sub}
+                        onChange={(v: string) => {
+                          const newSlides = [...form.hero.slides];
+                          newSlides[idx].sub = v;
+                          setForm({ ...form, hero: { slides: newSlides } });
+                        }} />
+                      <InputRow label="Chữ nút bấm (CTA Button)" value={slide.cta}
+                        onChange={(v: string) => {
+                          const newSlides = [...form.hero.slides];
+                          newSlides[idx].cta = v;
+                          setForm({ ...form, hero: { slides: newSlides } });
+                        }} />
+                    </div>
+                  </>
+                )}
               </div>
             ))}
 
