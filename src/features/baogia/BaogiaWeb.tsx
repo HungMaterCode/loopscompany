@@ -398,19 +398,26 @@ function PreviewPanel({ pkg, selectedDomains, hosting, seo, dbSeoPackages, onSub
   pkg: AnyPkg; selectedDomains: { label: string; price: number }[]; hosting: number; seo: number; dbSeoPackages: { label: string; price: number }[]; onSubmit: () => void; yearly?: boolean;
 }) {
   const isRental = pkg.isRental;
+  const isLandingPage = pkg.name.toLowerCase().includes("landing");
+  const cloudInfrastructurePrice = isLandingPage ? 0 : 270000;
+
   const domainPrice = selectedDomains.reduce((sum, d) => sum + d.price, 0);
   const basePrice = isRental && yearly ? getYearlyPrice(pkg.price) : pkg.price;
-  const subtotal = isRental ? basePrice : pkg.price + domainPrice + hosting + seo;
+  const subtotal = isRental ? basePrice + cloudInfrastructurePrice : pkg.price + domainPrice + hosting + seo + cloudInfrastructurePrice;
   const vat = Math.round(subtotal * 0.1);
-  const total = isRental ? basePrice : subtotal + vat;
+  const total = isRental ? subtotal : subtotal + vat;
 
   const selectedSeoPack = dbSeoPackages.find(p => p.price === seo);
   const seoLabel = selectedSeoPack ? `SEO ${selectedSeoPack.label}` : "Gói SEO";
 
   const lineItems = isRental
-    ? [{ id: "base", label: "Gói " + pkg.name + (yearly ? " (Chu kỳ năm - giảm 20%)" : ""), value: basePrice }]
+    ? [
+        { id: "base", label: "Gói " + pkg.name + (yearly ? " (Chu kỳ năm - giảm 20%)" : ""), value: basePrice },
+        { id: "cloud", label: "Hạ tầng cloud", value: cloudInfrastructurePrice }
+      ]
     : [
       { id: "base", label: "Gói " + pkg.name, value: pkg.price },
+      { id: "cloud", label: "Hạ tầng cloud", value: cloudInfrastructurePrice },
       ...(selectedDomains.length > 0 ? selectedDomains.map((d, index) => ({ id: `domain-${index}`, label: `Tên miền ${d.label}`, value: d.price })) : []),
       ...(hosting ? [{ id: "hosting", label: "Hosting NVMe", value: hosting }] : []),
       ...(seo ? [{ id: "seo", label: seoLabel, value: seo }] : []),
@@ -480,7 +487,9 @@ function PreviewPanel({ pkg, selectedDomains, hosting, seo, dbSeoPackages, onSub
               transition={{ duration: 0.22 }}
               style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${CONFIG.border}` }}>
               <motion.span key={item.label} initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ fontSize: 12, color: CONFIG.text60 }}>{item.label}</motion.span>
-              <motion.span key={item.value} initial={{ scale: 1.1 }} animate={{ scale: 1 }} style={{ fontSize: 12, fontWeight: 600, color: CONFIG.text }}>{fmt(item.value)}</motion.span>
+              <motion.span key={item.value} initial={{ scale: 1.1 }} animate={{ scale: 1 }} style={{ fontSize: 12, fontWeight: 600, color: CONFIG.text }}>
+                {item.id === "cloud" && item.value === 0 ? "0đ" : fmt(item.value)}
+              </motion.span>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -591,6 +600,15 @@ function FormModal({ pkg, total, selectedDomains, hostingPrice, seoPrice, dbHost
                   </div>
                 </div>
               )}
+
+              <div>
+                <p style={{ fontSize: 10, fontWeight: 700, color: CONFIG.text35, textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 4px" }}>Hạ tầng cloud:</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: CONFIG.accent, background: a(0.12), border: `1px solid ${a(0.25)}`, padding: "2px 8px", borderRadius: 20 }}>
+                    {pkg.name.toLowerCase().includes("landing") ? "0đ" : fmt(270000)}
+                  </span>
+                </div>
+              </div>
 
               <div>
                 <p style={{ fontSize: 10, fontWeight: 700, color: CONFIG.text35, textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 4px" }}>Hosting NVMe đã chọn:</p>
@@ -735,6 +753,7 @@ function SuccessScreen({ name, phone, email, pkg, total, selectedDomains, hostin
           style={{ ...glass, borderRadius: 20, padding: "24px 28px", marginBottom: 28, textAlign: "left" }}>
           {[
             { l: "Gói", v: pkg.name },
+            { l: "Hạ tầng cloud", v: pkg.name.toLowerCase().includes("landing") ? "0đ" : fmt(270000) },
             ...(!pkg.isRental && selectedDomains.length > 0 ? [{ l: "Tên miền", v: selectedDomains.map(d => d.label).join(", ") }] : []),
             ...(!pkg.isRental ? [{ l: "Hosting NVMe", v: `${selectedHosting.label} (${selectedHosting.price > 0 ? `+${fmt(selectedHosting.price)}` : "Kèm theo gói"})` }] : []),
             ...(!pkg.isRental ? [{ l: "Dịch vụ SEO", v: `${selectedSeo.label} ${selectedSeo.description ? `(${selectedSeo.description})` : ""} (${selectedSeo.price > 0 ? `+${fmt(selectedSeo.price)}` : "Miễn phí"})` }] : []),
@@ -1675,9 +1694,12 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
       { label: "Phổ biến (20 bài/tháng) +36.000.000đ", value: 36000000 }
     ];
 
+  const isLandingPage = activePkg.name.toLowerCase().includes("landing");
+  const cloudInfrastructurePrice = isLandingPage ? 0 : 270000;
+
   const baseRentPrice = isRentalMode && yearly ? getYearlyPrice(rentPkg.price) : rentPkg.price;
-  const subtotal = isRentalMode ? baseRentPrice : pkg.price + domainPrice + hosting + seo;
-  const total = isRentalMode ? baseRentPrice : subtotal + Math.round(subtotal * 0.1);
+  const subtotal = isRentalMode ? baseRentPrice + cloudInfrastructurePrice : pkg.price + domainPrice + hosting + seo + cloudInfrastructurePrice;
+  const total = isRentalMode ? subtotal : subtotal + Math.round(subtotal * 0.1);
 
   const handleModeChange = (next: "thue" | "mua") => {
     setMode(next);
@@ -1694,7 +1716,8 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
       details = {
         packageName: activePkg.name,
         packagePrice: yearly ? getYearlyPrice(activePkg.price) : activePkg.price,
-        billingCycle: yearly ? "yearly" : "monthly"
+        billingCycle: yearly ? "yearly" : "monthly",
+        cloudInfrastructurePrice
       };
     } else {
       const selectedHosting = dbHostings.find(h => h.price === hosting) || { label: "2GB NVMe (Mặc định)", price: 0 };
@@ -1710,7 +1733,8 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
         seoPackage: {
           label: selectedSeo.label,
           price: selectedSeo.price
-        }
+        },
+        cloudInfrastructurePrice
       };
     }
 
