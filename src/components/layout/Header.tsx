@@ -508,10 +508,10 @@ export function Header() {
                       href={l.href}
                       onClick={e => { goTo(l.href, e); setMenu(false); }}
                       style={{
-                        display: 'flex', alignItems: 'center', gap: '16px',
-                        color: 'var(--sc-text)', fontSize: 'clamp(28px, 4.5vw, 38px)',
+                        display: 'flex', alignItems: 'center', gap: '10px',
+                        color: 'var(--sc-text)', fontSize: 'clamp(18px, 3.5vw, 24px)',
                         fontFamily: F, fontWeight: 800, textDecoration: 'none',
-                        letterSpacing: '-0.03em', padding: '10px 20px', borderRadius: '16px',
+                        letterSpacing: '-0.03em', padding: '6px 12px', borderRadius: '16px',
                         transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                         width: '100%', boxSizing: 'border-box',
                         justifyContent: 'center',
@@ -520,15 +520,15 @@ export function Header() {
                       onMouseEnter={e => {
                         e.currentTarget.style.color = 'var(--sc-accent)';
                         e.currentTarget.style.background = 'var(--sc-card-bg, rgba(255,255,255,0.06))';
-                        e.currentTarget.style.paddingLeft = '28px';
+                        e.currentTarget.style.paddingLeft = '20px';
                       }}
                       onMouseLeave={e => {
                         e.currentTarget.style.color = 'var(--sc-text)';
                         e.currentTarget.style.background = 'transparent';
-                        e.currentTarget.style.paddingLeft = '20px';
+                        e.currentTarget.style.paddingLeft = '12px';
                       }}
                     >
-                      <span style={{ fontSize: '14px', fontFamily: 'monospace', color: 'var(--sc-accent)', opacity: 0.6, fontWeight: 500 }}>
+                      <span style={{ fontSize: '11px', fontFamily: 'monospace', color: 'var(--sc-accent)', opacity: 0.6, fontWeight: 500 }}>
                         0{i + 1}.
                       </span>
                       {l.label}
