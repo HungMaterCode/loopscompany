@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { fetchSiteConfig } from "@/features/legacy-core/site-config-api";
 import { generateSlug } from "@/lib/slug";
 import { ProjectDetailPage } from "@/components/pages/project-detail-page";
+import { buildMetadata } from "@/lib/seo";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
@@ -12,10 +13,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   
   if (!project) return { title: "Dự án không tồn tại" };
 
-  return {
+  return buildMetadata({
     title: `${project.title} | Dự án LOOP`,
     description: `Chi tiết dự án ${project.title} - ${project.cat} (${project.year})`,
-  };
+    path: `/du-an/${resolvedParams.slug}`,
+  });
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {

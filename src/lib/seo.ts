@@ -15,7 +15,10 @@ export type SeoInput = {
 };
 
 export function buildMetadata(input: SeoInput): Metadata {
-  const url = input.canonical ?? getSiteUrl(input.path ?? "/");
+  let url = input.canonical ?? getSiteUrl(input.path ?? "/");
+  if (url.includes("://loops.vn")) {
+    url = url.replace("://loops.vn", "://www.loops.vn");
+  }
   const title = input.title;
   const description = input.description;
   const ogTitle = input.ogTitle ?? title;

@@ -13,6 +13,21 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
+function getFallbackDescription(content: string): string {
+  if (!content) return "";
+  let text = content.replace(/<[^>]*>/g, ""); // Strip HTML tags
+  text = text
+    .replace(/#+\s+/g, "") // Headings
+    .replace(/\*\*|__/g, "") // Bold
+    .replace(/\*|_/g, "") // Italic
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // Links
+    .replace(/`[^`]+`/g, "") // Inline code
+    .replace(/```[^`]+```/g, "")
+    .replace(/\n+/g, " ")
+    .trim();
+  return text.slice(0, 150) + (text.length > 150 ? "..." : "");
+}
+
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const dbArticle = await getArticleBySlug(slug);
@@ -21,9 +36,13 @@ export async function generateMetadata({ params }: Props) {
   const article = dbArticle ?? fallback;
   if (!article) return {};
 
+  const description = article.excerpt?.trim()
+    ? article.excerpt
+    : getFallbackDescription(article.content);
+
   return buildMetadata({
     title: `${article.title} | LOOP Blog`,
-    description: article.excerpt,
+    description,
     path: `/bai-viet/${slug}`,
     ogImage: article.cover,
   });
