@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { MessageCircle } from "lucide-react";
 
-import { SITE_INFO } from "../../site-config";
+import { SITE_INFO } from "../../../features/legacy-core/site-config";
 
 export function FloatingZalo() {
   const cleanPhone = SITE_INFO.zalo.replace(/[^\d]/g, "");

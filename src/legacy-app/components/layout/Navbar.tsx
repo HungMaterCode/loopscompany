@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, User } from "lucide-react";
-import { NAV_LINKS } from "../../data";
-import { RED, TEXT, TEXT60, BORDER, GLASS_LIGHT, EASE } from "../../tokens";
+import { NAV_LINKS } from "../../../features/legacy-core/data";
+import { RED, TEXT, TEXT60, BORDER, GLASS_LIGHT, EASE } from "../../../features/legacy-core/tokens";
 
 export function Navbar() {
   const [scrolled, setScrolled]   = useState(false);
@@ -31,7 +31,7 @@ export function Navbar() {
       }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", height: 64, display: "flex", alignItems: "center", gap: 32 }}>
           {/* Logo */}
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", flexShrink: 0 }}>
+          <Link to="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", flexShrink: 0 }}>
             <div style={{ width: 34, height: 34, borderRadius: 8, backgroundColor: RED, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 800, letterSpacing: "-0.04em" }}>
               LP
             </div>
@@ -43,7 +43,7 @@ export function Navbar() {
             {NAV_LINKS.map(link => {
               const active = link.isRoute && location.pathname === link.href;
               return link.isRoute ? (
-                <Link key={link.label} href={link.href}
+                <Link key={link.label} to={link.href}
                   style={{ color: active ? TEXT : TEXT60, fontSize: 13, fontWeight: 500, textDecoration: "none", transition: "color 0.2s", borderBottom: active ? `1px solid ${RED}` : "none", paddingBottom: active ? 2 : 0 }}>
                   {link.label}
                 </Link>
@@ -60,7 +60,7 @@ export function Navbar() {
 
           {/* Desktop CTA */}
           <div className="nav-cta-btn" style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-            <Link href="/dang-nhap"
+            <Link to="/dang-nhap"
               style={{ display: "flex", alignItems: "center", gap: 6, color: TEXT60, fontSize: 13, fontWeight: 500, textDecoration: "none", padding: "8px 14px", borderRadius: 40, border: `1px solid ${BORDER}`, transition: "all 0.2s", background: "var(--vw-ghost)" }}
               onMouseEnter={e => { e.currentTarget.style.color = TEXT; e.currentTarget.style.borderColor = "var(--vw-ghost-22)"; }}
               onMouseLeave={e => { e.currentTarget.style.color = TEXT60; e.currentTarget.style.borderColor = BORDER; }}>
@@ -99,7 +99,7 @@ export function Navbar() {
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               {NAV_LINKS.map(link =>
                 link.isRoute ? (
-                  <Link key={link.label} href={link.href} onClick={() => setMenuOpen(false)}
+                  <Link key={link.label} to={link.href} onClick={() => setMenuOpen(false)}
                     style={{ padding: "12px 14px", borderRadius: 10, color: TEXT, fontSize: 15, fontWeight: 500, textDecoration: "none", display: "block" }}>
                     {link.label}
                   </Link>
@@ -110,7 +110,7 @@ export function Navbar() {
                   </a>
                 )
               )}
-              <Link href="/dang-nhap" onClick={() => setMenuOpen(false)}
+              <Link to="/dang-nhap" onClick={() => setMenuOpen(false)}
                 style={{ marginTop: 4, display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "12px", borderRadius: 14, border: `1px solid ${BORDER}`, color: TEXT60, fontSize: 14, fontWeight: 500, textDecoration: "none", background: "var(--vw-ghost)" }}>
                 <User size={14} /> Đăng nhập
               </Link>

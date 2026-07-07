@@ -3,9 +3,9 @@ import { motion, AnimatePresence } from "motion/react";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { BrowserMockup } from "../components/ui/BrowserMockup";
-import { IMG } from "../images";
-import { useSiteData } from "../SiteDataContext";
-import { RED, RED_DIM, TEXT, TEXT60, TEXT35, BORDER, BORDER_M, GLASS, EASE } from "../tokens";
+import { IMG } from "../../features/legacy-core/images";
+import { useSiteData } from "../../features/legacy-core/SiteDataContext";
+import { RED, RED_DIM, TEXT, TEXT60, TEXT35, BORDER, BORDER_M, GLASS, EASE } from "../../features/legacy-core/tokens";
 
 const SLIDE_DURATION = 6000;
 

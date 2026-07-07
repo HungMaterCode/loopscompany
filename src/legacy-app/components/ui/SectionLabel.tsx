@@ -1,4 +1,4 @@
-import { RED } from "../../tokens";
+import { RED } from "../../../features/legacy-core/tokens";
 
 export function SectionLabel({ children }: { children: React.ReactNode }) {
   return (

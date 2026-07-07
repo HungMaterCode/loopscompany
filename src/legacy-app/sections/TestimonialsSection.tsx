@@ -4,10 +4,10 @@ import { Star } from "lucide-react";
 import { Reveal } from "../components/ui/Reveal";
 import { SectionBg, Orb } from "../components/ui/SectionBg";
 import { SectionLabel } from "../components/ui/SectionLabel";
-import { TESTIMONIALS } from "../data";
-import { IMG } from "../images";
-import { useSiteData } from "../SiteDataContext";
-import { RED, TEXT, TEXT60, TEXT35, BORDER, GLASS, GLASS_LIGHT, EASE } from "../tokens";
+import { TESTIMONIALS } from "../../features/legacy-core/data";
+import { IMG } from "../../features/legacy-core/images";
+import { useSiteData } from "../../features/legacy-core/SiteDataContext";
+import { RED, TEXT, TEXT60, TEXT35, BORDER, GLASS, GLASS_LIGHT, EASE } from "../../features/legacy-core/tokens";
 
 function TestiCard({ t, index }: { t: typeof TESTIMONIALS[0]; index: number }) {
   const ref = useRef<HTMLDivElement>(null);

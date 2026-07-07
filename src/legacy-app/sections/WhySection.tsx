@@ -7,8 +7,8 @@ import {
 import { Reveal, RevealText } from "../components/ui/Reveal";
 import { SectionBg, Orb } from "../components/ui/SectionBg";
 import { SectionLabel } from "../components/ui/SectionLabel";
-import { useSiteData } from "../SiteDataContext";
-import { RED, RED_DIM, TEXT, TEXT60, TEXT35, EASE } from "../tokens";
+import { useSiteData } from "../../features/legacy-core/SiteDataContext";
+import { RED, RED_DIM, TEXT, TEXT60, TEXT35, EASE } from "../../features/legacy-core/tokens";
 
 const iconMap: Record<string, LucideIcon> = {
   Zap,

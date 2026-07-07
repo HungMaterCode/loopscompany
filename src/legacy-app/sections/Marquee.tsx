@@ -1,5 +1,5 @@
-import { MARQUEE_ITEMS } from "../data";
-import { RED } from "../tokens";
+import { MARQUEE_ITEMS } from "../../features/legacy-core/data";
+import { RED } from "../../features/legacy-core/tokens";
 
 export function Marquee() {
   const doubled = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];

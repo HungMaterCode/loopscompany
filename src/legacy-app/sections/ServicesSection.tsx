@@ -4,9 +4,9 @@ import { ChevronRight } from "lucide-react";
 import { Reveal } from "../components/ui/Reveal";
 import { SectionBg, Orb, GridPattern } from "../components/ui/SectionBg";
 import { SectionLabel } from "../components/ui/SectionLabel";
-import { SERVICES } from "../data";
-import { IMG } from "../images";
-import { RED, TEXT, TEXT60, BORDER, GLASS, EASE } from "../tokens";
+import { SERVICES } from "../../features/legacy-core/data";
+import { IMG } from "../../features/legacy-core/images";
+import { RED, TEXT, TEXT60, BORDER, GLASS, EASE } from "../../features/legacy-core/tokens";
 
 function ServiceCard({ svc, index }: { svc: typeof SERVICES[0]; index: number }) {
   const ref = useRef<HTMLDivElement>(null);

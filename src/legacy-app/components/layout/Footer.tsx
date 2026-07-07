@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { Settings } from "lucide-react";
-import { RED, TEXT, TEXT60, TEXT35, BORDER, GLASS } from "../../tokens";
+import { RED, TEXT, TEXT60, TEXT35, BORDER, GLASS } from "../../../features/legacy-core/tokens";
 
 const COLS = [
   { title: "Dịch vụ", links: ["Landing Page","Cửa hàng online","Website doanh nghiệp","SEO & Google","Thiết kế thương hiệu"] },
@@ -16,7 +16,7 @@ export function Footer() {
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 40, marginBottom: 44 }} className="footer-grid">
           {/* Brand */}
           <div>
-            <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, textDecoration: "none" }}>
+            <Link to="/" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, textDecoration: "none" }}>
               <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: RED, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 800, letterSpacing: "-0.04em" }}>LP</div>
               <span style={{ color: TEXT, fontWeight: 800, fontSize: 16, letterSpacing: "-0.04em" }}>LOOP</span>
             </Link>
@@ -54,7 +54,7 @@ export function Footer() {
                 onMouseEnter={e => (e.currentTarget.style.color = TEXT)}
                 onMouseLeave={e => (e.currentTarget.style.color = TEXT35)}>{item}</a>
             ))}
-            <Link href="/admin/dang-nhap"
+            <Link to="/admin/dang-nhap"
               style={{ display: "flex", alignItems: "center", gap: 5, color: TEXT35, fontSize: 11, textDecoration: "none", padding: "5px 11px", borderRadius: 20, border: `1px solid ${BORDER}`, transition: "all 0.2s" }}
               onMouseEnter={e => { e.currentTarget.style.color = TEXT; e.currentTarget.style.borderColor = "var(--vw-border-m)"; }}
               onMouseLeave={e => { e.currentTarget.style.color = TEXT35; e.currentTarget.style.borderColor = BORDER; }}>

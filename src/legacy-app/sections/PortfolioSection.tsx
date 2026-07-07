@@ -1,8 +1,8 @@
 import { Reveal } from "../components/ui/Reveal";
 import { SectionBg, Orb, GridPattern } from "../components/ui/SectionBg";
 import { SectionLabel } from "../components/ui/SectionLabel";
-import { PORTFOLIO } from "../data";
-import { BG, TEXT, TEXT60, TEXT35, RED, GLASS } from "../tokens";
+import { PORTFOLIO } from "../../features/legacy-core/data";
+import { BG, TEXT, TEXT60, TEXT35, RED, GLASS } from "../../features/legacy-core/tokens";
 
 const ROW1 = [...PORTFOLIO, ...PORTFOLIO];
 const ROW2 = [...[...PORTFOLIO].reverse(), ...[...PORTFOLIO].reverse()];

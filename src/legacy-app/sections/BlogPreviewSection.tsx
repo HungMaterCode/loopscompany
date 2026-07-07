@@ -3,8 +3,8 @@ import { Link } from "react-router";
 import { motion, useInView } from "motion/react";
 import { ArrowRight, Clock, Calendar } from "lucide-react";
 import { SectionLabel } from "../components/ui/SectionLabel";
-import { ARTICLES, CATEGORIES } from "../articles";
-import { RED, TEXT, TEXT60, TEXT35, BORDER, BG, EASE } from "../tokens";
+import { ARTICLES, CATEGORIES } from "../../features/legacy-core/articles";
+import { RED, TEXT, TEXT60, TEXT35, BORDER, BG, EASE } from "../../features/legacy-core/tokens";
 
 function ArticleCard({ article, index }: { article: typeof ARTICLES[0]; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -16,7 +16,7 @@ function ArticleCard({ article, index }: { article: typeof ARTICLES[0]; index: n
       animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
       transition={{ delay: index * 0.07, duration: 0.6, ease: EASE }}
     >
-      <Link href={`/bai-viet/${article.slug}`} style={{ textDecoration: "none", display: "block", height: "100%" }}>
+      <Link to={`/bai-viet/${article.slug}`} style={{ textDecoration: "none", display: "block", height: "100%" }}>
         <motion.article
           whileHover={{ y: -5 }}
           transition={{ duration: 0.25 }}
@@ -120,7 +120,7 @@ export function BlogPreviewSection() {
         </div>
 
         <div style={{ display: "flex", justifyContent: "center" }}>
-          <Link href="/bai-viet" style={{ textDecoration: "none" }}>
+          <Link to="/bai-viet" style={{ textDecoration: "none" }}>
             <motion.button
               whileHover={{ y: -2 }}
               style={{
