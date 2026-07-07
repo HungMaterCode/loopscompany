@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     "Thiết kế và thuê website chuyên nghiệp, chuẩn SEO. Giao trong 5 ngày, hỗ trợ 24/7 qua Zalo.",
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://loops.vn",
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.loops.vn",
   ),
   icons: {
     icon: "/LOOP_LOGO_removeBG.png",

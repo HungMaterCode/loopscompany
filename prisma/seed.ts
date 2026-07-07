@@ -42,7 +42,7 @@ async function main() {
       ogTitle: "Thiết Kế & Thuê Website Chuyên Nghiệp — LOOP",
       ogDescription:
         "Giao website trong 5 ngày, từ 189K/tháng. Hỗ trợ Zalo 24/7.",
-      canonical: "https://loops.vn/",
+      canonical: "https://www.loops.vn/",
     },
     {
       pageId: "team",
@@ -53,7 +53,7 @@ async function main() {
       keywords: "đội ngũ LOOP, chuyên gia thiết kế web, developer Cần Thơ",
       ogTitle: "Đội Ngũ LOOP — Chuyên Gia Thiết Kế Website",
       ogDescription: "Chuyên gia thiết kế website và SEO tại Cần Thơ.",
-      canonical: "https://loops.vn/doi-ngu",
+      canonical: "https://www.loops.vn/doi-ngu",
     },
     {
       pageId: "blog",
@@ -64,7 +64,7 @@ async function main() {
       keywords: "blog SEO, thiết kế web, marketing online",
       ogTitle: "Blog LOOP",
       ogDescription: "Bài viết SEO và thiết kế website.",
-      canonical: "https://loops.vn/bai-viet",
+      canonical: "https://www.loops.vn/bai-viet",
     },
   ];
 

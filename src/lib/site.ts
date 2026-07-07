@@ -18,6 +18,6 @@ export function getSiteUrl(path = "") {
 }
 
 export const SITE_URLS = {
-  primary: "https://loops.vn",
+  primary: "https://www.loops.vn",
   staging: "https://loopscompany.vercel.app",
 } as const;

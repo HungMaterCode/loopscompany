@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, X, Check, ExternalLink, Eye, EyeOff, Tag, Clock, Calendar } from "lucide-react";
 import { ARTICLES, CATEGORIES, type Article } from "@/features/legacy-core/articles";
 import type { TC } from "./types";
+import { generateSlug } from "@/lib/slug";
 
 type BlogItem = Article & { id?: string; status: "published" | "draft" };
 
@@ -129,7 +130,11 @@ export function BlogManager({ t, isDark }: Props) {
 
   const save = async () => {
     if (!form.title.trim()) return;
-    const slug = form.slug || form.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+    const slug = isAdding
+      ? generateSlug(form.title)
+      : (form.slug && !form.slug.startsWith("bai-viet-")
+          ? form.slug
+          : generateSlug(form.title));
     const tags = tagsInput.split(",").map((t) => t.trim()).filter(Boolean);
     const catColor = CATEGORY_COLORS[form.category] || "#D43B1F";
     const item = { ...form, slug, tags, categoryColor: catColor };
