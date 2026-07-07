@@ -1,4 +1,4 @@
-import { GLASS, TEXT35 } from "../../tokens";
+import { GLASS, TEXT35 } from "../../../features/legacy-core/tokens";
 
 interface BrowserMockupProps {
   src: string;

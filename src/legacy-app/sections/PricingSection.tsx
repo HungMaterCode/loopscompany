@@ -4,8 +4,8 @@ import { Check, X, ArrowRight } from "lucide-react";
 import { Reveal } from "../components/ui/Reveal";
 import { SectionBg, Orb, GridPattern } from "../components/ui/SectionBg";
 import { SectionLabel } from "../components/ui/SectionLabel";
-import { PLANS } from "../data";
-import { RED, TEXT, TEXT60, TEXT35, BORDER, BORDER_M, GLASS, EASE } from "../tokens";
+import { PLANS } from "../../features/legacy-core/data";
+import { RED, TEXT, TEXT60, TEXT35, BORDER, BORDER_M, GLASS, EASE } from "../../features/legacy-core/tokens";
 
 type Plan = typeof PLANS[number];
 

@@ -3,9 +3,9 @@ import { motion, useInView } from "motion/react";
 import { Check, ArrowRight, MapPin, Phone, Mail } from "lucide-react";
 import { SectionBg, Orb, GridPattern } from "../components/ui/SectionBg";
 import { SectionLabel } from "../components/ui/SectionLabel";
-import { IMG } from "../images";
-import { useSiteData } from "../SiteDataContext";
-import { RED, RED_MED, TEXT, TEXT60, TEXT35, BORDER_M, GLASS_LIGHT, EASE } from "../tokens";
+import { IMG } from "../../features/legacy-core/images";
+import { useSiteData } from "../../features/legacy-core/SiteDataContext";
+import { RED, RED_MED, TEXT, TEXT60, TEXT35, BORDER_M, GLASS_LIGHT, EASE } from "../../features/legacy-core/tokens";
 
 export function ContactSection() {
   const ref = useRef<HTMLDivElement>(null);

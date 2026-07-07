@@ -1,14 +1,22 @@
-import { createBrowserRouter, Outlet, useLocation } from "react-router";
+import { createBrowserRouter, Outlet, useLocation, useParams } from "react-router";
+import { ARTICLES } from "../features/legacy-core/articles";
 import { AnimatePresence, motion } from "motion/react";
 import { Root } from "./Root";
-import { Home } from "./pages/Home";
-import { Team } from "./pages/Team";
-import { Blog } from "./pages/Blog";
-import { BlogPost } from "./pages/BlogPost";
-import { NotFound } from "./pages/NotFound";
-import { Login } from "./pages/Login";
-import { AdminProtected } from "./pages/AdminProtected";
-import { UserLogin } from "./pages/UserLogin";
+import { Home } from "../features/home/Home";
+import { Team } from "../features/team/Team";
+import { Blog } from "../features/blog/Blog";
+import { BlogPost } from "../features/blog/BlogPost";
+import { NotFound } from "../features/home/NotFound";
+import { Login } from "../features/auth/Login";
+import { AdminProtected } from "../features/admin/AdminProtected";
+import { UserLogin } from "../features/auth/UserLogin";
+
+function BlogPostWrapper() {
+  const { slug } = useParams();
+  const article = ARTICLES.find(a => a.slug === slug);
+  if (!article) return <NotFound />;
+  return <BlogPost article={article} />;
+}
 
 function GlobalWrapper() {
   const location = useLocation();
@@ -41,7 +49,7 @@ export const router = createBrowserRouter([
 
       // Blog — standalone layout (with own Navbar/Footer)
       { path: "bai-viet", Component: Blog },
-      { path: "bai-viet/:slug", Component: BlogPost },
+      { path: "bai-viet/:slug", Component: BlogPostWrapper },
 
       // Public routes — inside Root layout
       {

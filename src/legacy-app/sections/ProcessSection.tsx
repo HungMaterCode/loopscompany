@@ -1,8 +1,8 @@
 import { Reveal } from "../components/ui/Reveal";
 import { SectionBg, Orb, GridPattern } from "../components/ui/SectionBg";
 import { SectionLabel } from "../components/ui/SectionLabel";
-import { useSiteData } from "../SiteDataContext";
-import { RED, RED_DIM, TEXT, TEXT60, TEXT35 } from "../tokens";
+import { useSiteData } from "../../features/legacy-core/SiteDataContext";
+import { RED, RED_DIM, TEXT, TEXT60, TEXT35 } from "../../features/legacy-core/tokens";
 import {
   MessageCircle, PenTool, Rocket, Headphones, Zap, Smartphone, Shield, Users, BarChart2, Star, Clock, Award, LucideIcon
 } from "lucide-react";

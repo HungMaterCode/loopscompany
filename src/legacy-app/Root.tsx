@@ -1,9 +1,9 @@
 import { Outlet, useLocation } from "react-router";
 import { useEffect } from "react";
-import { Header } from "../../Section_change";
+import { Header } from "../components/layout/Header";
 import { Footer } from "./components/layout/Footer";
 import { FloatingZalo } from "./components/layout/FloatingZalo";
-import { BG, GLOBAL_CSS } from "./tokens";
+import { BG, GLOBAL_CSS } from "../features/legacy-core/tokens";
 
 export function Root() {
   const { pathname } = useLocation();
