@@ -124,7 +124,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const session = await getSession();
-  if (!session) {
+  if (!session || session.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -160,7 +160,7 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   const session = await getSession();
-  if (!session) {
+  if (!session || session.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -196,7 +196,7 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   const session = await getSession();
-  if (!session) {
+  if (!session || session.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

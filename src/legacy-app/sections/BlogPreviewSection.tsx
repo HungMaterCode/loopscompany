@@ -33,11 +33,11 @@ function ArticleCard({ article, index }: { article: typeof ARTICLES[0]; index: n
         >
           {/* Cover image */}
           <div style={{ position: "relative", height: 200, overflow: "hidden", flexShrink: 0 }}>
-            <img src={article.cover} alt={article.title}
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform 0.5s ease" }}
-              onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.05)")}
-              onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-            />
+             <img src={article.cover || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=60"} alt={article.title}
+               style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform 0.5s ease" }}
+               onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.05)")}
+               onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+             />
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 60%)" }} />
             <span style={{
               position: "absolute", top: 14, left: 14,

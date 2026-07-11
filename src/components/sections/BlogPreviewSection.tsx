@@ -35,7 +35,7 @@ function ArticleCard({ article, index }: { article: typeof ARTICLES[0]; index: n
         >
           {/* Cover image */}
           <div style={{ position: "relative", height: 200, overflow: "hidden", flexShrink: 0 }}>
-            <img src={article.cover} alt={article.title}
+            <img src={article.cover || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=60"} alt={article.title}
               style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform 0.5s ease" }}
               onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.05)")}
               onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}

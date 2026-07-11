@@ -1,8 +1,22 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSession, verifyPassword } from "@/lib/auth";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
+  // Rate limiting: max 5 login attempts per minute per IP
+  const ip = getClientIp(request);
+  const { allowed, remaining } = checkRateLimit(`login:${ip}`, {
+    maxRequests: 5,
+    windowMs: 60 * 1000,
+  });
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Quá nhiều lần thử. Vui lòng đợi 1 phút." },
+      { status: 429 }
+    );
+  }
+
   const { email, password } = await request.json();
 
   if (!email || !password) {
@@ -28,20 +42,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true, name: user.name });
   } catch {
-    if (
-      email.trim().toLowerCase() === "admin@loops.vn" &&
-      password === "admin123"
-    ) {
-      await createSession({
-        userId: "dev-admin",
-        email: "admin@loops.vn",
-        name: "Quản trị viên LOOP",
-        role: "admin",
-        authMethod: "password",
-      });
-      return NextResponse.json({ ok: true, name: "Quản trị viên LOOP" });
-    }
-
-    return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+    return NextResponse.json({ error: "Hệ thống đang bảo trì, vui lòng thử lại sau" }, { status: 503 });
   }
 }

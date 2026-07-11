@@ -196,3 +196,15 @@ model Order {
   updatedAt DateTime @updatedAt
 }
 
+model Cloud {
+  id          Int      @id @default(autoincrement())
+  label       String
+  price       Int
+  price1Year  Int
+  price3Years Int
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+

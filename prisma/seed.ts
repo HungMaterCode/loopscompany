@@ -535,6 +535,44 @@ async function main() {
       create: svc,
     });
   }
+
+  const defaultClouds = [
+    {
+      id: 1,
+      label: "Cloud Cơ bản",
+      price: 521000,
+      price1Year: 430000,
+      price3Years: 325000,
+      order: 1,
+      active: true,
+    },
+    {
+      id: 2,
+      label: "Cloud Tiêu chuẩn",
+      price: 1195000,
+      price1Year: 809000,
+      price3Years: 596000,
+      order: 2,
+      active: true,
+    },
+    {
+      id: 3,
+      label: "Cloud Cao cấp",
+      price: 2365000,
+      price1Year: 1593000,
+      price3Years: 1165000,
+      order: 3,
+      active: true,
+    },
+  ];
+
+  for (const cloud of defaultClouds) {
+    await (prisma as any).cloud.upsert({
+      where: { id: cloud.id },
+      update: cloud,
+      create: cloud,
+    });
+  }
 }
 
 main()
