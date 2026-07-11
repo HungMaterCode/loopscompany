@@ -328,6 +328,65 @@ function AddonRow({ icon: Icon, label, desc, options, value, onChange }: {
   );
 }
 
+function CloudAddonRow({ dbClouds, selectedCloudId, onChangeCloudId, selectedCycle, onChangeCycle }: {
+  dbClouds: any[];
+  selectedCloudId: number;
+  onChangeCloudId: (id: number) => void;
+  selectedCycle: number;
+  onChangeCycle: (c: number) => void;
+}) {
+  const selectedCloud = dbClouds.find(c => c.id === selectedCloudId);
+  const selectedCloudPrice = selectedCloud
+    ? (selectedCycle === 12
+      ? selectedCloud.price1Year
+      : selectedCycle === 36
+      ? selectedCloud.price3Years
+      : selectedCloud.price)
+    : 0;
+  const totalCloudPrice = selectedCloudPrice * selectedCycle;
+
+  const cloudOpts = [
+    { label: "Không đăng ký", value: 0 },
+    ...dbClouds.map(c => ({ label: c.label, value: c.id }))
+  ];
+
+  const cycleOpts = [
+    { label: "1 tháng", value: 1 },
+    { label: "1 năm", value: 12 },
+    { label: "3 năm", value: 36 }
+  ];
+
+  return (
+    <div className="bw-addon-row" style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", borderRadius: 14, background: CONFIG.glassBg, border: `1px solid ${CONFIG.border}` }}>
+      <div style={{ width: 36, height: 36, borderRadius: 10, background: a(0.1), display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <Server size={16} color={CONFIG.accent} />
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: CONFIG.text, margin: "0 0 1px" }}>Hạ tầng cloud</p>
+        <p style={{ fontSize: 11, color: CONFIG.text35, margin: 0 }}>Lưu trữ dữ liệu tốc độ cao</p>
+      </div>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <CustomSelect options={cloudOpts} value={selectedCloudId} onChange={onChangeCloudId} />
+        {selectedCloudId > 0 && (
+          <CustomSelect options={cycleOpts} value={selectedCycle} onChange={onChangeCycle} />
+        )}
+      </div>
+      <AnimatePresence mode="popLayout">
+        {totalCloudPrice > 0 && (
+          <motion.span key={totalCloudPrice}
+            initial={{ scale: 0.5, opacity: 0, x: -10 }}
+            animate={{ scale: [1.1, 1], opacity: 1, x: 0 }}
+            exit={{ scale: 0.5, opacity: 0, x: 10 }}
+            transition={{ type: "spring", stiffness: 400, damping: 12 }}
+            style={{ fontSize: 12, fontWeight: 800, color: CONFIG.accent, background: a(0.15), border: `1px solid ${a(0.3)}`, padding: "4px 10px", borderRadius: 20, flexShrink: 0, whiteSpace: "nowrap" }}>
+            +{fmt(totalCloudPrice)}
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 // ── 5c. Package Card ──────────────────────────────────────────────────────────
 
 function PackageCard({ p, active, onClick, isRentalMode, idx, yearly }: {
@@ -394,16 +453,24 @@ function PackageCard({ p, active, onClick, isRentalMode, idx, yearly }: {
 
 // ── 5d. Preview Panel (right column) ─────────────────────────────────────────
 
-function PreviewPanel({ pkg, selectedDomains, hosting, seo, dbSeoPackages, onSubmit, yearly = false }: {
-  pkg: AnyPkg; selectedDomains: { label: string; price: number }[]; hosting: number; seo: number; dbSeoPackages: { label: string; price: number }[]; onSubmit: () => void; yearly?: boolean;
+function PreviewPanel({ pkg, selectedDomains, hosting, seo, dbSeoPackages, cloudPkgId, cloudCycle, dbClouds, onSubmit, yearly = false }: {
+  pkg: AnyPkg; selectedDomains: { label: string; price: number }[]; hosting: number; seo: number; dbSeoPackages: { label: string; price: number }[]; cloudPkgId: number; cloudCycle: number; dbClouds: any[]; onSubmit: () => void; yearly?: boolean;
 }) {
   const isRental = pkg.isRental;
-  const isLandingPage = pkg.name.toLowerCase().includes("landing");
-  const cloudInfrastructurePrice = isLandingPage ? 0 : 270000;
+  
+  const selectedCloud = dbClouds.find(c => c.id === cloudPkgId);
+  const selectedCloudPrice = selectedCloud
+    ? (cloudCycle === 12
+      ? selectedCloud.price1Year
+      : cloudCycle === 36
+      ? selectedCloud.price3Years
+      : selectedCloud.price)
+    : 0;
+  const cloudCost = selectedCloudPrice * cloudCycle;
 
   const domainPrice = selectedDomains.reduce((sum, d) => sum + d.price, 0);
   const basePrice = isRental && yearly ? getYearlyPrice(pkg.price) : pkg.price;
-  const subtotal = isRental ? basePrice + cloudInfrastructurePrice : pkg.price + domainPrice + hosting + seo + cloudInfrastructurePrice;
+  const subtotal = isRental ? basePrice : pkg.price + domainPrice + hosting + seo + cloudCost;
   const vat = Math.round(subtotal * 0.1);
   const total = isRental ? subtotal : subtotal + vat;
 
@@ -412,12 +479,11 @@ function PreviewPanel({ pkg, selectedDomains, hosting, seo, dbSeoPackages, onSub
 
   const lineItems = isRental
     ? [
-        { id: "base", label: "Gói " + pkg.name + (yearly ? " (Chu kỳ năm - giảm 20%)" : ""), value: basePrice },
-        { id: "cloud", label: "Hạ tầng cloud", value: cloudInfrastructurePrice }
+        { id: "base", label: "Gói " + pkg.name + (yearly ? " (Chu kỳ năm - giảm 20%)" : ""), value: basePrice }
       ]
     : [
       { id: "base", label: "Gói " + pkg.name, value: pkg.price },
-      { id: "cloud", label: "Hạ tầng cloud", value: cloudInfrastructurePrice },
+      ...(cloudCost > 0 && selectedCloud ? [{ id: "cloud", label: `Hạ tầng ${selectedCloud.label} (${cloudCycle === 12 ? "1 năm" : cloudCycle === 36 ? "3 năm" : "1 tháng"})`, value: cloudCost }] : []),
       ...(selectedDomains.length > 0 ? selectedDomains.map((d, index) => ({ id: `domain-${index}`, label: `Tên miền ${d.label}`, value: d.price })) : []),
       ...(hosting ? [{ id: "hosting", label: "Hosting NVMe", value: hosting }] : []),
       ...(seo ? [{ id: "seo", label: seoLabel, value: seo }] : []),
@@ -537,8 +603,8 @@ function PreviewPanel({ pkg, selectedDomains, hosting, seo, dbSeoPackages, onSub
 
 // ── 5e. Form Modal ────────────────────────────────────────────────────────────
 
-function FormModal({ pkg, total, selectedDomains, hostingPrice, seoPrice, dbHostings, dbSeoPackages, loggedInEmail, onClose, onSuccess, yearly = false }: {
-  pkg: AnyPkg; total: number; selectedDomains: { label: string; price: number }[]; hostingPrice: number; seoPrice: number; dbHostings: any[]; dbSeoPackages: any[]; loggedInEmail: string; onClose: () => void; onSuccess: (name: string, phone: string, email: string, notes: string) => void; yearly?: boolean;
+function FormModal({ pkg, total, selectedDomains, hostingPrice, seoPrice, cloudPkgId, cloudCycle, dbClouds, dbHostings, dbSeoPackages, loggedInEmail, onClose, onSuccess, yearly = false }: {
+  pkg: AnyPkg; total: number; selectedDomains: { label: string; price: number }[]; hostingPrice: number; seoPrice: number; cloudPkgId: number; cloudCycle: number; dbClouds: any[]; dbHostings: any[]; dbSeoPackages: any[]; loggedInEmail: string; onClose: () => void; onSuccess: (name: string, phone: string, email: string, notes: string) => void; yearly?: boolean;
 }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -561,6 +627,16 @@ function FormModal({ pkg, total, selectedDomains, hostingPrice, seoPrice, dbHost
      seoPrice === 6000000 ? { label: "Doanh nghiệp", description: "15 bài/tháng", price: 6000000 } :
      seoPrice === 36000000 ? { label: "Phổ biến", description: "20 bài/tháng", price: 36000000 } :
      { label: "Miễn phí", description: "5 bài/tháng", price: 0 });
+
+  const selectedCloud = dbClouds.find(c => c.id === cloudPkgId);
+  const selectedCloudPrice = selectedCloud
+    ? (cloudCycle === 12
+      ? selectedCloud.price1Year
+      : cloudCycle === 36
+      ? selectedCloud.price3Years
+      : selectedCloud.price)
+    : 0;
+  const cloudCost = selectedCloudPrice * cloudCycle;
 
   const inp: CSSProperties = { width: "100%", boxSizing: "border-box", background: CONFIG.glassBg, border: `1.5px solid ${CONFIG.borderM}`, borderRadius: 12, padding: "13px 16px", fontSize: 14, color: CONFIG.text, outline: "none", transition: "border-color 0.2s, box-shadow 0.2s" };
 
@@ -601,14 +677,16 @@ function FormModal({ pkg, total, selectedDomains, hostingPrice, seoPrice, dbHost
                 </div>
               )}
 
-              <div>
-                <p style={{ fontSize: 10, fontWeight: 700, color: CONFIG.text35, textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 4px" }}>Hạ tầng cloud:</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: CONFIG.accent, background: a(0.12), border: `1px solid ${a(0.25)}`, padding: "2px 8px", borderRadius: 20 }}>
-                    {pkg.name.toLowerCase().includes("landing") ? "0đ" : fmt(270000)}
-                  </span>
+              {selectedCloud && (
+                <div>
+                  <p style={{ fontSize: 10, fontWeight: 700, color: CONFIG.text35, textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 4px" }}>Hạ tầng cloud:</p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: CONFIG.accent, background: a(0.12), border: `1px solid ${a(0.25)}`, padding: "2px 8px", borderRadius: 20 }}>
+                      {selectedCloud.label} ({cloudCycle === 12 ? "1 năm" : cloudCycle === 36 ? "3 năm" : "1 tháng"}) (+{fmt(cloudCost)})
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div>
                 <p style={{ fontSize: 10, fontWeight: 700, color: CONFIG.text35, textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 4px" }}>Hosting NVMe đã chọn:</p>
@@ -720,8 +798,8 @@ function FormModal({ pkg, total, selectedDomains, hostingPrice, seoPrice, dbHost
 
 // ── 5f. Success Screen ────────────────────────────────────────────────────────
 
-function SuccessScreen({ name, phone, email, pkg, total, selectedDomains, hostingPrice, seoPrice, dbHostings, dbSeoPackages, onBack, yearly = false }: {
-  name: string; phone: string; email: string; pkg: AnyPkg; total: number; selectedDomains: { label: string; price: number }[]; hostingPrice: number; seoPrice: number; dbHostings: any[]; dbSeoPackages: any[]; onBack?: () => void; yearly?: boolean;
+function SuccessScreen({ name, phone, email, pkg, total, selectedDomains, hostingPrice, seoPrice, cloudPkgId, cloudCycle, dbClouds, dbHostings, dbSeoPackages, onBack, yearly = false }: {
+  name: string; phone: string; email: string; pkg: AnyPkg; total: number; selectedDomains: { label: string; price: number }[]; hostingPrice: number; seoPrice: number; cloudPkgId: number; cloudCycle: number; dbClouds: any[]; dbHostings: any[]; dbSeoPackages: any[]; onBack?: () => void; yearly?: boolean;
 }) {
   const selectedHosting = dbHostings.find(h => h.price === hostingPrice) || 
     (hostingPrice === 500000 ? { label: "5GB NVMe", price: 500000 } :
@@ -733,6 +811,16 @@ function SuccessScreen({ name, phone, email, pkg, total, selectedDomains, hostin
      seoPrice === 6000000 ? { label: "Doanh nghiệp", description: "15 bài/tháng", price: 6000000 } :
      seoPrice === 36000000 ? { label: "Phổ biến", description: "20 bài/tháng", price: 36000000 } :
      { label: "Miễn phí", description: "5 bài/tháng", price: 0 });
+
+  const selectedCloud = dbClouds.find(c => c.id === cloudPkgId);
+  const selectedCloudPrice = selectedCloud
+    ? (cloudCycle === 12
+      ? selectedCloud.price1Year
+      : cloudCycle === 36
+      ? selectedCloud.price3Years
+      : selectedCloud.price)
+    : 0;
+  const cloudCost = selectedCloudPrice * cloudCycle;
 
   return (
     <div style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "80px 24px", textAlign: "center" }}>
@@ -753,7 +841,7 @@ function SuccessScreen({ name, phone, email, pkg, total, selectedDomains, hostin
           style={{ ...glass, borderRadius: 20, padding: "24px 28px", marginBottom: 28, textAlign: "left" }}>
           {[
             { l: "Gói", v: pkg.name },
-            { l: "Hạ tầng cloud", v: pkg.name.toLowerCase().includes("landing") ? "0đ" : fmt(270000) },
+            ...(!pkg.isRental && selectedCloud ? [{ l: "Hạ tầng cloud", v: `${selectedCloud.label} (${cloudCycle === 12 ? "1 năm" : cloudCycle === 36 ? "3 năm" : "1 tháng"}) (+${fmt(cloudCost)})` }] : []),
             ...(!pkg.isRental && selectedDomains.length > 0 ? [{ l: "Tên miền", v: selectedDomains.map(d => d.label).join(", ") }] : []),
             ...(!pkg.isRental ? [{ l: "Hosting NVMe", v: `${selectedHosting.label} (${selectedHosting.price > 0 ? `+${fmt(selectedHosting.price)}` : "Kèm theo gói"})` }] : []),
             ...(!pkg.isRental ? [{ l: "Dịch vụ SEO", v: `${selectedSeo.label} ${selectedSeo.description ? `(${selectedSeo.description})` : ""} (${selectedSeo.price > 0 ? `+${fmt(selectedSeo.price)}` : "Miễn phí"})` }] : []),
@@ -1512,6 +1600,9 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
   const [rentPkg, setRentPkg] = useState(RENT_PACKAGES[2]);
   const [hosting, setHosting] = useState(0);
   const [seo, setSeo] = useState(0);
+  const [dbClouds, setDbClouds] = useState<{ id: number; label: string; price: number; price1Year: number; price3Years: number }[]>([]);
+  const [cloudPkgId, setCloudPkgId] = useState<number>(0);
+  const [cloudCycle, setCloudCycle] = useState<number>(1);
   const [showForm, setShowForm] = useState(false);
   const [success, setSuccess] = useState(false);
   const [custName, setCustName] = useState("");
@@ -1647,6 +1738,29 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
         setDbSeoPackages(fallbackSeo);
         setSeo(0);
       });
+
+    fetch("/api/clouds")
+      .then((res) => res.json())
+      .then((data) => {
+        const fallbackClouds = [
+          { id: 1, label: "Cloud Cơ bản", price: 521000, price1Year: 430000, price3Years: 325000 },
+          { id: 2, label: "Cloud Tiêu chuẩn", price: 1195000, price1Year: 809000, price3Years: 596000 },
+          { id: 3, label: "Cloud Cao cấp", price: 2365000, price1Year: 1593000, price3Years: 1165000 },
+        ];
+        if (Array.isArray(data) && data.length > 0) {
+          setDbClouds(data);
+        } else {
+          setDbClouds(fallbackClouds);
+        }
+      })
+      .catch(() => {
+        const fallbackClouds = [
+          { id: 1, label: "Cloud Cơ bản", price: 521000, price1Year: 430000, price3Years: 325000 },
+          { id: 2, label: "Cloud Tiêu chuẩn", price: 1195000, price1Year: 809000, price3Years: 596000 },
+          { id: 3, label: "Cloud Cao cấp", price: 2365000, price1Year: 1593000, price3Years: 1165000 },
+        ];
+        setDbClouds(fallbackClouds);
+      });
   }, []);
 
   const isRentalMode = mode === "thue";
@@ -1694,11 +1808,18 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
       { label: "Phổ biến (20 bài/tháng) +36.000.000đ", value: 36000000 }
     ];
 
-  const isLandingPage = activePkg.name.toLowerCase().includes("landing");
-  const cloudInfrastructurePrice = isLandingPage ? 0 : 270000;
+  const selectedCloud = dbClouds.find(c => c.id === cloudPkgId);
+  const selectedCloudPrice = selectedCloud
+    ? (cloudCycle === 12
+      ? selectedCloud.price1Year
+      : cloudCycle === 36
+      ? selectedCloud.price3Years
+      : selectedCloud.price)
+    : 0;
+  const cloudCost = selectedCloudPrice * cloudCycle;
 
   const baseRentPrice = isRentalMode && yearly ? getYearlyPrice(rentPkg.price) : rentPkg.price;
-  const subtotal = isRentalMode ? baseRentPrice + cloudInfrastructurePrice : pkg.price + domainPrice + hosting + seo + cloudInfrastructurePrice;
+  const subtotal = isRentalMode ? baseRentPrice : pkg.price + domainPrice + hosting + seo + cloudCost;
   const total = isRentalMode ? subtotal : subtotal + Math.round(subtotal * 0.1);
 
   const handleModeChange = (next: "thue" | "mua") => {
@@ -1707,6 +1828,8 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
     setSelectedDomains([]);
     setHosting(dbHostings.length > 0 ? dbHostings[0].price : 0);
     setSeo(dbSeoPackages.length > 0 ? dbSeoPackages[0].price : 0);
+    setCloudPkgId(0);
+    setCloudCycle(1);
   };
 
   const handleSuccess = async (n: string, p: string, e: string, notes: string) => {
@@ -1717,7 +1840,6 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
         packageName: activePkg.name,
         packagePrice: yearly ? getYearlyPrice(activePkg.price) : activePkg.price,
         billingCycle: yearly ? "yearly" : "monthly",
-        cloudInfrastructurePrice
       };
     } else {
       const selectedHosting = dbHostings.find(h => h.price === hosting) || { label: "2GB NVMe (Mặc định)", price: 0 };
@@ -1734,7 +1856,11 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
           label: selectedSeo.label,
           price: selectedSeo.price
         },
-        cloudInfrastructurePrice
+        cloudInfrastructure: selectedCloud ? {
+          label: selectedCloud.label,
+          cycle: cloudCycle === 12 ? "1 năm" : cloudCycle === 36 ? "3 năm" : "1 tháng",
+          price: cloudCost
+        } : null
       };
     }
 
@@ -1840,7 +1966,7 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
       {/* ── SUCCESS ── */}
       {success && (
         <div style={{ paddingTop: 80 }}>
-          <SuccessScreen name={custName} phone={custPhone} email={custEmail} pkg={activePkg} total={total} selectedDomains={selectedDomains} hostingPrice={hosting} seoPrice={seo} dbHostings={dbHostings} dbSeoPackages={dbSeoPackages} yearly={yearly}
+          <SuccessScreen name={custName} phone={custPhone} email={custEmail} pkg={activePkg} total={total} selectedDomains={selectedDomains} hostingPrice={hosting} seoPrice={seo} cloudPkgId={cloudPkgId} cloudCycle={cloudCycle} dbClouds={dbClouds} dbHostings={dbHostings} dbSeoPackages={dbSeoPackages} yearly={yearly}
             onBack={() => { setSuccess(false); setCustName(""); setCustPhone(""); setCustEmail(""); setSelectedDomains([]); }} />
         </div>
       )}
@@ -1929,6 +2055,7 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
                     </AnimatePresence>
                     <AddonRow icon={Server} label="Hosting NVMe" desc="Nâng cấp dung lượng cloud" options={hostingOpts} value={hosting} onChange={setHosting} />
                     <AddonRow icon={Search} label="Gói dịch vụ SEO" desc="Tối ưu hóa công cụ tìm kiếm" options={seoOpts} value={seo} onChange={setSeo} />
+                    <CloudAddonRow dbClouds={dbClouds} selectedCloudId={cloudPkgId} onChangeCloudId={setCloudPkgId} selectedCycle={cloudCycle} onChangeCycle={setCloudCycle} />
                   </div>
                 </motion.div>
               )}
@@ -1952,7 +2079,7 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
           >
-            <PreviewPanel pkg={activePkg} selectedDomains={selectedDomains} hosting={hosting} seo={seo} dbSeoPackages={dbSeoPackages} onSubmit={() => setShowForm(true)} yearly={yearly} />
+            <PreviewPanel pkg={activePkg} selectedDomains={selectedDomains} hosting={hosting} seo={seo} dbSeoPackages={dbSeoPackages} cloudPkgId={cloudPkgId} cloudCycle={cloudCycle} dbClouds={dbClouds} onSubmit={() => setShowForm(true)} yearly={yearly} />
           </motion.div>
         </div>
       )}
@@ -1965,7 +2092,7 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
 
       <AnimatePresence>
         {showForm && (
-          <FormModal pkg={activePkg} total={total} selectedDomains={selectedDomains} hostingPrice={hosting} seoPrice={seo} dbHostings={dbHostings} dbSeoPackages={dbSeoPackages} loggedInEmail={loggedInEmail} onClose={() => setShowForm(false)} onSuccess={handleSuccess} yearly={yearly} />
+          <FormModal pkg={activePkg} total={total} selectedDomains={selectedDomains} hostingPrice={hosting} seoPrice={seo} cloudPkgId={cloudPkgId} cloudCycle={cloudCycle} dbClouds={dbClouds} dbHostings={dbHostings} dbSeoPackages={dbSeoPackages} loggedInEmail={loggedInEmail} onClose={() => setShowForm(false)} onSuccess={handleSuccess} yearly={yearly} />
         )}
       </AnimatePresence>
 

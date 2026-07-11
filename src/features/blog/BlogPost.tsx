@@ -151,7 +151,7 @@ function RelatedCard({ article, index }: { article: typeof ARTICLES[0]; index: n
         <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}
           style={{ ...GLASS, borderRadius: 16, overflow: "hidden" }}>
           <div style={{ height: 140, overflow: "hidden" }}>
-            <img src={article.cover} alt={article.title}
+            <img src={article.cover || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=60"} alt={article.title}
               style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform 0.4s ease" }}
               onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.06)")}
               onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
@@ -225,7 +225,7 @@ export function BlogPost({ article, allArticles, bgUrl }: { article: Article; al
       <section style={{ position: "relative", paddingTop: 80, overflow: "hidden" }}>
         <div style={{ position: "relative", height: "clamp(280px, 42vw, 500px)", overflow: "hidden" }}>
           <motion.img
-            src={article.cover} alt={article.title}
+            src={article.cover || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=60"} alt={article.title}
             initial={{ scale: 1.08 }}
             animate={{ scale: 1 }}
             transition={{ duration: 1.2, ease: EASE }}

@@ -8,6 +8,7 @@ export type AdminTab =
   | "hostings"
   | "domains"
   | "seoPackages"
+  | "clouds"
   | "portfolio"
   | "services"
   | "blog"

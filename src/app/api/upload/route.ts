@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSession } from "@/lib/auth";
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -19,7 +20,18 @@ const r2Client = new S3Client({
   },
 });
 
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"];
+const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/ogg", "video/quicktime"];
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
+
 export async function POST(request: Request) {
+  // Auth check — only admin can upload
+  const session = await getSession();
+  if (!session || session.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type");
@@ -30,11 +42,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
+    // File type validation
+    const isVideo = ALLOWED_VIDEO_TYPES.includes(file.type) ||
+                    /\.(mp4|webm|ogg|mov)$/i.test(file.name);
+    const isImage = ALLOWED_IMAGE_TYPES.includes(file.type) ||
+                    /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(file.name);
+
+    if (!isVideo && !isImage) {
+      return NextResponse.json(
+        { error: "Loại file không được hỗ trợ. Chỉ chấp nhận ảnh (JPG, PNG, WebP, GIF, SVG) và video (MP4, WebM, OGG, MOV)." },
+        { status: 400 }
+      );
+    }
+
+    // File size validation
+    const maxSize = isVideo ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE;
+    if (file.size > maxSize) {
+      const maxMB = maxSize / (1024 * 1024);
+      return NextResponse.json(
+        { error: `File quá lớn. Giới hạn: ${maxMB}MB cho ${isVideo ? "video" : "ảnh"}.` },
+        { status: 400 }
+      );
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-
-    const isVideo = file.type.startsWith("video/") || 
-                    /\.(mp4|webm|ogg|mov|avi|mkv)$/i.test(file.name);
 
     if (isVideo && process.env.R2_BUCKET_NAME && process.env.R2_ACCOUNT_ID) {
       const uniqueFileName = `${Date.now()}-${file.name.replace(/\s+/g, "_")}`;

@@ -5,7 +5,7 @@ import {
   BarChart3, Eye, Layers3, LogOut, MonitorSmartphone, Palette,
   Search, Settings2, ShieldCheck, Sparkles, Globe, Menu, X,
   BookOpen, Users, UserSquare2, Laptop, Server, TrendingUp,
-  ShoppingBag,
+  ShoppingBag, Cloud,
 } from "lucide-react";
 import { tc, type AdminTheme, type AdminTab } from "./admin/types";
 import { Dashboard } from "./admin/Dashboard";
@@ -15,6 +15,7 @@ import { WebPageManager } from "./admin/WebPageManager";
 import { HostingManager } from "./admin/HostingManager";
 import { DomainManager } from "./admin/DomainManager";
 import { SeoPackageManager } from "./admin/SeoPackageManager";
+import { CloudManager } from "./admin/CloudManager";
 import { PortfolioManager } from "./admin/PortfolioManager";
 import { ServicesManager } from "./admin/ServicesManager";
 import { BlogManager } from "./admin/BlogManager";
@@ -32,6 +33,7 @@ const NAV_ITEMS: { id: AdminTab; label: string; icon: typeof Layers3; group?: st
   { id: "pricing",     label: "Bảng giá",     icon: MonitorSmartphone, group: "content" },
   { id: "webpages",    label: "Gói web", icon: Laptop,         group: "content" },
   { id: "hostings",    label: "Gói hosting",  icon: Server,            group: "content" },
+  { id: "clouds",      label: "Gói hạ tầng cloud", icon: Cloud,         group: "content" },
   { id: "domains",     label: "Gói tên miền",  icon: Globe,             group: "content" },
   { id: "seoPackages", label: "Gói SEO",       icon: TrendingUp,        group: "content" },
   { id: "portfolio",   label: "Dự án",        icon: BarChart3,         group: "content" },
@@ -225,6 +227,7 @@ export function Admin({
             {activeTab === "pricing"    && <PricingManager t={t} isDark={isDark} />}
             {activeTab === "webpages"   && <WebPageManager t={t} isDark={isDark} />}
             {activeTab === "hostings"   && <HostingManager t={t} isDark={isDark} />}
+            {activeTab === "clouds"     && <CloudManager t={t} isDark={isDark} />}
             {activeTab === "domains"    && <DomainManager t={t} isDark={isDark} />}
             {activeTab === "seoPackages" && <SeoPackageManager t={t} isDark={isDark} />}
             {activeTab === "portfolio"  && <PortfolioManager t={t} isDark={isDark} />}

@@ -1,7 +1,21 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
+  // Rate limiting: max 3 contact submissions per minute per IP
+  const ip = getClientIp(request);
+  const { allowed } = checkRateLimit(`contact:${ip}`, {
+    maxRequests: 3,
+    windowMs: 60 * 1000,
+  });
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau." },
+      { status: 429 }
+    );
+  }
+
   const body = await request.json();
   const { name, email, phone, message, source = "website", details } = body;
 
