@@ -1651,12 +1651,32 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
         const timer = setTimeout(() => {
           const element = document.getElementById("select-package-section");
           if (element) {
+            const html = document.documentElement;
+            const originalScrollBehavior = html.style.scrollBehavior;
+
+            // 1. Reset scroll position to top instantly (without animation)
+            html.style.scrollBehavior = "auto";
+            window.scrollTo(0, 0);
+
+            // Force layout flush so window.pageYOffset registers as 0
+            const _ = html.offsetHeight;
+
+            // 2. Calculate coordinates from the top (yOffset includes header gap)
             const yOffset = -120;
             const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+            // 3. Perform a clean smooth scroll downwards from top (y=0) to target
+            html.style.scrollBehavior = "smooth";
             window.scrollTo({ top: y, behavior: "smooth" });
+
+            // 4. Restore original scroll behavior after animation completes
+            setTimeout(() => {
+              html.style.scrollBehavior = originalScrollBehavior;
+            }, 800);
+
             hasScrolledRef.current = true;
           }
-        }, 500);
+        }, 600);
         return () => clearTimeout(timer);
       }
     }
