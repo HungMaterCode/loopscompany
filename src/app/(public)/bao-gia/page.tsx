@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import BaogiaWeb from "@/features/baogia/BaogiaWeb";
 import { buildMetadata } from "@/lib/seo";
 
@@ -10,7 +11,9 @@ export const metadata = buildMetadata({
 export default function BaoGiaPage() {
   return (
     <main>
-      <BaogiaWeb />
+      <Suspense fallback={null}>
+        <BaogiaWeb />
+      </Suspense>
     </main>
   );
 }

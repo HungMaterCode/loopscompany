@@ -104,6 +104,10 @@ export async function getSiteConfig(): Promise<SiteConfig> {
           ...DEFAULT_SITE_CONFIG.process,
           ...(dbConfig.process || {}),
         },
+        sectionsVisibility: {
+          ...DEFAULT_SITE_CONFIG.sectionsVisibility,
+          ...(dbConfig.sectionsVisibility || {}),
+        },
       };
     } else {
       return {

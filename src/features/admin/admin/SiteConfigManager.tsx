@@ -14,7 +14,7 @@ export function SiteConfigManager({ t, isDark }: Props) {
   const [form, setForm] = useState<SiteConfig | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'banners' | 'philosophy' | 'whyChooseUs' | 'process' | 'sectionBgs'>('banners');
+  const [activeTab, setActiveTab] = useState<'banners' | 'philosophy' | 'whyChooseUs' | 'process' | 'sectionBgs' | 'sections'>('banners');
 
   // Sync form when config is loaded
   useEffect(() => {
@@ -228,6 +228,7 @@ export function SiteConfigManager({ t, isDark }: Props) {
           { id: 'whyChooseUs', label: 'Tại sao chọn chúng tôi' },
           { id: 'process', label: 'Quy trình làm việc' },
           { id: 'sectionBgs', label: 'Hình nền Section' },
+          { id: 'sections', label: 'Quản lý Section' },
         ].map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
             className={`px-6 py-3 text-sm font-semibold transition-all border-b-2 ${activeTab === tab.id ? 'border-red-500 text-red-500' : `border-transparent ${t.textMuted} hover:${t.text}`}`}>
@@ -899,6 +900,70 @@ export function SiteConfigManager({ t, isDark }: Props) {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+        {activeTab === 'sections' && (
+          <div className={`rounded-2xl p-6 ${t.card}`}>
+            <h3 className={`mb-6 text-lg font-bold ${t.text}`}>Bật/Tắt hiển thị các Section trên Website</h3>
+            <p className={`mb-6 text-sm ${t.textMuted}`}>Các thay đổi dưới đây sẽ quyết định những phần nào được hiển thị trên trang chủ của bạn.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { key: 'hero', label: 'Banners Chính (Hero Carousel)' },
+                { key: 'marquee', label: 'Dải chữ chạy (Marquee)' },
+                { key: 'creativeVision', label: 'Triết lý của chúng tôi (Creative Vision)' },
+                { key: 'service', label: 'Section Dịch vụ (Services)' },
+                { key: 'whyChooseUs', label: 'Tại sao chọn chúng tôi (Why Choose Us)' },
+                { key: 'portfolio', label: 'Dự án đã thực hiện (Portfolio)' },
+                { key: 'process', label: 'Quy trình làm việc (Work Process)' },
+                { key: 'pricing', label: 'Gói thuê website (Rental Pricing)' },
+                { key: 'blog', label: 'Bài viết mới nhất (Blog Preview)' },
+                { key: 'contact', label: 'Section Liên hệ (Contact Form)' },
+              ].map(sec => {
+                const isVisible = form.sectionsVisibility?.[sec.key as keyof typeof form.sectionsVisibility] !== false;
+                return (
+                  <div key={sec.key} className="flex items-center justify-between p-4 rounded-xl border border-white/[0.05] bg-white/[0.01]">
+                    <div>
+                      <h4 className={`text-sm font-semibold ${t.text}`}>{sec.label}</h4>
+                      <p className={`text-xs ${t.textFaint}`}>
+                        Trạng thái: <span className={isVisible ? 'text-emerald-500 font-semibold' : 'text-red-500 font-semibold'}>
+                          {isVisible ? 'Đang bật' : 'Đang ẩn'}
+                        </span>
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newVisibility = {
+                          ...(form.sectionsVisibility || {
+                            hero: true,
+                            marquee: true,
+                            creativeVision: true,
+                            service: true,
+                            whyChooseUs: true,
+                            portfolio: true,
+                            process: true,
+                            pricing: true,
+                            blog: true,
+                            contact: true,
+                          }),
+                          [sec.key]: !isVisible
+                        };
+                        setForm({ ...form, sectionsVisibility: newVisibility });
+                      }}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${
+                        isVisible ? 'bg-emerald-500' : 'bg-gray-700'
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                          isVisible ? 'translate-x-5' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

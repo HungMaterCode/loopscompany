@@ -108,6 +108,18 @@ export interface SiteConfig {
   blog: {
     bgUrl: string;
   };
+  sectionsVisibility?: {
+    hero?: boolean;
+    marquee?: boolean;
+    creativeVision?: boolean;
+    service?: boolean;
+    whyChooseUs?: boolean;
+    portfolio?: boolean;
+    process?: boolean;
+    pricing?: boolean;
+    blog?: boolean;
+    contact?: boolean;
+  };
 }
 
 export const DEFAULT_SITE_CONFIG: SiteConfig = {
@@ -225,6 +237,18 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
   },
   blog: {
     bgUrl: "",
+  },
+  sectionsVisibility: {
+    hero: true,
+    marquee: true,
+    creativeVision: true,
+    service: true,
+    whyChooseUs: true,
+    portfolio: true,
+    process: true,
+    pricing: true,
+    blog: true,
+    contact: true,
   },
 };
 
