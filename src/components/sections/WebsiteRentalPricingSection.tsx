@@ -236,7 +236,7 @@ export function WebsiteRentalPricingSection() {
                       ))}
                     </div>
 
-                    <button onClick={() => router.push('/bao-gia')}
+                    <button onClick={() => router.push(`/bao-gia?plan=${plan.id.replace('W-', 'R-')}`)}
                       style={{ width: '100%', borderRadius: '9999px', padding: '11px 8px', background: isFeat ? 'var(--sc-accent)' : 'var(--sc-card-bg)', border: isFeat ? 'none' : '1px solid var(--sc-border-h)', color: isFeat ? '#fff' : 'var(--sc-text)', fontFamily: F, fontSize: '12px', fontWeight: 700, cursor: 'pointer', letterSpacing: '0.03em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', transition: 'all 0.2s' }}
                       onMouseEnter={e => { if (!isFeat) (e.currentTarget as HTMLElement).style.background = 'var(--sc-border-m)'; }}
                       onMouseLeave={e => { if (!isFeat) (e.currentTarget as HTMLElement).style.background = 'var(--sc-card-bg)'; }}

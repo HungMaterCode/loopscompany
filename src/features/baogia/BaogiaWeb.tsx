@@ -18,6 +18,7 @@
  */
 
 import { useState, useRef, useEffect, type ReactNode, type CSSProperties } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Check, X, Star, Send, ChevronDown, Globe, Server, ShieldCheck,
@@ -1582,8 +1583,18 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
   }, [isDesktop]);
 
   const [loggedInEmail, setLoggedInEmail] = useState("");
+  const hasScrolledRef = useRef(false);
 
   useEffect(() => {
+    // Reset scroll to top instantly to prevent browser scroll restoration from starting at the bottom
+    const html = document.documentElement;
+    const originalScrollBehavior = html.style.scrollBehavior;
+    html.style.scrollBehavior = "auto";
+    window.scrollTo(0, 0);
+    // Force layout flush so scroll position is updated before restoring behavior
+    const _ = html.offsetHeight;
+    html.style.scrollBehavior = originalScrollBehavior;
+
     fetch("/api/auth/me")
       .then((res) => res.json())
       .then((data) => {
@@ -1594,10 +1605,63 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
       .catch((err) => console.error(err));
   }, []);
 
+  const searchParams = useSearchParams();
+  const planParam = searchParams.get("plan");
+  const modeParam = searchParams.get("mode");
+
   const [mode, setMode] = useState<"thue" | "mua">("thue");
   const [yearly, setYearly] = useState(false);
   const [pkg, setPkg] = useState(initPkg);
   const [rentPkg, setRentPkg] = useState(RENT_PACKAGES[2]);
+  const [packagesList, setPackagesList] = useState<any[]>([]);
+
+  // Handle mode and package synchronization from URL query parameters
+  useEffect(() => {
+    if (modeParam === "thue" || modeParam === "mua") {
+      setMode(modeParam);
+    }
+  }, [modeParam]);
+
+  useEffect(() => {
+    if (planParam) {
+      const matchedPkg = packagesList.find(p => p.id === planParam);
+      if (matchedPkg) {
+        if (matchedPkg.isRental) {
+          setMode("thue");
+          setRentPkg(matchedPkg);
+        } else {
+          setMode("mua");
+          setPkg(matchedPkg);
+        }
+      } else {
+        // Fallback matching using static package data
+        const rentPkgMatch = RENT_PACKAGES.find(p => p.id === planParam);
+        const pkgMatch = PACKAGES.find(p => p.id === planParam);
+        if (rentPkgMatch) {
+          setMode("thue");
+          setRentPkg(rentPkgMatch);
+        } else if (pkgMatch) {
+          setMode("mua");
+          setPkg(pkgMatch);
+        }
+      }
+
+      // Smooth scroll to the package selector section only once, leaving 120px gap for sticky header
+      if (!hasScrolledRef.current) {
+        const timer = setTimeout(() => {
+          const element = document.getElementById("select-package-section");
+          if (element) {
+            const yOffset = -120;
+            const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({ top: y, behavior: "smooth" });
+            hasScrolledRef.current = true;
+          }
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [planParam, packagesList]);
+
   const [hosting, setHosting] = useState(0);
   const [seo, setSeo] = useState(0);
   const [dbClouds, setDbClouds] = useState<{ id: number; label: string; price: number; price1Year: number; price3Years: number }[]>([]);
@@ -1615,8 +1679,6 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
   const [dbHostings, setDbHostings] = useState<{ id: string; label: string; price: number }[]>([]);
   const [dbSeoPackages, setDbSeoPackages] = useState<{ id: string; label: string; description: string; price: number }[]>([]);
   const domainPrice = selectedDomains.reduce((sum, d) => sum + d.price, 0);
-
-  const [packagesList, setPackagesList] = useState<any[]>([]);
 
   useEffect(() => {
     // Fetch domain list from backend
@@ -1990,7 +2052,7 @@ export default function BaogiaWeb({ renderHeader, renderFooter, initialPlan = "W
             }}
           >
             {/* Step 01 */}
-            <div>
+            <div id="select-package-section">
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
                 <span style={{ width: 28, height: 28, borderRadius: 8, background: CONFIG.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "#fff", flexShrink: 0 }}>01</span>
                 <h2 style={{ color: CONFIG.text, fontSize: 18, fontWeight: 800, letterSpacing: "-0.02em", margin: 0 }}>Chọn gói dịch vụ</h2>

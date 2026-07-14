@@ -21,10 +21,10 @@ const COLS = [
   {
     title: "Bảng giá",
     links: [
-      { label: "W-01 — 189K/tháng", href: "/bao-gia" },
-      { label: "W-02 — 589K/tháng", href: "/bao-gia" },
-      { label: "W-03 — 889K/tháng", href: "/bao-gia" },
-      { label: "W-04 — 1.189K/tháng", href: "/bao-gia" },
+      { label: "W-01 — 189K/tháng", href: "/bao-gia?plan=R-01" },
+      { label: "W-02 — 589K/tháng", href: "/bao-gia?plan=R-02" },
+      { label: "W-03 — 889K/tháng", href: "/bao-gia?plan=R-03" },
+      { label: "W-04 — 1.189K/tháng", href: "/bao-gia?plan=R-04" },
       { label: "Tất cả bảng giá", href: "/bao-gia" }
     ]
   },
