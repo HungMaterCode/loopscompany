@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { MessageCircle, Facebook, Phone, Mail, ArrowUpRight } from 'lucide-react';
 import { useTilt3D } from '@/hooks/useTilt3D';
 import { useTheme } from '@/features/legacy-core/theme-context';
+import { useRouter } from 'next/navigation';
 
 const F = "inherit";
 const SERIF = "'Instrument Serif', serif";
@@ -112,9 +113,15 @@ const FRAME_DEPTH = 14;
 
 function TeamCard({ member, index }: { member: TeamMember; index: number }) {
   const tilt = useTilt3D(6, 900);
+  const router = useRouter();
   const edgeDark = '#C8C3B5';
   const edgeDark2 = '#B0ABA0';
   const frameShadow = `${FRAME_DEPTH}px ${FRAME_DEPTH}px 0 #C8C3B5, ${FRAME_DEPTH * 2}px ${FRAME_DEPTH * 2}px 0 #B0ABA0, ${FRAME_DEPTH * 2}px ${FRAME_DEPTH * 2}px 36px rgba(26,20,10,0.12)`;
+
+  const handleCardClick = () => {
+    const id = member.id || member.name.replace(/\s+/g, '-').toLowerCase();
+    router.push(`/doi-ngu/${id}`);
+  };
 
   return (
     <motion.div
@@ -128,7 +135,8 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
         ref={tilt.ref}
         onMouseMove={tilt.onMouseMove}
         onMouseLeave={tilt.onMouseLeave}
-        style={{ cursor: 'pointer', willChange: 'transform', position: 'relative' }}
+        onClick={handleCardClick}
+        style={{ cursor: 'pointer', willChange: 'transform', position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}
       >
         {/* Portrait */}
         <div style={{ position: 'relative', boxShadow: frameShadow, borderRadius: '4px' }}>
@@ -192,7 +200,7 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
         </div>
 
         {/* Info */}
-        <div style={{ marginTop: '36px', paddingLeft: '4px' }}>
+        <div style={{ marginTop: '36px', paddingLeft: '4px', flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div style={{ fontFamily: F, fontSize: '17px', fontWeight: 600, color: 'var(--sc-text)', letterSpacing: '-0.01em', marginBottom: '3px' }}>{member.name}</div>
           <div style={{ fontFamily: F, fontSize: '10px', color: 'var(--sc-accent)', letterSpacing: '0.08em', marginBottom: '10px', fontWeight: 600 }}>{member.role}</div>
           <p style={{ fontFamily: F, fontSize: '12px', color: 'var(--sc-text-60)', lineHeight: 1.7, margin: '0 0 14px', fontStyle: 'italic', textAlign: 'justify' }}>{member.bio}</p>
@@ -212,7 +220,7 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
           </div>
 
           {/* Stats */}
-          <div style={{ display: 'flex', gap: '20px', marginBottom: '14px' }}>
+          <div style={{ display: 'flex', gap: '20px', marginBottom: '14px', marginTop: 'auto' }}>
             <div>
               <div style={{ fontFamily: SERIF, fontSize: '22px', color: 'var(--sc-text)', fontWeight: 300, lineHeight: 1 }}>{member.projects}+</div>
               <div style={{ fontFamily: F, fontSize: '10px', color: 'var(--sc-text-60)', marginTop: '3px' }}>Dự án</div>
@@ -224,7 +232,7 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
           </div>
 
           {/* Social links */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }} onClick={(e) => e.stopPropagation()}>
             {[
               { name: 'Zalo', icon: MessageCircle, value: member.zalo || member.socials?.zalo },
               { name: 'Facebook', icon: Facebook, value: member.facebook || member.socials?.facebook },
@@ -355,7 +363,7 @@ export default function TeamPage() {
             </p>
           </motion.div>
 
-          <div style={{ display: 'flex', gap: '60px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', gap: '60px', flexWrap: 'wrap', alignItems: 'stretch' }}>
             {members.map((member, i) => (
               <TeamCard key={member.id || member.name} member={member} index={i} />
             ))}

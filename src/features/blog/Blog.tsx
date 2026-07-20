@@ -22,8 +22,9 @@ function ArticleCard({ article, index }: { article: typeof ARTICLES[0]; index: n
       initial={{ opacity: 0, y: 32, scale: 0.96 }}
       animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
       transition={{ delay: index * 0.07, duration: 0.6, ease: EASE }}
+      style={{ height: "100%" }}
     >
-      <Link href={`/bai-viet/${article.slug}`} style={{ textDecoration: "none", display: "block" }}>
+      <Link href={`/bai-viet/${article.slug}`} style={{ textDecoration: "none", display: "block", height: "100%" }}>
         <motion.article
           whileHover={{ y: -5 }}
           transition={{ duration: 0.25 }}
