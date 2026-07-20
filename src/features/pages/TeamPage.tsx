@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { MessageCircle, Facebook, Phone, Mail, ArrowUpRight } from 'lucide-react';
 import { useTilt3D } from '@/hooks/useTilt3D';
 import { useTheme } from '@/features/legacy-core/theme-context';
+import { useRouter } from 'next/navigation';
 
 const F = "inherit";
 const SERIF = "'Instrument Serif', serif";
@@ -112,9 +113,15 @@ const FRAME_DEPTH = 14;
 
 function TeamCard({ member, index }: { member: TeamMember; index: number }) {
   const tilt = useTilt3D(6, 900);
+  const router = useRouter();
   const edgeDark = '#C8C3B5';
   const edgeDark2 = '#B0ABA0';
   const frameShadow = `${FRAME_DEPTH}px ${FRAME_DEPTH}px 0 #C8C3B5, ${FRAME_DEPTH * 2}px ${FRAME_DEPTH * 2}px 0 #B0ABA0, ${FRAME_DEPTH * 2}px ${FRAME_DEPTH * 2}px 36px rgba(26,20,10,0.12)`;
+
+  const handleCardClick = () => {
+    const id = member.id || member.name.replace(/\s+/g, '-').toLowerCase();
+    router.push(`/doi-ngu/${id}`);
+  };
 
   return (
     <motion.div
@@ -128,6 +135,7 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
         ref={tilt.ref}
         onMouseMove={tilt.onMouseMove}
         onMouseLeave={tilt.onMouseLeave}
+        onClick={handleCardClick}
         style={{ cursor: 'pointer', willChange: 'transform', position: 'relative' }}
       >
         {/* Portrait */}
@@ -224,7 +232,7 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
           </div>
 
           {/* Social links */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }} onClick={(e) => e.stopPropagation()}>
             {[
               { name: 'Zalo', icon: MessageCircle, value: member.zalo || member.socials?.zalo },
               { name: 'Facebook', icon: Facebook, value: member.facebook || member.socials?.facebook },
