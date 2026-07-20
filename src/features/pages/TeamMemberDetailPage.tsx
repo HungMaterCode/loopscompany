@@ -270,38 +270,7 @@ export default function TeamMemberDetailPage({ id }: { id: string }) {
             </div>
           </motion.div>
 
-          <div className="mt-12 lg:mt-auto mb-10 w-full flex justify-center gap-4 z-10 relative">
-            {[
-              { name: 'Zalo', icon: MessageCircle, value: member.zalo || member.socials?.zalo },
-              { name: 'Facebook', icon: Facebook, value: member.facebook || member.socials?.facebook },
-              { name: 'Phone', icon: Phone, value: member.phone || member.socials?.phone },
-              { name: 'Email', icon: Mail, value: member.email || member.socials?.email },
-            ].map(({ name, icon: Icon, value }, j) => {
-              const hasValue = !!value && value !== '#';
-              const href = name === 'Phone' && hasValue ? `tel:${value}` : name === 'Email' && hasValue ? `mailto:${value}` : (hasValue ? value : '#');
 
-              return (
-                <a
-                  key={j}
-                  href={href}
-                  onClick={e => {
-                    if (!hasValue) {
-                      e.preventDefault();
-                      alert(`${member.name} chưa cung cấp ${name}.`);
-                    }
-                  }}
-                  className={`w-12 h-12 rounded-full border flex items-center justify-center transition-all duration-300 ${
-                    hasValue 
-                      ? 'border-white/10 text-white hover:border-[#C8A261] hover:text-[#C8A261] hover:bg-[#C8A261]/5' 
-                      : 'border-white/5 text-white/20 cursor-default'
-                  }`}
-                  title={hasValue ? `Liên hệ qua ${name}` : `${member.name} chưa cung cấp ${name}`}
-                >
-                  <Icon size={18} />
-                </a>
-              );
-            })}
-          </div>
         </div>
 
         {/* Right Content Area */}
@@ -381,6 +350,45 @@ export default function TeamMemberDetailPage({ id }: { id: string }) {
               </div>
             </div>
             
+            {/* Contact Icons */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="flex flex-wrap gap-4 mb-12"
+            >
+              {[
+                { name: 'Zalo', icon: MessageCircle, value: member.zalo || member.socials?.zalo },
+                { name: 'Facebook', icon: Facebook, value: member.facebook || member.socials?.facebook },
+                { name: 'Phone', icon: Phone, value: member.phone || member.socials?.phone },
+                { name: 'Email', icon: Mail, value: member.email || member.socials?.email },
+              ].map(({ name, icon: Icon, value }, j) => {
+                const hasValue = !!value && value !== '#';
+                const href = name === 'Phone' && hasValue ? `tel:${value}` : name === 'Email' && hasValue ? `mailto:${value}` : (hasValue ? value : '#');
+
+                return (
+                  <a
+                    key={j}
+                    href={href}
+                    onClick={e => {
+                      if (!hasValue) {
+                        e.preventDefault();
+                        alert(`${member.name} chưa cung cấp ${name}.`);
+                      }
+                    }}
+                    className={`w-12 h-12 rounded-full border flex items-center justify-center transition-all duration-300 ${
+                      hasValue 
+                        ? 'border-white/10 text-white hover:border-[#C8A261] hover:text-[#C8A261] hover:bg-[#C8A261]/5' 
+                        : 'border-white/5 text-white/20 cursor-default'
+                    }`}
+                    title={hasValue ? `Liên hệ qua ${name}` : `${member.name} chưa cung cấp ${name}`}
+                  >
+                    <Icon size={18} />
+                  </a>
+                );
+              })}
+            </motion.div>
+
             {/* Stats */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
