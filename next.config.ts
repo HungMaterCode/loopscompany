@@ -36,6 +36,26 @@ const nextConfig: NextConfig = {
         destination: "/bai-viet/:path*",
         permanent: true,
       },
+      {
+        source: "/vi/team",
+        destination: "/doi-ngu",
+        permanent: true,
+      },
+      {
+        source: "/vi/team/:path*",
+        destination: "/doi-ngu",
+        permanent: true,
+      },
+      {
+        source: "/team",
+        destination: "/doi-ngu",
+        permanent: true,
+      },
+      {
+        source: "/team/:path*",
+        destination: "/doi-ngu",
+        permanent: true,
+      },
     ];
   },
 };
