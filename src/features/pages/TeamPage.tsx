@@ -136,7 +136,7 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
         onMouseMove={tilt.onMouseMove}
         onMouseLeave={tilt.onMouseLeave}
         onClick={handleCardClick}
-        style={{ cursor: 'pointer', willChange: 'transform', position: 'relative' }}
+        style={{ cursor: 'pointer', willChange: 'transform', position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}
       >
         {/* Portrait */}
         <div style={{ position: 'relative', boxShadow: frameShadow, borderRadius: '4px' }}>
@@ -200,7 +200,7 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
         </div>
 
         {/* Info */}
-        <div style={{ marginTop: '36px', paddingLeft: '4px' }}>
+        <div style={{ marginTop: '36px', paddingLeft: '4px', flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div style={{ fontFamily: F, fontSize: '17px', fontWeight: 600, color: 'var(--sc-text)', letterSpacing: '-0.01em', marginBottom: '3px' }}>{member.name}</div>
           <div style={{ fontFamily: F, fontSize: '10px', color: 'var(--sc-accent)', letterSpacing: '0.08em', marginBottom: '10px', fontWeight: 600 }}>{member.role}</div>
           <p style={{ fontFamily: F, fontSize: '12px', color: 'var(--sc-text-60)', lineHeight: 1.7, margin: '0 0 14px', fontStyle: 'italic', textAlign: 'justify' }}>{member.bio}</p>
@@ -220,7 +220,7 @@ function TeamCard({ member, index }: { member: TeamMember; index: number }) {
           </div>
 
           {/* Stats */}
-          <div style={{ display: 'flex', gap: '20px', marginBottom: '14px' }}>
+          <div style={{ display: 'flex', gap: '20px', marginBottom: '14px', marginTop: 'auto' }}>
             <div>
               <div style={{ fontFamily: SERIF, fontSize: '22px', color: 'var(--sc-text)', fontWeight: 300, lineHeight: 1 }}>{member.projects}+</div>
               <div style={{ fontFamily: F, fontSize: '10px', color: 'var(--sc-text-60)', marginTop: '3px' }}>Dự án</div>
@@ -363,7 +363,7 @@ export default function TeamPage() {
             </p>
           </motion.div>
 
-          <div style={{ display: 'flex', gap: '60px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', gap: '60px', flexWrap: 'wrap', alignItems: 'stretch' }}>
             {members.map((member, i) => (
               <TeamCard key={member.id || member.name} member={member} index={i} />
             ))}
